@@ -1,6 +1,6 @@
 {
   "name": "react-native-declarative-ui",
-  "version": "0.5.0",
+  "version": "0.1.0",
   "main": "index.js",
   "repository": "https://github.com/BelkaLab/react-native-declarative-ui",
   "author": "Belka <fabrizio@belka.us> (http://belka.us)",
@@ -41,6 +41,6 @@
   },
   "dependencies": {},
   "optionalDependencies": {
-    "react-native-navigation": "^2.12.0"
+    "react-native-navigation": "^2.1.0"
   }
 }

@@ -2367,9 +2367,9 @@ js-tokens@^3.0.2:
   integrity sha1-mGbfOVECEw449/mWvOtlRDIJwls=
 
 js-yaml@^3.7.0, js-yaml@^3.9.0:
-  version "3.12.1"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.1.tgz#295c8632a18a23e054cf5c9d3cecafe678167600"
-  integrity sha512-um46hB9wNOKlwkHgiuyEVAybXBjwFUV0Z/RaHJblRd9DXltue9FTYvzCr9ErQrK9Adz5MU4gHWVaNUfdmrC8qA==
+  version "3.12.2"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.12.2.tgz#ef1d067c5a9d9cb65bd72f285b5d8105c77f14fc"
+  integrity sha512-QHn/Lh/7HhZ/Twc7vJYQTkjuCa0kaCcDcjK5Zlk2rvnUpy7DxMJ23+Jc2dcyvltwQVg1nygAVlB2oRDFHoRS5Q==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
@@ -3485,9 +3485,9 @@ react-lifecycles-compat@2.0.0:
   integrity sha512-txfpPCQYiazVdcbMRhatqWKcAxJweUu2wDXvts5/7Wyp6+Y9cHojqXHsLPEckzutfHlxZhG8Oiundbmp8Fd6eQ==
 
 "react-native-declarative-ui@file:..":
-  version "0.5.0"
+  version "0.1.0"
   optionalDependencies:
-    react-native-navigation "^2.12.0"
+    react-native-navigation "^2.1.0"
 
 react-native-iphone-x-helper@^1.0.3:
   version "1.2.0"
@@ -3502,7 +3502,7 @@ react-native-keyboard-aware-scroll-view@^0.8.0:
     prop-types "^15.6.2"
     react-native-iphone-x-helper "^1.0.3"
 
-react-native-navigation@^2.12.0:
+react-native-navigation@^2.1.0:
   version "2.12.0"
   resolved "https://registry.yarnpkg.com/react-native-navigation/-/react-native-navigation-2.12.0.tgz#3b845a976a0e1b79b6caff185bb109fdb60889f2"
   integrity sha512-5CGui427CccXvckzkLy2cBF0ApLzFjDLMRtwGvmTJeCZ2DkXAvvMnQjHohsxKGPKujVZmsMFfEfvCf7Eb9FuSg==
