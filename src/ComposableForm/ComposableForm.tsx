@@ -281,7 +281,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     switch (field.type) {
       case 'text':
         return (
-          //   <View key={index} style={index === 0 ? styles.formRowNoMargin : styles.formRow}>
           <View
             key={index}
             style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
@@ -291,7 +290,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         );
       case 'number':
         return (
-          // <View key={index} style={index === 0 ? styles.formRowNoMargin : styles.formRow}>
           <View
             key={index}
             style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
@@ -301,7 +299,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         );
       case 'checkbox':
         return (
-          // <View key={index} style={index === 0 ? styles.formRowNoMargin : styles.formRow}>
           <View
             key={index}
             style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
@@ -311,7 +308,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         );
       case 'select':
         return (
-          // <View key={index} style={index === 0 ? styles.formRowNoMargin : styles.formRow}>
           <View
             key={index}
             style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
@@ -321,7 +317,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         );
       case 'autocomplete':
         return (
-          // <View key={index} style={index === 0 ? styles.formRowNoMargin : styles.formRow}>
           <View
             key={index}
             style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
@@ -332,7 +327,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       case 'inline':
         return (
           <View key={index}>
-            {/* <View style={[index === 0 ? styles.formRowNoMargin : styles.formRow, { minHeight: 60 }]}> */}
             <View style={[styles.formRow, { marginTop: 0 }]}>
               {field.childs!.map((childField, childIndex) =>
                 this.renderFields(
@@ -539,7 +533,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
-        onPress={() => this.openPicker(field, model)}
+        onPress={() => this.openSelectPicker(field, model)}
         itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
         displayProperty={field.displayProperty}
@@ -551,130 +545,69 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private openPicker = (field: FormField, model: T) => {
+  private openSelectPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    this.renderPickerOverlay(field, model);
+    if (SharedOptions.isRNNAvailable()) {
+      showOverlay((dismissOverlay: () => void) => this.renderSelectPickerOverlay(field, model, dismissOverlay));
+    } else {
+      this.setState({
+        isModalVisible: true,
+        overlayComponent: this.renderSelectPickerOverlay(field, model, () =>
+          this.setState({
+            isModalVisible: false
+          })
+        )
+      });
+    }
   };
 
-  private renderPickerOverlay = (field: FormField, model: T) => {
+  private renderSelectPickerOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
     const items = field.options || this.props.pickerMapper![field.id];
 
-    this.setState({
-      isModalVisible: true,
-      overlayComponent: (
-        <View>
-          <ItemPicker
-            pickedItem={model[field.id] as ComposableItem | string}
-            items={items}
-            displayProperty={field.displayProperty}
-            keyProperty={field.keyProperty}
-            onPick={(selectedItem: ComposableItem | string) => {
+    return (
+      <View>
+        <ItemPicker
+          pickedItem={model[field.id] as ComposableItem | string}
+          items={items}
+          displayProperty={field.displayProperty}
+          keyProperty={field.keyProperty}
+          onPick={(selectedItem: ComposableItem | string) => {
+            this.setState({
+              errors: {
+                ...this.state.errors,
+                [field.id]: ''
+              }
+            });
+
+            if (field.shouldReturnKey) {
+              if (typeof selectedItem !== 'object') {
+                throw new Error(
+                  `Field ${
+                    field.id
+                  } is setted as "isObjectMappedToKey" but your picker is returning a string instead of an object`
+                );
+              }
+              this.props.onChange(field.id, selectedItem[field.keyProperty!]);
+            } else {
+              this.props.onChange(field.id, selectedItem);
+            }
+
+            if (field.updateFieldId && field.updateFieldKeyProperty) {
+              this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
               this.setState({
                 errors: {
                   ...this.state.errors,
-                  [field.id]: ''
+                  [field.updateFieldId]: ''
                 }
               });
+            }
 
-              if (field.shouldReturnKey) {
-                if (typeof selectedItem !== 'object') {
-                  throw new Error(
-                    `Field ${
-                      field.id
-                    } is setted as "isObjectMappedToKey" but your picker is returning a string instead of an object`
-                  );
-                }
-                this.props.onChange(field.id, selectedItem[field.keyProperty!]);
-              } else {
-                this.props.onChange(field.id, selectedItem);
-              }
-
-              if (field.updateFieldId && field.updateFieldKeyProperty) {
-                this.props.onChange(
-                  field.updateFieldId,
-                  (selectedItem as ComposableItem)[field.updateFieldKeyProperty]
-                );
-                this.setState({
-                  errors: {
-                    ...this.state.errors,
-                    [field.updateFieldId]: ''
-                  }
-                });
-              }
-
-              this.setState({
-                isModalVisible: false
-              });
-            }}
-          />
-        </View>
-      )
-    });
-
-    // Navigation.showOverlay({
-    //   component: {
-    //     name: OverlayKeys.slideBottomOverlay,
-    //     passProps: {
-    //       renderOverlayComponent: (dismissOverlay: () => void) => (
-    //         // <View style={{ flex: 1, backgroundColor: Colors.BLUE_PRIMARY }}>
-    //         <View>
-    //           {/* <SearchBar /> */}
-    //           <ItemPicker
-    //             pickedItem={model[field.id] as ComposableItem | string}
-    //             items={items}
-    //             displayProperty={field.displayProperty}
-    //             keyProperty={field.keyProperty}
-    //             onPick={(selectedItem: ComposableItem | string) => {
-    //               this.setState({
-    //                 errors: {
-    //                   ...this.state.errors,
-    //                   [field.id]: ''
-    //                 }
-    //               });
-
-    //               if (field.shouldReturnKey) {
-    //                 if (typeof selectedItem !== 'object') {
-    //                   throw new Error(
-    //                     `Field ${
-    //                       field.id
-    //                     } is setted as "isObjectMappedToKey" but your picker is returning a string instead of an object`
-    //                   );
-    //                 }
-    //                 this.props.onChange(field.id, selectedItem[field.keyProperty!]);
-    //               } else {
-    //                 this.props.onChange(field.id, selectedItem);
-    //               }
-
-    //               if (field.updateFieldId && field.updateFieldKeyProperty) {
-    //                 this.props.onChange(
-    //                   field.updateFieldId,
-    //                   (selectedItem as ComposableItem)[field.updateFieldKeyProperty]
-    //                 );
-    //                 this.setState({
-    //                   errors: {
-    //                     ...this.state.errors,
-    //                     [field.updateFieldId]: ''
-    //                   }
-    //                 });
-    //               }
-
-    //               dismissOverlay();
-    //             }}
-    //           />
-    //         </View>
-    //       )
-    //     },
-    //     options: {
-    //       overlay: {
-    //         interceptTouchOutside: true
-    //       },
-    //       layout: {
-    //         backgroundColor: 'transparent'
-    //       }
-    //     }
-    //   }
-    // });
+            closeOverlay();
+          }}
+        />
+      </View>
+    );
   };
 
   private renderAutocompleteField = (
@@ -710,10 +643,21 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openAutocompletePicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    this.renderAutocompleteOverlay(field, model);
+    if (SharedOptions.isRNNAvailable()) {
+      showOverlay((dismissOverlay: () => void) => this.renderAutocompleteOverlay(field, model, dismissOverlay));
+    } else {
+      this.setState({
+        isModalVisible: true,
+        overlayComponent: this.renderAutocompleteOverlay(field, model, () =>
+          this.setState({
+            isModalVisible: false
+          })
+        )
+      });
+    }
   };
 
-  private renderAutocompleteOverlayComponent = (field: FormField, model: T, dismissOverlay: () => void) => {
+  private renderAutocompleteOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
     const items =
       this.props.pickerMapper && this.props.pickerMapper[field.id] ? this.props.pickerMapper[field.id] : field.options!;
 
@@ -760,28 +704,12 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
                 }
               });
             }
-            dismissOverlay();
+
+            closeOverlay();
           }}
         />
       </View>
     );
-  };
-
-  private renderAutocompleteOverlay = (field: FormField, model: T) => {
-    if (SharedOptions.isRNNAvailable()) {
-      showOverlay((dismissOverlay: () => void) =>
-        this.renderAutocompleteOverlayComponent(field, model, dismissOverlay)
-      );
-    } else {
-      this.setState({
-        isModalVisible: true,
-        overlayComponent: this.renderAutocompleteOverlayComponent(field, model, () =>
-          this.setState({
-            isModalVisible: false
-          })
-        )
-      });
-    }
   };
 }
 
