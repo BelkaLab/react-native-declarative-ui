@@ -26,6 +26,7 @@
       "label": "Password",
       "isPassword": true,
       "type": "text",
+      "nextField": "phone",
       "validation": {
         "password": {
           "presence": {
