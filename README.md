@@ -1,2 +1,2 @@
 # react-native-declarative-ui
-Documentation under construction
+Build your forms and your interface of a React Native app using a json. Save time and be consistent through all your components!
