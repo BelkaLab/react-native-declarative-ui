@@ -1,6 +1,6 @@
 {
   "name": "react-native-declarative-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "index.js",
   "repository": "https://github.com/BelkaLab/react-native-declarative-ui",
   "author": "Belka <fabrizio@belka.us> (http://belka.us)",
@@ -24,6 +24,7 @@
     "lodash.some": "^4.6.0",
     "numbro": "^2.1.2",
     "react-native-modal": "^9.0.0",
+    "react-native-navigation": "^2.1.0",
     "react-native-typescript-transformer": "^1.1.4",
     "tslib": "^1.9.3",
     "tslint": "^5.8.0",
@@ -39,8 +40,5 @@
     "react": "16.6.3",
     "react-native": "0.57.8"
   },
-  "dependencies": {},
-  "optionalDependencies": {
-    "react-native-navigation": "^2.1.0"
-  }
+  "dependencies": {}
 }
