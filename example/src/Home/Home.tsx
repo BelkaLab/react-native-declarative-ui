@@ -2,6 +2,12 @@ import filter from 'lodash.filter';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ComposableForm, SharedOptions } from 'react-native-declarative-ui';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Colors } from '../styles/colors';
+
+type City = {
+  city: string;
+};
 
 export interface IHomeProps {}
 
@@ -19,7 +25,7 @@ interface IState {
     phone?: string;
     fax?: string;
   };
-  cities: Array<{ city: string }>;
+  cities: City[];
 }
 
 SharedOptions.setDefaultOptions({
@@ -46,24 +52,28 @@ export default class Home extends Component<IHomeProps, IState> {
   render() {
     return (
       <View style={styles.root}>
-        <ComposableForm
-          model={this.state.model}
-          onChange={this.onChangeHandler}
-          structure={require('../../src/assets/test.json')}
-          searchMapper={{
-            city: async text => {
-              if (text) {
-                return filter(this.state.cities, city => city.city.includes(text));
-              }
+        <KeyboardAwareScrollView style={{ flex: 1 }}>
+          <ComposableForm
+            model={this.state.model}
+            onChange={this.onChangeHandler}
+            structure={require('../../src/assets/test.json')}
+            searchMapper={{
+              city: async text => {
+                if (text) {
+                  return filter(this.state.cities, (city: City) => city.city.includes(text));
+                }
 
-              return this.state.cities;
-            }
-          }}
-          pickerMapper={{
-            city: this.state.cities
-          }}
-        />
-        <Text>{JSON.stringify(this.state.model)}</Text>
+                return this.state.cities;
+              }
+            }}
+            pickerMapper={{
+              city: this.state.cities
+            }}
+          />
+          <View style={{ padding: 20, borderTopWidth: 1, borderColor: Colors.GRAY_300 }}>
+            <Text>{JSON.stringify(this.state.model)}</Text>
+          </View>
+        </KeyboardAwareScrollView>
       </View>
     );
   }

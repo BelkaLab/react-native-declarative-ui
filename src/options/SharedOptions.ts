@@ -1,18 +1,24 @@
+import { Colors } from '../styles/colors';
+
 export type ComposableFormOptions = {
   formContainer: {
     externalPadding?: number;
     inlinePadding?: number;
+    backgroundColor?: string;
   };
 };
 
 class SharedOptions {
   private static instance: SharedOptions;
-  private options: ComposableFormOptions = {
+
+  private _options: ComposableFormOptions = {
     formContainer: {
       externalPadding: 16,
-      inlinePadding: 16
+      inlinePadding: 16,
+      backgroundColor: Colors.WHITE
     }
   };
+  private _isRNNAvailable: boolean = false;
 
   private constructor() {
     // do something construct...
@@ -27,14 +33,22 @@ class SharedOptions {
   }
 
   setDefaultOptions(newOptions: ComposableFormOptions) {
-    this.options = {
-      ...this.options,
+    this._options = {
+      ...this._options,
       ...newOptions
     };
   }
 
   getDefaultOptions() {
-    return this.options;
+    return this._options;
+  }
+
+  setRNNAvailable(isAvailable: boolean) {
+    this._isRNNAvailable = isAvailable;
+  }
+
+  isRNNAvailable() {
+    return this._isRNNAvailable;
   }
 }
 

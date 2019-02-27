@@ -21,6 +21,7 @@ declare module 'react-native-declarative-ui' {
     formContainer: {
       externalPadding?: number;
       inlinePadding?: number;
+      backgroundColor?: string;
     };
   };
 
@@ -28,6 +29,10 @@ declare module 'react-native-declarative-ui' {
     setDefaultOptions: (newOptions: ComposableFormOptions) => void;
 
     getDefaultOptions: () => ComposableFormOptions;
+
+    setRNNAvailable: (isAvailable: boolean) => void;
+
+    isRNNAvailable: () => boolean;
   }
 
   const SharedOptions: SharedOptionsManager;

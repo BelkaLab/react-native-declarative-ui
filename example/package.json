@@ -15,7 +15,8 @@
   "dependencies": {
     "react": "16.6.3",
     "react-native": "0.57.8",
-    "react-native-declarative-ui": "file:../"
+    "react-native-declarative-ui": "file:../",
+    "react-native-keyboard-aware-scroll-view": "^0.8.0"
   },
   "devDependencies": {
     "@types/lodash.filter": "^4.6.5",
