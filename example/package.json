@@ -1,0 +1,37 @@
+{
+  "name": "ReactNativeDeclarativeUIExample",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.js",
+  "author": "Belka <fabrizio@belka.us> (http://belka.us)",
+  "license": "MIT",
+  "scripts": {
+    "lint": "tslint-config-prettier-check ./tslint.json",
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "test": "jest"
+  },
+  "dependencies": {
+    "react": "16.6.3",
+    "react-native": "0.57.8",
+    "react-native-declarative-ui": "file:../"
+  },
+  "devDependencies": {
+    "@types/lodash.filter": "^4.6.5",
+    "@types/react": "^16.0.23",
+    "@types/react-native": "^0.50.7",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-jest": "24.1.0",
+    "lodash.filter": "^4.6.0",
+    "react-native-typescript-transformer": "^1.1.4",
+    "tslib": "^1.9.3",
+    "tslint": "^5.8.0",
+    "tslint-config-prettier": "^1.6.0",
+    "tslint-react": "^3.2.0",
+    "typescript": "^3.3.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

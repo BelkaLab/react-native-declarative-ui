@@ -1,0 +1,141 @@
+{
+  "title": "Login",
+  "model": "User",
+  "fields": [
+    {
+      "id": "email",
+      "label": "Email",
+      "type": "text",
+      "autoFocus": true,
+      "keyboard": "email-address",
+      "nextField": "password",
+      "validation": {
+        "email": {
+          "presence": {
+            "message": "^Inserisci un indirizzo email",
+            "allowEmpty": false
+          },
+          "email": {
+            "message": "^Inserisci un indirizzo email valido"
+          }
+        }
+      }
+    },
+    {
+      "id": "password",
+      "label": "Password",
+      "isPassword": true,
+      "type": "text",
+      "validation": {
+        "password": {
+          "presence": {
+            "message": "^Inserisci la password",
+            "allowEmpty": false
+          },
+          "length": {
+            "message": "^La tua password deve essere lunga almeno 4 caratteri",
+            "minimum": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "acceptToS",
+      "label": "Accept ",
+      "checkboxTextPosition": "right",
+      "type": "checkbox",
+      "urlLink": "https://www.belka.us",
+      "checkBoxLabelUrl": "terms and conditions",
+      "validation": {
+        "acceptToS": {
+          "presence": {
+            "message": "^Devi accettare le condizioni per proseguire",
+            "allowEmpty": false
+          },
+          "inclusion": {
+            "within": [true],
+            "message": "^Devi accettare le condizioni per proseguire"
+          }
+        }
+      }
+    },
+    {
+      "id": "language",
+      "label": "Language",
+      "type": "select",
+      "displayProperty": "name",
+      "keyProperty": "code",
+      "options": [
+        {
+          "code": "it",
+          "name": "Italiano"
+        },
+        {
+          "code": "en",
+          "name": "Inglese"
+        },
+        {
+          "code": "de",
+          "name": "Tedesco"
+        },
+        {
+          "code": "fr",
+          "name": "Francese"
+        },
+        {
+          "code": "es",
+          "name": "Spagnolo"
+        }
+      ]
+    },
+    {
+      "id": "city",
+      "label": "City",
+      "type": "autocomplete",
+      "shouldReturnKey": true,
+      "keyProperty": "city",
+      "displayProperty": "city"
+    },
+    {
+      "id": "fruit",
+      "label": "Fruit",
+      "type": "select",
+      "visibilityFieldId": "city",
+      "visibilityFieldValue": "Trento",
+      "options": ["Apple", "Peach", "Strawberry"]
+    },
+    {
+      "id": "age",
+      "label": "Age",
+      "type": "number",
+      "validation": {
+        "age": {
+          "numericality": {
+            "message": "^Il valore deve essere compreso tra 0 e 100",
+            "greaterThanOrEqualTo": 0,
+            "lessThanOrEqualTo": 100
+          }
+        }
+      }
+    },
+    {
+      "id": "numbers",
+      "type": "inline",
+      "childs": [
+        {
+          "id": "phone",
+          "label": "Phone",
+          "type": "text",
+          "nextField": "fax",
+          "flex": 0.5
+        },
+        {
+          "id": "fax",
+          "label": "Fax",
+          "type": "text",
+          "flex": 0.5
+        }
+      ]
+    }
+  ]
+}
