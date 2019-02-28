@@ -1,15 +1,5 @@
 import React, { Component } from 'react';
-import {
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputProperties,
-  TouchableHighlight,
-  View,
-  ViewStyle
-} from 'react-native';
-// import FeatherIcon from 'react-native-vector-icons/Feather';
+import { Image, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Colors } from '../../../src/styles/colors';
 
 export interface ISearchBarProps extends TextInputProperties {
@@ -37,12 +27,11 @@ export default class SearchBar extends Component<ISearchBarProps, IState> {
 
     return (
       <View style={[styles.searchBarContainer, contentContainerStyle]}>
-        <View style={[styles.inputContainer]}>
-          {/* <FeatherIcon name="search" size={16} color={Colors.WHITE} /> */}
-          <View />
+        <View style={styles.inputContainer}>
+          <Image source={require('../../img/search.png')} style={{ width: 16, height: 16, marginHorizontal: 8 }} />
           <TextInput
             {...props}
-            style={[styles.input]}
+            style={styles.input}
             value={this.state.keyword}
             onChangeText={this.onChangeText}
             onSubmitEditing={this.onSearch}
@@ -50,47 +39,31 @@ export default class SearchBar extends Component<ISearchBarProps, IState> {
             returnKeyType="search"
             underlineColorAndroid="transparent"
             placeholderTextColor={Colors.WHITE}
-            selectionColor={Colors.WHITE}
           />
           {Boolean(this.state.keyword) && (
-            <TouchableHighlight onPress={this.onDelete} style={styles.iconXContainer}>
-              <View style={[styles.iconXContent]}>
-                <View />
-                {/* <FeatherIcon name="x" color={Colors.WHITE} size={10} /> */}
+            <TouchableOpacity onPress={this.onDelete} style={styles.iconXContainer}>
+              <View style={styles.iconXContent}>
+                <Image
+                  source={Platform.select({
+                    ios: require('../../img/ios_clear_input.png'),
+                    android: require('../../img/android_clear_input.png')
+                  })}
+                />
               </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
           )}
-          {/* {Boolean(yearPicker) && this.renderYearBox()} */}
         </View>
         {this.props.onCancelSearch && (
-          <TouchableHighlight
+          <TouchableOpacity
             onPress={this.onCancelSearch}
             style={{ alignContent: 'center', justifyContent: 'center', padding: 8 }}
           >
             <Text style={{ color: Colors.WHITE }}>localizations.cancel</Text>
-            {/* text={'localizations.cancel'} color={Colors.WHITE} /> */}
-          </TouchableHighlight>
+          </TouchableOpacity>
         )}
       </View>
     );
   }
-
-  //   private renderYearBox = () => {
-  //     return (
-  //       <View style={styles.yearBox}>
-  //         <View style={[ficStyles.verticalDivider, { backgroundColor: Colors.WHITE_TEXT_DISABLED }]} />
-  //         <Touchable
-  //           onPress={this.onShowYearPicker}
-  //           style={{ height: '100%', alignItems: 'center', justifyContent: 'center' }}
-  //         >
-  //           <View style={{ flexDirection: 'row' }}>
-  //             <Body text={String(this.props.currentYear)} color={Colors.WHITE} style={{ paddingHorizontal: 8 }} />
-  //             <FeatherIcon name="chevron-down" size={20} color={Colors.WHITE} style={{ alignSelf: 'center' }} />
-  //           </View>
-  //         </Touchable>
-  //       </View>
-  //     );
-  //   };
 
   private onChangeText = async (text: string) => {
     await this.setState({ keyword: text });
@@ -112,8 +85,7 @@ export default class SearchBar extends Component<ISearchBarProps, IState> {
   };
 
   private onDelete = async () => {
-    // await this.setState({ keyword: '', autoCorrect: true });
-    // await this.setState({ autoCorrect: false });
+    await this.setState({ keyword: '' });
     if (this.props.onDelete) {
       await this.props.onDelete();
     }
@@ -125,27 +97,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 48,
-    paddingLeft: 16,
-    paddingRight: 8,
+    height: 64,
+    paddingTop: 16,
+    paddingHorizontal: 16,
     elevation: 4
   },
   inputContainer: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     height: 40,
-    flex: 1,
-    paddingHorizontal: 8,
-    borderRadius: 10,
-    // backgroundColor: Colors.WHITE_OPACITY_SEARCHBAR,
-    backgroundColor: Colors.PRIMARY_BLUE,
-    marginRight: 8
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: Colors.GRAY_400,
+    backgroundColor: Colors.GRAY_100
   },
   input: {
     flex: 1,
+    height: 40,
     backgroundColor: 'transparent',
-    marginLeft: 8,
-    color: Colors.WHITE
+    color: Colors.BLACK
   },
   iconXContainer: {
     paddingHorizontal: 8,
@@ -154,8 +125,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   iconXContent: {
-    // backgroundColor: Colors.WHITE_OPACITY_SEARCHBAR,
-    backgroundColor: Colors.PRIMARY_BLUE,
+    backgroundColor: Colors.WHITE_OPACITY_SEARCHBAR,
     borderRadius: 8,
     height: 14,
     width: 14,

@@ -112,26 +112,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           { backgroundColor: this.getComposableFormOptions().formContainer.backgroundColor }
         ]}
       >
-        {/* <View
-          style={[
-            { flexDirection: 'row', alignItems: 'center' },
-            {
-              height: 40,
-              backgroundColor: Colors.WHITE,
-              paddingHorizontal: 16
-            }
-          ]}
-        >
-          {Boolean(structure.headerIcon) && (
-            <FeatherIcon
-              style={{ paddingLeft: 8, paddingRight: 8 }}
-              name={structure.headerIcon!}
-              size={24}
-              color={Colors.BLACK}
-            />
-          )}
-          <Text>{structure.title}</Text>
-        </View> */}
         <View
           style={{
             backgroundColor: this.getComposableFormOptions().formContainer.backgroundColor,

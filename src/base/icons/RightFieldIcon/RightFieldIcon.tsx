@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-// import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { Colors } from '../../../styles/colors';
+import { Image, Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 
 export interface IRightFieldIconProps {
   rightIcon: string;
@@ -11,13 +9,7 @@ export interface IRightFieldIconProps {
 export default class RightFieldIcon extends Component<IRightFieldIconProps> {
   render() {
     return (
-      <View
-        // animation="zoomIn"
-        // duration={150}
-        // easing="ease-in"
-        // useNativeDriver={true}
-        style={styles.iconContainer}
-      >
+      <View style={styles.iconContainer}>
         <TouchableOpacity
           onPress={() => {
             if (this.props.onRightIconClick) {
@@ -25,8 +17,12 @@ export default class RightFieldIcon extends Component<IRightFieldIconProps> {
             }
           }}
         >
-          <View />
-          {/* <MaterialIcon style={styles.icon} name={this.props.rightIcon} size={20} color={Colors.GRAY_500} /> */}
+          <Image
+            source={Platform.select({
+              ios: require('../../../img/ios_clear_input.png'),
+              android: require('../../../img/android_clear_input.png')
+            })}
+          />
         </TouchableOpacity>
       </View>
     );
@@ -36,7 +32,7 @@ export default class RightFieldIcon extends Component<IRightFieldIconProps> {
 const styles = StyleSheet.create({
   iconContainer: {
     position: 'absolute',
-    right: 2,
+    right: 10,
     backgroundColor: 'transparent'
   },
   icon: {

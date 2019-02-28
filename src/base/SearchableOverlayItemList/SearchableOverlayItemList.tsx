@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -111,15 +111,17 @@ export default class SearchableOverlayItemList extends Component<ISearchableOver
       return (
         <View style={styles.helperPickerContainer}>
           {this.renderUseThisField()}
-          <TouchableHighlight
+          <TouchableOpacity
             onPress={() => {
               this.props.onPick('');
             }}
-            style={{ paddingVertical: 8, paddingHorizontal: 16 }}
+            style={{ padding: 8, marginHorizontal: 8 }}
           >
-            <View />
-            {/* <FeatherIcon name="x" size={16} color={Colors.RED} /> */}
-          </TouchableHighlight>
+            <Image
+              source={require('../../img/android_clear_input.png')}
+              style={{ tintColor: Colors.RED, width: 8, height: 8 }}
+            />
+          </TouchableOpacity>
         </View>
       );
     } else {
@@ -131,17 +133,16 @@ export default class SearchableOverlayItemList extends Component<ISearchableOver
     const { currentText } = this.state;
 
     return Boolean(currentText) ? (
-      <TouchableHighlight
+      <TouchableOpacity
         onPress={() => {
           this.props.onPick(currentText);
         }}
       >
         <View style={styles.pickedTextContainer}>
-          {/* <Body text={localizations.autocomplete_use_this} color={Colors.GRAY_TEXT} /> */}
-          <Text>Utilizza: </Text>
-          <Text>{currentText}</Text>
+          <Text style={{ color: Colors.GRAY_600 }}>Use: </Text>
+          <Text style={{ fontWeight: '600' }}>{currentText}</Text>
         </View>
-      </TouchableHighlight>
+      </TouchableOpacity>
     ) : (
       <View />
     );
