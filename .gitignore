@@ -1,3 +1,4 @@
+.vscode
 yarn-error.log
 node_modules/
 example/node_modules/
