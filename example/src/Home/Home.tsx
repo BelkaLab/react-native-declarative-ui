@@ -1,7 +1,7 @@
 import filter from 'lodash.filter';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ComposableForm, SharedOptions } from 'react-native-declarative-ui';
+import { ComposableForm, ComposableItem, SharedOptions } from 'react-native-declarative-ui';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Colors } from '../styles/colors';
 
@@ -35,6 +35,20 @@ SharedOptions.setDefaultOptions({
   }
 });
 
+SharedOptions.setCustomComponents({
+  renderSelectPickerItem: (item: ComposableItem | string, displayProperty?: string) => {
+    return (
+      <View style={{ padding: 16, backgroundColor: Colors.WHITE }}>
+        {typeof item === 'object' && displayProperty ? (
+          <Text style={{ fontSize: 18 }}>{String(item[displayProperty])}</Text>
+        ) : (
+          <Text style={{ fontSize: 18 }}>{item}</Text>
+        )}
+      </View>
+    );
+  }
+});
+
 export default class Home extends Component<IHomeProps, IState> {
   constructor(props: IHomeProps) {
     super(props);
@@ -52,7 +66,7 @@ export default class Home extends Component<IHomeProps, IState> {
   render() {
     return (
       <View style={styles.root}>
-        <KeyboardAwareScrollView style={{ flex: 1 }}>
+        <KeyboardAwareScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
           <ComposableForm
             model={this.state.model}
             onChange={this.onChangeHandler}
@@ -67,7 +81,17 @@ export default class Home extends Component<IHomeProps, IState> {
               }
             }}
             pickerMapper={{
-              city: this.state.cities
+              city: this.state.cities,
+              language: [
+                {
+                  code: 'it',
+                  name: 'Italiano'
+                },
+                {
+                  code: 'en',
+                  name: 'Inglese'
+                }
+              ]
             }}
           />
           <View style={{ padding: 20, borderTopWidth: 1, borderColor: Colors.GRAY_300 }}>

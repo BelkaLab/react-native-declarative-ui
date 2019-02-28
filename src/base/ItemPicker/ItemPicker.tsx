@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -12,6 +12,7 @@ export interface IItemPickerProps {
   onPick: (item: ComposableItem | string) => void;
   topLabel?: string;
   isObjectMappedToKey?: boolean;
+  renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
 }
 
 interface IState {
@@ -33,25 +34,6 @@ export default class ItemPicker extends Component<IItemPickerProps, IState> {
       isFirstLoad: true
     };
   }
-
-  componentDidMount() {
-    // if (this.props.onRef != null) {
-    //   this.props.onRef(this);
-    // }
-    // if (this.props.apiProp) {
-    //   this.getItems();
-    // }
-  }
-
-  componentWillUnmount() {
-    // if (this.props.onRef != null) {
-    //   this.props.onRef(null);
-    // }
-  }
-
-  getSelectedItem = () => {
-    // return this.selectableList.getSelectedItem();
-  };
 
   render() {
     // const { currentText, isLoading } = this.state;
@@ -79,9 +61,8 @@ export default class ItemPicker extends Component<IItemPickerProps, IState> {
         }
         {isLoading ? (
           //   <CloudLoader />
-          <View>Loeader</View>
+          <View>Loader</View>
         ) : (
-          // <View style={{ height: '100%' }}>
           <FlatList
             // contentContainerStyle={{ flex: 1 }}
             keyboardShouldPersistTaps="handled"
@@ -102,17 +83,32 @@ export default class ItemPicker extends Component<IItemPickerProps, IState> {
             extraData={this.state}
             keyExtractor={(item, index) => index.toString()}
           />
-          // </View>
         )}
       </View>
     );
   }
 
   private renderItem = (item: ComposableItem | string) => {
+    const { renderSelectPickerItem } = this.props;
+
     return (
-      <TouchableHighlight onPress={() => this.props.onPick(item)}>
-        {typeof item === 'object' ? <Text>{String(item[this.props.displayProperty!])}</Text> : <Text>{item}</Text>}
-      </TouchableHighlight>
+      <TouchableOpacity onPress={() => this.props.onPick(item)}>
+        {renderSelectPickerItem
+          ? renderSelectPickerItem(item, this.props.displayProperty)
+          : this.renderDefaultItem(item)}
+      </TouchableOpacity>
+    );
+  };
+
+  private renderDefaultItem = (item: ComposableItem | string) => {
+    return (
+      <View style={{ padding: 16 }}>
+        {typeof item === 'object' && this.props.displayProperty ? (
+          <Text>{String(item[this.props.displayProperty])}</Text>
+        ) : (
+          <Text>{item}</Text>
+        )}
+      </View>
     );
   };
 
@@ -121,86 +117,6 @@ export default class ItemPicker extends Component<IItemPickerProps, IState> {
       isLoading: show
     });
   };
-
-  //   private getItems = async (text?: string) => {
-  //     const { companyAccessToken, apiProp, filterRegex, isLocalFilter } = this.props;
-  //     const { isFirstLoad } = this.state;
-
-  //     this.toggleLoadingIndicator(true);
-
-  //     // not handled via api, filter locally
-  //     if (!apiProp || (!isFirstLoad && isLocalFilter)) {
-  //       this.setState({
-  //         items: text
-  //           ? (filter(this.props.items, item => (item[this.props.displayProp] as string).includes(text)) as IItem[])
-  //           : this.props.items
-  //       });
-  //     } else {
-  //       const apiCall = retrieveApiCallByApiProp(apiProp!);
-
-  //       if (filterRegex) {
-  //         // handled via API, filter on server, with a special condition
-  //         // you should add here the logic for more specific filters
-  //         const regex = new RegExp(filterRegex);
-
-  //         const [error, items] = await to(
-  //           regex.test(text!) ? apiCall(companyAccessToken!, text) : apiCall(companyAccessToken!, undefined, text)
-  //         );
-
-  //         if (!items) {
-  //           throw error;
-  //         } else {
-  //           this.setState({
-  //             items: this.props.items ? [...this.props.items, ...items] : items
-  //           });
-  //         }
-  //       } else {
-  //         // handle via API, filter on server, no custom condition
-  //         const [error, items] = await to(apiCall(companyAccessToken!));
-
-  //         if (!items) {
-  //           throw error;
-  //         } else {
-  //           this.setState({
-  //             items: this.props.items ? [...this.props.items, ...items] : items
-  //           });
-  //         }
-  //       }
-  //     }
-
-  //     this.toggleLoadingIndicator(false);
-
-  //     if (this.state.isFirstLoad) {
-  //       this.setState({
-  //         isFirstLoad: false
-  //       });
-  //     }
-  //   };
-
-  //   private onSearch = (queryText: string) => {
-  //     const { companyAccessToken, apiProp } = this.props;
-
-  //     this.setState({
-  //       currentText: queryText
-  //     });
-
-  //     retrieveApiCallByApiProp(apiProp!)(companyAccessToken!, queryText);
-  //   };
-
-  //   private onChangeText = debounce((queryText: string) => {
-  //     this.setState({
-  //       currentText: queryText
-  //     });
-
-  //     this.onSearch(queryText);
-  //   }, 300);
-
-  //   private onDelete = () => {
-  //     this.setState({
-  //       currentText: ''
-  //     });
-  //     this.getItems();
-  //   };
 }
 
 const HEADER_HEIGHT = 52;

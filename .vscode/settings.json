@@ -1,0 +1,7 @@
+{
+  "react-native.ios.runArguments.simulator": ["--simulator", "iPhone X"],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

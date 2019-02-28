@@ -1,4 +1,8 @@
 declare module 'react-native-declarative-ui' {
+  export type ComposableItem = {
+    [key: string]: unknown;
+  };
+
   interface ComposableFormProps<T> {
     model: T;
     structure: ComposableStructure;
@@ -13,6 +17,8 @@ declare module 'react-native-declarative-ui' {
       [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
     };
     externalModel?: T;
+    customStyle?: ComposableFormOptions;
+    customComponents?: ComposableFormCustomComponents;
   }
 
   export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> {}
@@ -25,14 +31,19 @@ declare module 'react-native-declarative-ui' {
     };
   };
 
-  class SharedOptionsManager {
-    setDefaultOptions: (newOptions: ComposableFormOptions) => void;
+  export type ComposableFormCustomComponents = {
+    renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  };
 
+  class SharedOptionsManager {
+    setRNNAvailable: (isAvailable: boolean) => void;
+    isRNNAvailable: () => boolean;
+
+    setDefaultOptions: (newOptions: ComposableFormOptions) => void;
     getDefaultOptions: () => ComposableFormOptions;
 
-    setRNNAvailable: (isAvailable: boolean) => void;
-
-    isRNNAvailable: () => boolean;
+    setCustomComponents: (customRenderers: ComposableFormCustomComponents) => void;
+    getCustomComponents: () => ComposableFormCustomComponents;
   }
 
   const SharedOptions: SharedOptionsManager;

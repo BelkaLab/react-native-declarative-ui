@@ -1,21 +1,13 @@
 import every from 'lodash.every';
 import find from 'lodash.find';
 import isEqual from 'lodash.isequal';
+import merge from 'lodash.merge';
 import some from 'lodash.some';
 import numbro from 'numbro';
 import languages from 'numbro/dist/languages.min.js';
 import React, { Component } from 'react';
-import {
-  Keyboard,
-  Linking,
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-  ViewStyle
-} from 'react-native';
+import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
+import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import Modal from 'react-native-modal';
 import { Colors } from '../../src/styles/colors';
 import { TextInputInstance } from '../base/FloatingLabel';
@@ -30,7 +22,7 @@ import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
 import { showOverlay } from '../navigation/integration';
-import SharedOptions from '../options/SharedOptions';
+import SharedOptions, { ComposableFormOptions } from '../options/SharedOptions';
 
 numbro.registerLanguage(languages['it-IT']);
 numbro.setLanguage('it-IT');
@@ -50,6 +42,8 @@ interface IComposableFormProps<T> {
     [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
   };
   externalModel?: T;
+  customStyle?: ComposableFormOptions;
+  customComponents?: ComposableFormCustomComponents;
 }
 
 interface IState {
@@ -115,7 +109,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <View
         style={[
           styles.formContainer,
-          { backgroundColor: SharedOptions.getDefaultOptions().formContainer.backgroundColor }
+          { backgroundColor: this.getComposableFormOptions().formContainer.backgroundColor }
         ]}
       >
         {/* <View
@@ -140,8 +134,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         </View> */}
         <View
           style={{
-            backgroundColor: SharedOptions.getDefaultOptions().formContainer.backgroundColor,
-            padding: SharedOptions.getDefaultOptions().formContainer.externalPadding
+            backgroundColor: this.getComposableFormOptions().formContainer.backgroundColor,
+            padding: this.getComposableFormOptions().formContainer.externalPadding
           }}
         >
           {structure.fields.map((field, index) => this.renderFields(field, index, model, errors))}
@@ -231,14 +225,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     isVisibilityConditionInverted: boolean = false,
     keyProperty?: string
   ) => {
-    // if (linkedField === 'use_gross_price') {
-    //   return linkedFieldValue !== model[linkedField];
-    // }
-
-    // if (linkedField === 'company_type') {
-    //   return (model[linkedField] as IItem).id !== linkedFieldValue.id;
-    // }
-
     const isVisible =
       !model[visibilityFieldId] ||
       (keyProperty
@@ -283,7 +269,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderTextField(field, model, errors, isInline, customStyle)}
           </View>
@@ -292,7 +278,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderNumberField(field, model, errors, isInline, customStyle)}
           </View>
@@ -301,7 +287,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderCheckBoxField(field, model, errors, customStyle)}
           </View>
@@ -310,7 +296,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderSelectField(field, model, errors, isInline, customStyle)}
           </View>
@@ -319,7 +305,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderAutocompleteField(field, model, errors, isInline, customStyle)}
           </View>
@@ -327,7 +313,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       case 'inline':
         return (
           <View key={index}>
-            <View style={[styles.formRow, { marginTop: 0 }]}>
+            <View style={styles.formRow}>
               {field.childs!.map((childField, childIndex) =>
                 this.renderFields(
                   childField,
@@ -540,7 +526,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         keyProperty={field.keyProperty}
         error={errors[field.id]}
         disableErrorMessage={isInline}
-        options={field.options || this.props.pickerMapper![field.id]}
+        options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
       />
     );
   };
@@ -563,50 +549,49 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   };
 
   private renderSelectPickerOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
-    const items = field.options || this.props.pickerMapper![field.id];
+    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
     return (
-      <View>
-        <ItemPicker
-          pickedItem={model[field.id] as ComposableItem | string}
-          items={items}
-          displayProperty={field.displayProperty}
-          keyProperty={field.keyProperty}
-          onPick={(selectedItem: ComposableItem | string) => {
+      <ItemPicker
+        pickedItem={model[field.id] as ComposableItem | string}
+        items={items}
+        displayProperty={field.displayProperty}
+        keyProperty={field.keyProperty}
+        onPick={(selectedItem: ComposableItem | string) => {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field.id]: ''
+            }
+          });
+
+          if (field.shouldReturnKey) {
+            if (typeof selectedItem !== 'object') {
+              throw new Error(
+                `Field ${
+                  field.id
+                } is setted as "isObjectMappedToKey" but your picker is returning a string instead of an object`
+              );
+            }
+            this.props.onChange(field.id, selectedItem[field.keyProperty!]);
+          } else {
+            this.props.onChange(field.id, selectedItem);
+          }
+
+          if (field.updateFieldId && field.updateFieldKeyProperty) {
+            this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
             this.setState({
               errors: {
                 ...this.state.errors,
-                [field.id]: ''
+                [field.updateFieldId]: ''
               }
             });
+          }
 
-            if (field.shouldReturnKey) {
-              if (typeof selectedItem !== 'object') {
-                throw new Error(
-                  `Field ${
-                    field.id
-                  } is setted as "isObjectMappedToKey" but your picker is returning a string instead of an object`
-                );
-              }
-              this.props.onChange(field.id, selectedItem[field.keyProperty!]);
-            } else {
-              this.props.onChange(field.id, selectedItem);
-            }
-
-            if (field.updateFieldId && field.updateFieldKeyProperty) {
-              this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
-              this.setState({
-                errors: {
-                  ...this.state.errors,
-                  [field.updateFieldId]: ''
-                }
-              });
-            }
-
-            closeOverlay();
-          }}
-        />
-      </View>
+          closeOverlay();
+        }}
+        renderSelectPickerItem={this.getComposableFormCustomComponents().renderSelectPickerItem}
+      />
     );
   };
 
@@ -617,8 +602,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     isInline: boolean = false,
     customStyle: StyleProp<ViewStyle> = {}
   ) => {
-    const items =
-      this.props.pickerMapper && this.props.pickerMapper[field.id] ? this.props.pickerMapper[field.id] : field.options!;
+    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
     return (
       <AutocompletePickerField
@@ -658,8 +642,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   };
 
   private renderAutocompleteOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
-    const items =
-      this.props.pickerMapper && this.props.pickerMapper[field.id] ? this.props.pickerMapper[field.id] : field.options!;
+    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
     return (
       <View>
@@ -707,9 +690,22 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
             closeOverlay();
           }}
+          renderSelectPickerItem={this.getComposableFormCustomComponents().renderSelectPickerItem}
         />
       </View>
     );
+  };
+
+  private getComposableFormOptions = () => {
+    const { customStyle } = this.props;
+
+    return merge({}, SharedOptions.getDefaultOptions(), customStyle);
+  };
+
+  private getComposableFormCustomComponents = () => {
+    const { customComponents } = this.props;
+
+    return merge({}, SharedOptions.getCustomComponents(), customComponents);
   };
 }
 
@@ -718,14 +714,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'stretch',
     borderColor: Colors.GRAY_200,
-    paddingTop: 8,
     backgroundColor: Colors.WHITE
   },
   formRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'stretch',
-    marginTop: SharedOptions.getDefaultOptions().formContainer.inlinePadding || 16
+    alignItems: 'stretch'
   },
   checkboxUrlContainer: { flexDirection: 'row', paddingHorizontal: 8, width: '100%' },
   overlayContainer: { justifyContent: 'flex-end', margin: 0 }

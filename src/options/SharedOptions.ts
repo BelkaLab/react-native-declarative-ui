@@ -1,3 +1,4 @@
+import { ComposableItem } from '../models/composableItem';
 import { Colors } from '../styles/colors';
 
 export type ComposableFormOptions = {
@@ -8,9 +9,14 @@ export type ComposableFormOptions = {
   };
 };
 
+export type ComposableFormCustomComponents = {
+  renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+};
+
 class SharedOptions {
   private static instance: SharedOptions;
 
+  private _isRNNAvailable: boolean = false;
   private _options: ComposableFormOptions = {
     formContainer: {
       externalPadding: 16,
@@ -18,7 +24,7 @@ class SharedOptions {
       backgroundColor: Colors.WHITE
     }
   };
-  private _isRNNAvailable: boolean = false;
+  private _customComponents: ComposableFormCustomComponents = {};
 
   private constructor() {
     // do something construct...
@@ -32,6 +38,14 @@ class SharedOptions {
     return SharedOptions.instance;
   }
 
+  setRNNAvailable(isAvailable: boolean) {
+    this._isRNNAvailable = isAvailable;
+  }
+
+  isRNNAvailable() {
+    return this._isRNNAvailable;
+  }
+
   setDefaultOptions(newOptions: ComposableFormOptions) {
     this._options = {
       ...this._options,
@@ -43,12 +57,15 @@ class SharedOptions {
     return this._options;
   }
 
-  setRNNAvailable(isAvailable: boolean) {
-    this._isRNNAvailable = isAvailable;
+  setCustomComponents(customRenderers: ComposableFormCustomComponents) {
+    this._customComponents = {
+      ...this._customComponents,
+      ...customRenderers
+    };
   }
 
-  isRNNAvailable() {
-    return this._isRNNAvailable;
+  getCustomComponents() {
+    return this._customComponents;
   }
 }
 
