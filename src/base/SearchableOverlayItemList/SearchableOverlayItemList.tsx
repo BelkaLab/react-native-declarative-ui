@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
-// import FeatherIcon from 'react-native-vector-icons/Feather';
+import { Dimensions, FlatList, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 import { SearchBar } from '../SearchBar';
 
-export interface ISearchableItemPickerProps {
+export interface ISearchableOverlayItemListProps {
   pickedItem: ComposableItem | string;
   items: ComposableItem[] | string[];
   onFilterItems: (filterText?: string) => Promise<ComposableItem[] | string[]>;
@@ -15,6 +14,7 @@ export interface ISearchableItemPickerProps {
   onPick: (item: ComposableItem | string) => void;
   topLabel?: string;
   isObjectMappedToKey?: boolean;
+  renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
 }
 
 interface IState {
@@ -24,8 +24,8 @@ interface IState {
   isFirstLoad: boolean;
 }
 
-export default class SearchableItemPicker extends Component<ISearchableItemPickerProps, IState> {
-  constructor(props: ISearchableItemPickerProps) {
+export default class SearchableOverlayItemList extends Component<ISearchableOverlayItemListProps, IState> {
+  constructor(props: ISearchableOverlayItemListProps) {
     super(props);
     this.state = {
       items: props.items,
@@ -81,10 +81,26 @@ export default class SearchableItemPicker extends Component<ISearchableItemPicke
   }
 
   private renderItem = (item: ComposableItem | string) => {
+    const { renderOverlayItem: renderSelectPickerItem } = this.props;
+
     return (
-      <TouchableHighlight onPress={() => this.props.onPick(item)}>
-        {typeof item === 'object' ? <Text>{String(item[this.props.displayProperty!])}</Text> : <Text>{item}</Text>}
-      </TouchableHighlight>
+      <TouchableOpacity onPress={() => this.props.onPick(item)}>
+        {renderSelectPickerItem
+          ? renderSelectPickerItem(item, this.props.displayProperty)
+          : this.renderDefaultItem(item)}
+      </TouchableOpacity>
+    );
+  };
+
+  private renderDefaultItem = (item: ComposableItem | string) => {
+    return (
+      <View style={{ padding: 16 }}>
+        {typeof item === 'object' && this.props.displayProperty ? (
+          <Text>{String(item[this.props.displayProperty])}</Text>
+        ) : (
+          <Text>{item}</Text>
+        )}
+      </View>
     );
   };
 
@@ -93,7 +109,7 @@ export default class SearchableItemPicker extends Component<ISearchableItemPicke
 
     if (this.props.pickedItem && currentText) {
       return (
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+        <View style={styles.helperPickerContainer}>
           {this.renderUseThisField()}
           <TouchableHighlight
             onPress={() => {
@@ -188,5 +204,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 48,
     paddingHorizontal: 16
-  }
+  },
+  helperPickerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
 });

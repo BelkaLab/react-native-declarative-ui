@@ -40,11 +40,7 @@ export default class Home extends Component<IHomeProps, IState> {
     super(props);
 
     this.state = {
-      model: {
-        email: '',
-        password: '',
-        city: ''
-      },
+      model: {},
       cities: [{ city: 'Trento' }, { city: 'Verona' }, { city: 'Parigi' }]
     };
   }
@@ -52,7 +48,7 @@ export default class Home extends Component<IHomeProps, IState> {
   render() {
     return (
       <View style={styles.root}>
-        <KeyboardAwareScrollView style={{ flex: 1 }}>
+        <KeyboardAwareScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
           <ComposableForm
             model={this.state.model}
             onChange={this.onChangeHandler}
@@ -67,10 +63,21 @@ export default class Home extends Component<IHomeProps, IState> {
               }
             }}
             pickerMapper={{
-              city: this.state.cities
+              city: this.state.cities,
+              language: [
+                {
+                  code: 'it',
+                  name: 'Italiano'
+                },
+                {
+                  code: 'en',
+                  name: 'Inglese'
+                }
+              ]
             }}
           />
-          <View style={{ padding: 20, borderTopWidth: 1, borderColor: Colors.GRAY_300 }}>
+          <View style={styles.modelContainer}>
+            <Text>Model: </Text>
             <Text>{JSON.stringify(this.state.model)}</Text>
           </View>
         </KeyboardAwareScrollView>
@@ -94,5 +101,6 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     alignItems: 'stretch',
     backgroundColor: 'white'
-  }
+  },
+  modelContainer: { padding: 20, borderTopWidth: 1, borderColor: Colors.GRAY_300 }
 });
