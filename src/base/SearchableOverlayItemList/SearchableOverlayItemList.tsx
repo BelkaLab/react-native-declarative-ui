@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import { Dimensions, FlatList, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View } from 'react-native';
-// import FeatherIcon from 'react-native-vector-icons/Feather';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 import { SearchBar } from '../SearchBar';
 
-export interface ISearchableItemPickerProps {
+export interface ISearchableOverlayItemListProps {
   pickedItem: ComposableItem | string;
   items: ComposableItem[] | string[];
   onFilterItems: (filterText?: string) => Promise<ComposableItem[] | string[]>;
@@ -15,7 +14,7 @@ export interface ISearchableItemPickerProps {
   onPick: (item: ComposableItem | string) => void;
   topLabel?: string;
   isObjectMappedToKey?: boolean;
-  renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
 }
 
 interface IState {
@@ -25,8 +24,8 @@ interface IState {
   isFirstLoad: boolean;
 }
 
-export default class SearchableItemPicker extends Component<ISearchableItemPickerProps, IState> {
-  constructor(props: ISearchableItemPickerProps) {
+export default class SearchableOverlayItemList extends Component<ISearchableOverlayItemListProps, IState> {
+  constructor(props: ISearchableOverlayItemListProps) {
     super(props);
     this.state = {
       items: props.items,
@@ -82,7 +81,7 @@ export default class SearchableItemPicker extends Component<ISearchableItemPicke
   }
 
   private renderItem = (item: ComposableItem | string) => {
-    const { renderSelectPickerItem } = this.props;
+    const { renderOverlayItem: renderSelectPickerItem } = this.props;
 
     return (
       <TouchableOpacity onPress={() => this.props.onPick(item)}>

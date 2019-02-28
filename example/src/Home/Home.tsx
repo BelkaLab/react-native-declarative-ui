@@ -1,7 +1,7 @@
 import filter from 'lodash.filter';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ComposableForm, ComposableItem, SharedOptions } from 'react-native-declarative-ui';
+import { ComposableForm, SharedOptions } from 'react-native-declarative-ui';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { Colors } from '../styles/colors';
 
@@ -35,30 +35,12 @@ SharedOptions.setDefaultOptions({
   }
 });
 
-SharedOptions.setCustomComponents({
-  renderSelectPickerItem: (item: ComposableItem | string, displayProperty?: string) => {
-    return (
-      <View style={{ padding: 16, backgroundColor: Colors.WHITE }}>
-        {typeof item === 'object' && displayProperty ? (
-          <Text style={{ fontSize: 18 }}>{String(item[displayProperty])}</Text>
-        ) : (
-          <Text style={{ fontSize: 18 }}>{item}</Text>
-        )}
-      </View>
-    );
-  }
-});
-
 export default class Home extends Component<IHomeProps, IState> {
   constructor(props: IHomeProps) {
     super(props);
 
     this.state = {
-      model: {
-        email: '',
-        password: '',
-        city: ''
-      },
+      model: {},
       cities: [{ city: 'Trento' }, { city: 'Verona' }, { city: 'Parigi' }]
     };
   }
@@ -94,7 +76,8 @@ export default class Home extends Component<IHomeProps, IState> {
               ]
             }}
           />
-          <View style={{ padding: 20, borderTopWidth: 1, borderColor: Colors.GRAY_300 }}>
+          <View style={styles.modelContainer}>
+            <Text>Model: </Text>
             <Text>{JSON.stringify(this.state.model)}</Text>
           </View>
         </KeyboardAwareScrollView>
@@ -118,5 +101,6 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     alignItems: 'stretch',
     backgroundColor: 'white'
-  }
+  },
+  modelContainer: { padding: 20, borderTopWidth: 1, borderColor: Colors.GRAY_300 }
 });

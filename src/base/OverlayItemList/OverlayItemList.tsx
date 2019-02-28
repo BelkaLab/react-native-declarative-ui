@@ -4,7 +4,7 @@ import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
-export interface IItemPickerProps {
+export interface IOverlayItemListProps {
   pickedItem: ComposableItem | string;
   items: ComposableItem[] | string[];
   displayProperty?: string;
@@ -17,50 +17,31 @@ export interface IItemPickerProps {
 
 interface IState {
   items: ComposableItem[] | string[];
-  //   currentText: string;
   isLoading: boolean;
   isFirstLoad: boolean;
 }
 
-export default class ItemPicker extends Component<IItemPickerProps, IState> {
-  //   private selectableList!: GenericSelectableListTypeComponent<IItem>;
-
-  constructor(props: IItemPickerProps) {
+export default class OverlayItemList extends Component<IOverlayItemListProps, IState> {
+  constructor(props: IOverlayItemListProps) {
     super(props);
     this.state = {
       items: props.items,
-      //   currentText: props.pickedItem ? (props.pickedItem[props.displayProp] as string) || '' : props.pickedItem || '',
       isLoading: false,
       isFirstLoad: true
     };
   }
 
   render() {
-    // const { currentText, isLoading } = this.state;
-    // const { isFilterable, topLabel } = this.props;
     const { isLoading } = this.state;
     const { topLabel } = this.props;
 
     return (
       <View style={globalStyles.pickerContainer}>
-        {
-          //     isFilterable ? (
-          //   <SearchBar
-          //     style={styles.searchBar}
-          //     placeholder={localizations.omni_search_title}
-          //     value={currentText}
-          //     onSearch={this.onSearch}
-          //     onChangeText={this.onChangeText}
-          //     onDelete={this.onDelete}
-          //     isInPicker={true}
-          //   />
-          // ) :
-          <View style={styles.listHeaderContainer}>
-            <Text>{topLabel}</Text>
-          </View>
-        }
+        <View style={styles.listHeaderContainer}>
+          <Text>{topLabel}</Text>
+        </View>
+
         {isLoading ? (
-          //   <CloudLoader />
           <View>Loader</View>
         ) : (
           <FlatList

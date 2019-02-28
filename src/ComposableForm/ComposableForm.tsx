@@ -12,8 +12,8 @@ import Modal from 'react-native-modal';
 import { Colors } from '../../src/styles/colors';
 import { TextInputInstance } from '../base/FloatingLabel';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
-import { ItemPicker } from '../base/ItemPicker';
-import { SearchableItemPicker } from '../base/SearchableItemPicker';
+import { OverlayItemList } from '../base/OverlayItemList';
+import { SearchableOverlayItemList } from '../base/SearchableOverlayItemList';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
 import { CheckBoxField } from '../components/CheckBoxField';
 import { SelectPickerField } from '../components/SelectPickerField';
@@ -552,7 +552,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
     return (
-      <ItemPicker
+      <OverlayItemList
         pickedItem={model[field.id] as ComposableItem | string}
         items={items}
         displayProperty={field.displayProperty}
@@ -590,7 +590,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
           closeOverlay();
         }}
-        renderSelectPickerItem={this.getComposableFormCustomComponents().renderSelectPickerItem}
+        renderSelectPickerItem={this.getComposableFormCustomComponents().renderOverlayItem}
       />
     );
   };
@@ -645,54 +645,52 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
     return (
-      <View>
-        <SearchableItemPicker
-          pickedItem={model[field.id] as ComposableItem | string}
-          items={items}
-          displayProperty={field.displayProperty}
-          keyProperty={field.keyProperty}
-          onFilterItems={text => {
-            return this.props.searchMapper![field.id](text);
-          }}
-          onPick={(selectedItem: ComposableItem | string) => {
+      <SearchableOverlayItemList
+        pickedItem={model[field.id] as ComposableItem | string}
+        items={items}
+        displayProperty={field.displayProperty}
+        keyProperty={field.keyProperty}
+        renderOverlayItem={this.getComposableFormCustomComponents().renderOverlayItem}
+        onFilterItems={text => {
+          return this.props.searchMapper![field.id](text);
+        }}
+        onPick={(selectedItem: ComposableItem | string) => {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field.id]: ''
+            }
+          });
+          if (field.shouldReturnKey) {
+            if (typeof selectedItem === 'string') {
+              this.props.onChange(field.id, selectedItem);
+              if (field.updateFieldId && field.updateFieldKeyProperty) {
+                this.props.onChange(field.updateFieldId, undefined);
+              }
+            } else {
+              this.props.onChange(field.id, selectedItem[field.keyProperty!] as string);
+              if (field.updateFieldId && field.updateFieldKeyProperty) {
+                this.props.onChange(
+                  field.updateFieldId,
+                  (selectedItem as ComposableItem)[field.updateFieldKeyProperty]
+                );
+              }
+            }
+          } else {
+            this.props.onChange(field.id, selectedItem);
+          }
+          if (field.updateFieldId && field.updateFieldKeyProperty) {
             this.setState({
               errors: {
                 ...this.state.errors,
-                [field.id]: ''
+                [field.updateFieldId]: ''
               }
             });
-            if (field.shouldReturnKey) {
-              if (typeof selectedItem === 'string') {
-                this.props.onChange(field.id, selectedItem);
-                if (field.updateFieldId && field.updateFieldKeyProperty) {
-                  this.props.onChange(field.updateFieldId, undefined);
-                }
-              } else {
-                this.props.onChange(field.id, selectedItem[field.keyProperty!] as string);
-                if (field.updateFieldId && field.updateFieldKeyProperty) {
-                  this.props.onChange(
-                    field.updateFieldId,
-                    (selectedItem as ComposableItem)[field.updateFieldKeyProperty]
-                  );
-                }
-              }
-            } else {
-              this.props.onChange(field.id, selectedItem);
-            }
-            if (field.updateFieldId && field.updateFieldKeyProperty) {
-              this.setState({
-                errors: {
-                  ...this.state.errors,
-                  [field.updateFieldId]: ''
-                }
-              });
-            }
+          }
 
-            closeOverlay();
-          }}
-          renderSelectPickerItem={this.getComposableFormCustomComponents().renderSelectPickerItem}
-        />
-      </View>
+          closeOverlay();
+        }}
+      />
     );
   };
 

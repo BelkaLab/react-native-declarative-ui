@@ -10,7 +10,7 @@ export type ComposableFormOptions = {
 };
 
 export type ComposableFormCustomComponents = {
-  renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
 };
 
 class SharedOptions {
