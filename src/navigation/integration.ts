@@ -1,8 +1,10 @@
+import React from 'react';
+import { requireWrapper } from '../utils/helper';
 export const SLIDE_BOTTOM_OVERLAY_KEY = 'react-native-declarative-ui-slide-bottom-overlay';
 
 export function showOverlay(renderOverlayComponent: (dismissOverlay: () => void) => React.ReactElement<{}>) {
   try {
-    const Navigation = require('react-native-navigation');
+    const Navigation = requireWrapper('react-native-navigation');
 
     Navigation.showOverlay({
       component: {
@@ -21,6 +23,6 @@ export function showOverlay(renderOverlayComponent: (dismissOverlay: () => void)
       }
     });
   } catch (err) {
-    console.log(err);
+    console.log('Cannot use RNN showOverlay before installing dependency');
   }
 }

@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { Animated, Dimensions, Easing, PanResponder, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
-import { ComponentEvent, Navigation } from 'react-native-navigation';
 import { Colors } from '../../styles/colors';
+import { requireWrapper } from '../../utils/helper';
 
 const deviceHeight = Dimensions.get('window').height;
 const ANIM_DURATION = 200;
 
-interface ISlideBottomOverlayProps extends ComponentEvent {
+interface ISlideBottomOverlayProps {
+  componentId?: string;
   renderOverlayComponent: (dismissOverlay: () => void) => React.ReactElement<{}>;
 }
 
@@ -41,6 +42,8 @@ export default class SlideBottomOverlay extends Component<ISlideBottomOverlayPro
         useNativeDriver: false
       })
     ]).start(() => {
+      const Navigation = requireWrapper('react-native-navigation');
+
       Navigation.dismissOverlay(this.props.componentId);
     });
   };

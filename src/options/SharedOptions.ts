@@ -1,3 +1,7 @@
+import React from 'react';
+import { SLIDE_BOTTOM_OVERLAY_KEY } from 'react-native-declarative-ui/src/navigation/integration';
+import { SlideBottomOverlay } from 'react-native-declarative-ui/src/overlays/SlideBottomOverlay';
+import { requireF } from 'react-native-declarative-ui/src/utils/helper';
 import { ComposableItem } from '../models/composableItem';
 import { Colors } from '../styles/colors';
 
@@ -35,6 +39,16 @@ class SharedOptions {
       SharedOptions.instance = new SharedOptions();
       // ... any one time initialization goes here ...
     }
+
+    try {
+      const Navigation = requireF('react-native-navigation');
+      
+      Navigation.registerComponent(SLIDE_BOTTOM_OVERLAY_KEY, () => SlideBottomOverlay);
+      SharedOptions.instance.setRNNAvailable(true);
+    } catch (err) {
+      SharedOptions.instance.setRNNAvailable(false);
+    }
+
     return SharedOptions.instance;
   }
 
