@@ -17,16 +17,8 @@
     "@types/react-native": "^0.50.7",
     "@types/react-native-vector-icons": "^4.6.4",
     "cpx": "^1.5.0",
-    "lodash.every": "^4.6.0",
-    "lodash.filter": "^4.6.0",
-    "lodash.find": "^4.6.0",
-    "lodash.isequal": "^4.5.0",
-    "lodash.map": "^4.6.0",
-    "lodash.merge": "^4.6.1",
-    "lodash.some": "^4.6.0",
-    "numbro": "^2.1.2",
-    "react-native-modal": "^9.0.0",
-    "react-native-navigation": "^2.1.0",
+    "react": "16.6.3",
+    "react-native": "0.57.8",
     "react-native-typescript-transformer": "^1.1.4",
     "tslib": "^1.9.3",
     "tslint": "^5.8.0",
@@ -38,9 +30,16 @@
     "lint": "tslint-config-prettier-check ./tslint.json",
     "build": "cpx \"src/**/*.{ts,tsx}\" \"example/node_modules/react-native-declarative-ui/src\" --watch"
   },
-  "peerDependencies": {
-    "react": "16.6.3",
-    "react-native": "0.57.8"
-  },
-  "dependencies": {}
+  "dependencies": {
+    "lodash.every": "^4.6.0",
+    "lodash.filter": "^4.6.0",
+    "lodash.find": "^4.6.0",
+    "lodash.isequal": "^4.5.0",
+    "lodash.map": "^4.6.0",
+    "lodash.merge": "^4.6.1",
+    "lodash.some": "^4.6.0",
+    "numbro": "^2.1.2",
+    "react-native-modal": "^9.0.0",
+    "react-native-navigation": "^2.1.0"
+  }
 }
