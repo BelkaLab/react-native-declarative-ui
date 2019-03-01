@@ -423,6 +423,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }}
         error={errors[field.id]}
         disableErrorMessage={isInline}
+        onBlur={() => this.props.onChange(field.id, numbro.unformat(model[field.id] as string))}
       />
     );
   };
@@ -440,7 +441,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       return undefined;
     }
 
-    if (this.isSeparatorLastChar(val)) {
+    if (this.isSeparatorLastChar(val) || (val.includes(',') && val.slice(-1) === '0')) {
       return val;
     }
 
