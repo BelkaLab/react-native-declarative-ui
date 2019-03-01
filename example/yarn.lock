@@ -3522,9 +3522,9 @@ react-native-animatable@^1.2.4:
     prop-types "^15.5.10"
 
 react-native-declarative-ui@^0.1.3:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.5.tgz#30884b0b0d25ad4fcc51f1a4d7a600331d0322a3"
-  integrity sha512-tsyt7IGgxfYqo8H4qT7s00/T3SqpAH9AvRqyPhx6z5hUQ6yn82DG1jXZKStsB1XnjK4UAyTG3U+SRR4ZLhw9kA==
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.6.tgz#2854f75412de5c02ffe54f38a3ccdd85abeaeb12"
+  integrity sha512-Gb0Mklrp4pPmzeCwKthxIYq3S81CiGYzVpUHUl6l1PpNHz4eBIwQv97QBCe8DeNmEU9/6FC7VsisXNgEXu2hYA==
   dependencies:
     lodash.every "^4.6.0"
     lodash.filter "^4.6.0"
