@@ -107,7 +107,7 @@ export default class CheckBox extends Component<ICheckBoxProps, IState> {
     if (this.props.isIndeterminate) {
       return (
         <Image
-          source={require('../../img/ic_indeterminate_check_box.png')}
+          source={require('../../assets/ic_indeterminate_check_box.png')}
           style={{ tintColor: this.props.checkBoxColor }}
         />
       );
@@ -117,8 +117,8 @@ export default class CheckBox extends Component<ICheckBoxProps, IState> {
       <Image
         source={
           this.state.isChecked
-            ? require('../../img/ic_check_box.png')
-            : require('../../img/ic_check_box_outline_blank.png')
+            ? require('../../assets/ic_check_box.png')
+            : require('../../assets/ic_check_box_outline_blank.png')
         }
         style={{ tintColor: this.props.checkBoxColor }}
       />

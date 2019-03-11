@@ -10,7 +10,7 @@ export default class OpenPickerFieldIcon extends Component<IOpenPickerFieldIconP
     return (
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={this.props.onOpenPickerIconClicked}>
-          <Image source={require('../../../img/chevron_down.png')} />
+          <Image source={require('../../../assets/chevron_down.png')} />
         </TouchableOpacity>
       </View>
     );

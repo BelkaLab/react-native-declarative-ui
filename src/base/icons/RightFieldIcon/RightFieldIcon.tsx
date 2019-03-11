@@ -19,8 +19,8 @@ export default class RightFieldIcon extends Component<IRightFieldIconProps> {
         >
           <Image
             source={Platform.select({
-              ios: require('../../../img/ios_clear_input.png'),
-              android: require('../../../img/android_clear_input.png')
+              ios: require('../../../assets/ios_clear_input.png'),
+              android: require('../../../assets/android_clear_input.png')
             })}
           />
         </TouchableOpacity>
