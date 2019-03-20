@@ -137,6 +137,19 @@
           "flex": 0.5
         }
       ]
+    },
+    {
+      "id": "date",
+      "label": "Data",
+      "type": "date",
+      "validation": {
+        "date": {
+          "presence": {
+            "message": "^Inserisci un data",
+            "allowEmpty": false
+          }
+        }
+      }
     }
   ]
 }

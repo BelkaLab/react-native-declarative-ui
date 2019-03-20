@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Colors } from '../../../styles/colors';
 import { globalStyles } from '../../../styles/globalStyles';
 import { SingleDayCalendar } from '../SingleDayCalendar';
 
@@ -23,6 +24,14 @@ export default class OverlayCalendar extends Component<IOverlayCalendarProps, IS
   render() {
     return (
       <View style={globalStyles.pickerContainer}>
+        <View style={styles.listHeaderContainer}>
+          <TouchableWithoutFeedback onPress={this.props.onCancel}>
+            <Text>Annulla</Text>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={this.onConfirmPressed}>
+            <Text>Conferma</Text>
+          </TouchableWithoutFeedback>
+        </View>
         <SingleDayCalendar
           pickedDate={this.props.pickedDate}
           isAlreadyPicked={this.props.isAlreadyPicked}
@@ -92,46 +101,16 @@ export default class OverlayCalendar extends Component<IOverlayCalendarProps, IS
   };
 }
 
+const HEADER_HEIGHT = 48;
+
 const styles = StyleSheet.create({
-  // root: {
-  //   flex: 1,
-  //   height: window.height,
-  //   width: isTablet() ? (window.width * 3) / 5 : window.width,
-  //   justifyContent: 'flex-start',
-  //   alignItems: 'stretch',
-  //   backgroundColor: 'transparent'
-  // },
-  // underView: {
-  //   flex: 1,
-  //   justifyContent: 'flex-end',
-  //   alignItems: 'stretch'
-  // },
-  // bottomView: {
-  //   maxHeight: (window.height / 4) * 3,
-  //   justifyContent: 'flex-start',
-  //   alignItems: 'stretch',
-  //   backgroundColor: 'transparent',
-  //   paddingBottom: isIphoneX() ? 34 : 0
-  // },
-  // backgroundGradient: {
-  //   width: '100%',
-  //   height: HEADER_HEIGHT,
-  //   overflow: 'hidden',
-  //   borderTopRightRadius: 6,
-  //   borderTopLeftRadius: 6
-  // },
-  // buttonContainer: {
-  //   position: 'absolute',
-  //   top: 0,
-  //   flexDirection: 'row',
-  //   justifyContent: 'space-between',
-  //   alignItems: 'center',
-  //   width: '100%',
-  //   height: HEADER_HEIGHT,
-  //   zIndex: 2,
-  //   paddingHorizontal: 16,
-  //   backgroundColor: 'transparent',
-  //   borderTopRightRadius: 6,
-  //   borderTopLeftRadius: 6
-  // }
+  listHeaderContainer: {
+    height: HEADER_HEIGHT,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopRightRadius: 6,
+    borderTopLeftRadius: 6,
+    backgroundColor: Colors.GRAY_200,
+    paddingHorizontal: 16
+  }
 });

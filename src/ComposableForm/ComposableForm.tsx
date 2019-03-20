@@ -757,6 +757,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
         isAlreadyPicked={Boolean(model[field.id])}
         mode="single-day"
+        onCancel={closeOverlay}
         onConfirm={(selectedItem: string) => {
           this.setState({
             errors: {
@@ -766,10 +767,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           });
 
           this.props.onChange(field.id, selectedItem);
-
-          // this.setState({
-          //   checkRestoreFields: true
-          // });
 
           closeOverlay();
         }}

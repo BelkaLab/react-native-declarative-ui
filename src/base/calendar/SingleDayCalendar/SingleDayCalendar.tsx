@@ -16,7 +16,7 @@ interface IState {
   selectedDay?: string;
 }
 
-const CALENDAR_HEIGHT = 360;
+const CALENDAR_HEIGHT = 350;
 
 export default class SingleDayCalendar extends Component<ISingleDayCalendarProps, IState> {
   constructor(props: ISingleDayCalendarProps) {
@@ -54,7 +54,7 @@ export default class SingleDayCalendar extends Component<ISingleDayCalendarProps
     const { markedDate, selectedDay } = this.state;
 
     return (
-      <View style={{ height: CALENDAR_HEIGHT, backgroundColor: Colors.GRAY_100 }}>
+      <View style={{ height: CALENDAR_HEIGHT, backgroundColor: Colors.WHITE }}>
         <Calendar
           current={selectedDay}
           markedDates={markedDate}

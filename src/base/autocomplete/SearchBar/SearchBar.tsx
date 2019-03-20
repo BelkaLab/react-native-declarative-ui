@@ -28,7 +28,7 @@ export default class SearchBar extends Component<ISearchBarProps, IState> {
     return (
       <View style={[styles.searchBarContainer, contentContainerStyle]}>
         <View style={styles.inputContainer}>
-          <Image source={require('../../assets/search.png')} style={{ width: 16, height: 16, marginHorizontal: 8 }} />
+          <Image source={require('../../../assets/search.png')} style={{ width: 16, height: 16, marginHorizontal: 8 }} />
           <TextInput
             {...props}
             style={styles.input}
@@ -45,8 +45,8 @@ export default class SearchBar extends Component<ISearchBarProps, IState> {
               <View style={styles.iconXContent}>
                 <Image
                   source={Platform.select({
-                    ios: require('../../assets/ios_clear_input.png'),
-                    android: require('../../assets/android_clear_input.png')
+                    ios: require('../../../assets/ios_clear_input.png'),
+                    android: require('../../../assets/android_clear_input.png')
                   })}
                 />
               </View>

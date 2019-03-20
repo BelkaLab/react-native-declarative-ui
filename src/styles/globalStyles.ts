@@ -24,6 +24,8 @@ export const globalStyles = StyleSheet.create({
   },
   pickerContainer: {
     paddingBottom: 52,
+    borderTopRightRadius: 6,
+    borderTopLeftRadius: 6, 
     backgroundColor: Colors.WHITE
   }
 });

@@ -2936,6 +2936,11 @@ mkdirp@^0.5.0, mkdirp@^0.5.1:
   dependencies:
     minimist "0.0.8"
 
+moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
+
 morgan@^1.9.0:
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/morgan/-/morgan-1.9.1.tgz#0a8d16734a1d9afbc824b99df87e738e58e2da59"
@@ -3515,16 +3520,26 @@ react-is@^16.8.1:
   integrity sha512-PVadd+WaUDOAciICm/J1waJaSvgq+4rHE/K70j0PFqKhkTBsPv/82UGQJNXAngz1fOQLLxI6z1sEDmJDQhCTAA==
 
 react-native-animatable@^1.2.4:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.3.1.tgz#f004a7e9de6838d0fbf210d642593cff7affd9ef"
-  integrity sha512-NoE6OAgCrhggWBRV6rBJup5vLAGoTjx168Tku1RZmjUGIdYRAyGesP/MoqvxiNJjhTAgwYx2LT63VTT1xO8g4Q==
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/react-native-animatable/-/react-native-animatable-1.3.2.tgz#4783ee1a73dc98815aef234ce6b819f80bfe7d80"
+  integrity sha512-rmah3KQ63ft8DxkzFUwJSuZeq+oSYwldoGF4DTOR5WM2WR5wiWLgBAtrAHlI3Di3by323uOR21s+MlqPcHz2Kw==
   dependencies:
     prop-types "^15.5.10"
 
+react-native-calendars@^1.22.0:
+  version "1.22.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.22.0.tgz#873836dc7faa70dbf870da08944661370a0e5fae"
+  integrity sha512-7blT6v8mU8bRC1JqnDTnnHNlTmqQfa5FXWOkKSd6mtdF+EgrV+WyM1iHQzzwyjHYJlLKMqQALdCA+xqvK6lG9w==
+  dependencies:
+    lodash.get "^4.4.2"
+    lodash.isequal "^4.5.0"
+    prop-types "^15.5.10"
+    xdate "^0.8.0"
+
 react-native-declarative-ui@^0.1.3:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.7.tgz#ddc11cfd1b8f85318452e6f477164ca654439681"
-  integrity sha512-wtc8LvZJZaV31aXml5L6O/Mip/q85aqO/0EqLgxgEdjnmDlLdPauNtmiK8vHtrlmsysju/sI/O8hRiQiR5pmJA==
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.8.tgz#51b983f98eea59dbfafb36904811d2e7e00a9fff"
+  integrity sha512-ET9uTNKcR8iOyOYCe+tKdUDIkyu24ImRYesKxXCYmbwUWQ3OkylGESQEhPg3PElbMNGRbGBHmSg5cy8JQsJ/yA==
   dependencies:
     lodash.every "^4.6.0"
     lodash.filter "^4.6.0"
@@ -3533,7 +3548,9 @@ react-native-declarative-ui@^0.1.3:
     lodash.map "^4.6.0"
     lodash.merge "^4.6.1"
     lodash.some "^4.6.0"
+    moment "^2.24.0"
     numbro "^2.1.2"
+    react-native-calendars "^1.22.0"
     react-native-modal "^9.0.0"
 
 react-native-iphone-x-helper@^1.0.3:
@@ -4601,6 +4618,11 @@ xcode@^1.0.0:
   dependencies:
     simple-plist "^0.2.1"
     uuid "^3.3.2"
+
+xdate@^0.8.0:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/xdate/-/xdate-0.8.2.tgz#d7b033c00485d02695baf0044f4eacda3fc961a3"
+  integrity sha1-17AzwASF0CaVuvAET06s2j/JYaM=
 
 xmlbuilder@8.2.2:
   version "8.2.2"
