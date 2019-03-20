@@ -56,7 +56,12 @@ export default class SingleDayCalendar extends Component<ISingleDayCalendarProps
     const { markedDate, selectedDay } = this.state;
 
     return (
-      <View style={{ height: CALENDAR_HEIGHT, backgroundColor: Colors.WHITE }}>
+      <View
+        style={{
+          height: CALENDAR_HEIGHT,
+          backgroundColor: theme ? theme.calendarBackground || Colors.WHITE : Colors.WHITE
+        }}
+      >
         <Calendar
           current={selectedDay}
           markedDates={markedDate}

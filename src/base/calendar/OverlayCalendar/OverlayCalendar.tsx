@@ -64,6 +64,7 @@ const styles = StyleSheet.create({
     height: HEADER_HEIGHT,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     borderTopRightRadius: 6,
     borderTopLeftRadius: 6,
     backgroundColor: Colors.GRAY_200,

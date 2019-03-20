@@ -1,4 +1,6 @@
 declare module 'react-native-declarative-ui' {
+  import { CalendarTheme } from 'react-native-calendars';
+
   export type ComposableItem = {
     [key: string]: unknown;
   };
@@ -28,6 +30,9 @@ declare module 'react-native-declarative-ui' {
       externalPadding?: number;
       inlinePadding?: number;
       backgroundColor?: string;
+    };
+    calendars: {
+      singleDayTheme?: CalendarTheme;
     };
   };
 
