@@ -41,7 +41,9 @@
     "lodash.map": "^4.6.0",
     "lodash.merge": "^4.6.1",
     "lodash.some": "^4.6.0",
+    "moment": "^2.24.0",
     "numbro": "^2.1.2",
+    "react-native-calendars": "^1.22.0",
     "react-native-modal": "^9.0.0"
   }
 }

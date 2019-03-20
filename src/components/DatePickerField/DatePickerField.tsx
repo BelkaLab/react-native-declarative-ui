@@ -1,13 +1,11 @@
-import find from 'lodash.find';
 import React from 'react';
 import { Platform, StyleProp, StyleSheet, Text, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { FloatingLabel, TextInputInstance } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
-import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
-export interface ISelectPickerFieldProps extends TextInputProperties {
+export interface IDatePickerFieldProps extends TextInputProperties {
   onRef?: (input: TextInputInstance) => void;
   label: string;
   onPress: () => void;
@@ -18,20 +16,19 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   error?: string;
   disableErrorMessage?: boolean;
 
-  options?: ComposableItem[] | string[];
-  displayProperty?: string;
-  keyProperty?: string;
-  itemValue?: ComposableItem | string;
-  isPercentage?: boolean;
-  //   reduxProp?: string;
+  onRightIconClick?: () => void;
+  rightContent?: JSX.Element;
 }
 
 type State = {
   isFocused: boolean;
 } & React.ComponentState;
 
-export default class SelectPickerField extends React.Component<ISelectPickerFieldProps, State> {
-  constructor(props: ISelectPickerFieldProps) {
+export default class DatePickerField extends React.Component<IDatePickerFieldProps, State> {
+  private inputRef!: FloatingLabel;
+  private textInput!: FloatingLabel;
+
+  constructor(props: IDatePickerFieldProps) {
     super(props);
     this.state = {
       isFocused: false
@@ -39,19 +36,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
   }
 
   render() {
-    // const { isPercentage } = this.props;
-    const {
-      onRef,
-      onFocus,
-      onBlur,
-      onPress,
-      displayProperty,
-      keyProperty,
-      itemValue,
-      options,
-      error,
-      ...rest
-    } = this.props;
+    const { onRef, onFocus, onBlur, onPress, error, ...rest } = this.props;
 
     return (
       <View style={[styles.containerStyle, this.props.containerStyle]}>
@@ -70,8 +55,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
                 }
               }}
               editable={false}
-              isSelectField={true}
-              value={this.retrieveDisplayValue(itemValue)}
+              isSelectField={true} // Check if needed
               style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
               labelStyle={{ backgroundColor: 'transparent', color: Colors.GRAY_600 }}
               inputStyle={styles.inputStyle}
@@ -148,25 +132,6 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       borderColor: Colors.GRAY_400
     };
   };
-
-  private retrieveDisplayValue = (itemValue?: ComposableItem | string) => {
-    // Add isPercentage check
-    const { displayProperty, keyProperty, options } = this.props;
-
-    if (!itemValue) {
-      return undefined;
-    }
-
-    if (displayProperty && typeof itemValue === 'object') {
-      return String(itemValue[displayProperty]);
-    }
-
-    if (options && displayProperty && keyProperty) {
-      return String(find(options as ComposableItem[], item => item[keyProperty] === itemValue)![displayProperty]);
-    }
-
-    return String(itemValue);
-  };
 }
 
 const styles = StyleSheet.create({
@@ -178,7 +143,6 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     borderWidth: 0,
-    padding: 0,
     fontSize: 17
   },
   errorMessage: {

@@ -3,6 +3,7 @@ import find from 'lodash.find';
 import isEqual from 'lodash.isequal';
 import merge from 'lodash.merge';
 import some from 'lodash.some';
+import moment from 'moment';
 import numbro from 'numbro';
 import languages from 'numbro/dist/languages.min.js';
 import React, { Component } from 'react';
@@ -10,12 +11,14 @@ import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TouchableHigh
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import Modal from 'react-native-modal';
 import { Colors } from '../../src/styles/colors';
+import { SearchableOverlayItemList } from '../base/autocomplete/SearchableOverlayItemList';
+import { OverlayCalendar } from '../base/calendar/OverlayCalendar';
 import { TextInputInstance } from '../base/FloatingLabel';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
 import { OverlayItemList } from '../base/OverlayItemList';
-import { SearchableOverlayItemList } from '../base/SearchableOverlayItemList';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
 import { CheckBoxField } from '../components/CheckBoxField';
+import { DatePickerField } from '../components/DatePickerField';
 import { SelectPickerField } from '../components/SelectPickerField';
 import { TextField } from '../components/TextField';
 import { ComposableItem } from '../models/composableItem';
@@ -245,6 +248,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     const isInline = !!flex && flex < 1;
 
     switch (field.type) {
+      case 'header':
+        return (
+          <Text
+            key={index}
+            style={{
+              color: Colors.BLACK,
+              fontSize: 16,
+              marginTop: this.getComposableFormOptions().formContainer.inlinePadding
+            }}
+          >
+            {field.label}
+          </Text>
+        );
       case 'text':
         return (
           <View
@@ -288,6 +304,22 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderAutocompleteField(field, model, errors, isInline, customStyle)}
+          </View>
+        );
+      case 'date':
+        return (
+          <View
+            key={index}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+          >
+            {this.renderDatePickerField(field, model, errors, isInline, customStyle)}
+            {/* {this.renderDatePickerField(
+              childField,
+              model,
+              errors,
+              childField.flex,
+              childIndex === 0 ? { marginLeft: 2, marginRight: 8 } : { marginLeft: 8, marginRight: 2 }
+            )} */}
           </View>
         );
       case 'inline':
@@ -667,6 +699,77 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
               }
             });
           }
+
+          closeOverlay();
+        }}
+      />
+    );
+  };
+
+  // This is a date picker field renderer for fields of type date
+  private renderDatePickerField = (
+    field: FormField,
+    model: T,
+    errors: Dictionary<string>,
+    isInline: boolean = false,
+    customStyle: StyleProp<ViewStyle> = {}
+  ) => {
+    const date = model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('DD/MM/YYYY') : undefined;
+
+    return (
+      <DatePickerField
+        onRef={input => {
+          this.fieldRefs[field.id] = input;
+        }}
+        containerStyle={[{ flex: 1 }, customStyle]}
+        value={date}
+        // floatingLabel={localizations.getString(field.label, localizations.getLanguage()) || field.label}
+        label={field.label}
+        // editable={false}
+        onPress={() => this.openCalendar(field, model)}
+        onRightIconClick={() => this.openCalendar(field, model)}
+        error={errors[field.id]}
+        disableErrorMessage={isInline}
+      />
+    );
+  };
+
+  private openCalendar = (field: FormField, model: T) => {
+    Keyboard.dismiss();
+
+    if (SharedOptions.isRNNAvailable()) {
+      showOverlay((dismissOverlay: () => void) => this.renderCalendarOverlay(field, model, dismissOverlay));
+    } else {
+      this.setState({
+        isModalVisible: true,
+        overlayComponent: this.renderCalendarOverlay(field, model, () =>
+          this.setState({
+            isModalVisible: false
+          })
+        )
+      });
+    }
+  };
+
+  private renderCalendarOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
+    return (
+      <OverlayCalendar
+        pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
+        isAlreadyPicked={Boolean(model[field.id])}
+        mode="single-day"
+        onConfirm={(selectedItem: string) => {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field.id]: ''
+            }
+          });
+
+          this.props.onChange(field.id, selectedItem);
+
+          // this.setState({
+          //   checkRestoreFields: true
+          // });
 
           closeOverlay();
         }}

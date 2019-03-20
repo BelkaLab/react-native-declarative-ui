@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Image, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { Colors } from '../../../src/styles/colors';
+import { Colors } from '../../../../src/styles/colors';
 
 export interface ISearchBarProps extends TextInputProperties {
   onSearch?: (text: string) => void;
