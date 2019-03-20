@@ -4,9 +4,10 @@ import { Calendar, CalendarTheme, DotMarking } from 'react-native-calendars';
 import { Colors } from '../../../styles/colors';
 
 export interface ISingleDayCalendarProps {
+  onRef?: (ref: SingleDayCalendar | null) => void;
   pickedDate?: string;
   isAlreadyPicked?: boolean;
-  onRef?: (ref: SingleDayCalendar | null) => void;
+  theme?: CalendarTheme;
 }
 
 interface IState {
@@ -51,6 +52,7 @@ export default class SingleDayCalendar extends Component<ISingleDayCalendarProps
   };
 
   render() {
+    const { theme } = this.props;
     const { markedDate, selectedDay } = this.state;
 
     return (
@@ -66,7 +68,7 @@ export default class SingleDayCalendar extends Component<ISingleDayCalendarProps
               selectedDay: date.dateString
             });
           }}
-          theme={singleDayCalendarStyle}
+          theme={theme}
         />
       </View>
     );

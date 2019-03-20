@@ -3,7 +3,7 @@ export function requireWrapper(modulePath: string) {
   try {
     return require(modulePath);
   } catch (e) {
-    console.log('requireF(): The file "' + modulePath + '".js could not be loaded.');
+    console.log('requireWrapper(): The file "' + modulePath + '".js could not be loaded.');
     return false;
   }
 }

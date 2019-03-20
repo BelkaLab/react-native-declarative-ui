@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { ComposableFormOptions } from '../../../options/SharedOptions';
 import { Colors } from '../../../styles/colors';
 import { globalStyles } from '../../../styles/globalStyles';
 import { SingleDayCalendar } from '../SingleDayCalendar';
@@ -10,6 +11,7 @@ export interface IOverlayCalendarProps {
   onCancel?: () => void;
   onConfirm?: (pickedDate: string) => void;
   isAlreadyPicked?: boolean;
+  customFormOptions: ComposableFormOptions;
 }
 
 interface IState {}
@@ -40,57 +42,11 @@ export default class OverlayCalendar extends Component<IOverlayCalendarProps, IS
               this.calendar = calendar;
             }
           }}
+          theme={this.props.customFormOptions.calendars.singleDayTheme}
         />
       </View>
     );
   }
-
-  // render() {
-  //   const navBarGradient = require('../../../img/gradient_top_bar.png');
-
-  //   return (
-  //     <View style={styles.root}>
-  //       <View style={styles.underView}>
-  //         <Touchable style={{ height: '100%' }} onPress={() => this.props.navigator.dismissLightBox()}>
-  //           <View />
-  //         </Touchable>
-  //         <View style={styles.bottomView}>
-  //           <View style={styles.backgroundGradient}>
-  //             <Image source={navBarGradient} resizeMode="stretch" style={{ width: '100%', height: 48 }} />
-  //           </View>
-  //           <View style={styles.buttonContainer}>
-  //             {this.props.onCancel && (
-  //               <Touchable style={{ height: HEADER_HEIGHT, justifyContent: 'center' }} onPress={this.props.onCancel}>
-  //                 <Body text={localizations.cancel} color={Colors.WHITE} />
-  //               </Touchable>
-  //             )}
-  //             {this.props.onConfirm && (
-  //               <Touchable style={{ height: HEADER_HEIGHT, justifyContent: 'center' }} onPress={this.onConfirmPressed}>
-  //                 <Body text={localizations.confirm} color={Colors.WHITE} style={{ fontWeight: 'bold' }} />
-  //               </Touchable>
-  //             )}
-  //           </View>
-
-  //           {this.renderCalendar()}
-  //         </View>
-  //       </View>
-  //     </View>
-  //   );
-  // }
-
-  // private renderCalendar = () => {
-  //   return (
-  //     <SingleDayCalendar
-  //       pickedDate={this.props.pickedDate}
-  //       isAlreadyPicked={this.props.isAlreadyPicked}
-  //       onRef={calendar => {
-  //         if (calendar) {
-  //           this.calendar = calendar;
-  //         }
-  //       }}
-  //     />
-  //   );
-  // };
 
   private onConfirmPressed = () => {
     const pickedDate = this.calendar.getSelectedDate();

@@ -313,13 +313,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderDatePickerField(field, model, errors, isInline, customStyle)}
-            {/* {this.renderDatePickerField(
-              childField,
-              model,
-              errors,
-              childField.flex,
-              childIndex === 0 ? { marginLeft: 2, marginRight: 8 } : { marginLeft: 8, marginRight: 2 }
-            )} */}
           </View>
         );
       case 'inline':
@@ -770,6 +763,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
           closeOverlay();
         }}
+        customFormOptions={this.getComposableFormOptions()}
       />
     );
   };

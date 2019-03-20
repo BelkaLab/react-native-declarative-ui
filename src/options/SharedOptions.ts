@@ -1,15 +1,19 @@
 import React from 'react';
-import { SLIDE_BOTTOM_OVERLAY_KEY } from 'react-native-declarative-ui/src/navigation/integration';
-import { SlideBottomOverlay } from 'react-native-declarative-ui/src/overlays/SlideBottomOverlay';
-import { requireF } from 'react-native-declarative-ui/src/utils/helper';
+import { CalendarTheme } from 'react-native-calendars';
 import { ComposableItem } from '../models/composableItem';
+import { SLIDE_BOTTOM_OVERLAY_KEY } from '../navigation/integration';
+import { SlideBottomOverlay } from '../overlays/SlideBottomOverlay';
 import { Colors } from '../styles/colors';
+import { requireWrapper } from '../utils/helper';
 
 export type ComposableFormOptions = {
   formContainer: {
     externalPadding?: number;
     inlinePadding?: number;
     backgroundColor?: string;
+  };
+  calendars: {
+    singleDayTheme?: CalendarTheme;
   };
 };
 
@@ -26,7 +30,8 @@ class SharedOptions {
       externalPadding: 16,
       inlinePadding: 16,
       backgroundColor: Colors.WHITE
-    }
+    },
+    calendars: {}
   };
   private _customComponents: ComposableFormCustomComponents = {};
 
@@ -41,8 +46,8 @@ class SharedOptions {
     }
 
     try {
-      const Navigation = requireF('react-native-navigation');
-      
+      const Navigation = requireWrapper('react-native-navigation');
+
       Navigation.registerComponent(SLIDE_BOTTOM_OVERLAY_KEY, () => SlideBottomOverlay);
       SharedOptions.instance.setRNNAvailable(true);
     } catch (err) {
