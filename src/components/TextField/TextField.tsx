@@ -1,11 +1,11 @@
 import React from 'react';
-import { Platform, StyleProp, StyleSheet, Text, TextInputProperties, View, ViewStyle } from 'react-native';
-import { FloatingLabel, TextInputInstance } from '../../base/FloatingLabel';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, View, ViewStyle } from 'react-native';
+import { FloatingLabel } from '../../base/FloatingLabel';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
 export interface ITextFieldProps extends TextInputProperties {
-  onRef?: (input: TextInputInstance) => void;
+  onRef?: (input: TextInput) => void;
   label: string;
   onFocus?: () => void;
   onBlur?: () => void;
