@@ -1,4 +1,4 @@
-import FloatingLabel, { TextInputInstance } from './FloatingLabel';
+import FloatingLabel from './FloatingLabel';
 
-export { FloatingLabel, TextInputInstance };
+export { FloatingLabel };
 

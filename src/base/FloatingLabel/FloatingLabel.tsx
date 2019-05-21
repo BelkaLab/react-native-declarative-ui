@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Animated, Easing, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextInputStatic, TextStyle, View, ViewStyle } from 'react-native';
+import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
 
 const INPUT_HEIGHT = 35;
@@ -22,7 +22,7 @@ const floatingLabelStyle: StyleProp<TextStyle> = {
 };
 
 interface IFloatingLabelProps extends TextInputProperties {
-  onRef?: (ref: TextInputInstance | null) => void;
+  onRef?: (ref: TextInput | null) => void;
   inputStyle?: StyleProp<TextStyle>;
   labelStyle?: StyleProp<TextStyle>;
   dirtyStyle?: {
@@ -49,8 +49,6 @@ interface IState {
   fontSize: Animated.Value;
   top: Animated.Value;
 }
-
-export type TextInputInstance = React.Component<TextInputProperties, React.ComponentState> & TextInputStatic;
 
 export default class FloatingLabel extends Component<IFloatingLabelProps, IState> {
   constructor(props: IFloatingLabelProps) {
@@ -108,7 +106,7 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
       <TextInput
         {...rest}
         value={value}
-        ref={(input: TextInputInstance) => this.props.onRef && this.props.onRef(input)}
+        ref={input => this.props.onRef && this.props.onRef(input)}
         style={[
           styles.input,
           inputStyle,
@@ -164,7 +162,7 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
     }
   };
 
-  onEndEditing = (event: { nativeEvent: { text: string } }) => {
+  onEndEditing = (event: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
     this.setState({ text: event.nativeEvent.text });
 
     if (this.props.onEndEditing) {
@@ -194,15 +192,15 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
     ]).start();
   };
 
-  private onFocus = () => {
+  private onFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     this.animate(true);
     this.setState({ isDirty: true, isFocused: true });
     if (this.props.onFocus) {
-      this.props.onFocus();
+      this.props.onFocus(e);
     }
   };
 
-  private onBlur = () => {
+  private onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     if (!this.state.text) {
       this.animate(false);
       this.setState({ isDirty: false });
@@ -211,7 +209,7 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
     this.setState({ isFocused: false });
 
     if (this.props.onBlur) {
-      this.props.onBlur();
+      this.props.onBlur(e);
     }
   };
 }

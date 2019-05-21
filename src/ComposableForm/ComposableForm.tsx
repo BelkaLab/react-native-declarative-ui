@@ -7,13 +7,12 @@ import moment from 'moment';
 import numbro from 'numbro';
 import languages from 'numbro/dist/languages.min.js';
 import React, { Component } from 'react';
-import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TouchableHighlight, View, ViewStyle } from 'react-native';
+import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import Modal from 'react-native-modal';
 import { Colors } from '../../src/styles/colors';
 import { SearchableOverlayItemList } from '../base/autocomplete/SearchableOverlayItemList';
 import { OverlayCalendar } from '../base/calendar/OverlayCalendar';
-import { TextInputInstance } from '../base/FloatingLabel';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
 import { OverlayItemList } from '../base/OverlayItemList';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
@@ -38,6 +37,7 @@ interface IComposableFormProps<T> {
   onChange: (id: string, value?: unknown) => void;
   onSave?: () => void;
   onClear?: () => void;
+  onFocus?: (inputField?: TextInput) => void;
   pickerMapper?: {
     [id: string]: ComposableItem[] | string[];
   };
@@ -59,7 +59,7 @@ interface IState {
 }
 
 export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
-  private fieldRefs: Dictionary<TextInputInstance> = {};
+  private fieldRefs: Dictionary<TextInput> = {};
   private errors: Dictionary<string> = {};
 
   constructor(props: IComposableFormProps<T>) {
@@ -394,9 +394,9 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
         rightContentVisibility={!!model[field.id]}
         onFocus={() => {
-          //   if (this.props.onFocus) {
-          //     this.props.onFocus(this.fieldRefs[field.id]);
-          //   }
+          if (this.props.onFocus) {
+            this.props.onFocus(this.fieldRefs[field.id]);
+          }
         }}
         error={errors[field.id]}
         disableErrorMessage={isInline}

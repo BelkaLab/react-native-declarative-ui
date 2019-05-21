@@ -1,23 +1,14 @@
 import find from 'lodash.find';
 import React from 'react';
-import {
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInputProperties,
-  TouchableWithoutFeedback,
-  View,
-  ViewStyle
-} from 'react-native';
-import { FloatingLabel, TextInputInstance } from '../../base/FloatingLabel';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { FloatingLabel } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
 export interface IAutocompletePickerFieldProps extends TextInputProperties {
-  onRef?: (input: TextInputInstance) => void;
+  onRef?: (input: TextInput) => void;
   label: string;
   onPress: () => void;
   onFocus?: () => void;

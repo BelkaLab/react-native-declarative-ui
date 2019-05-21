@@ -32,7 +32,8 @@ SharedOptions.setDefaultOptions({
   formContainer: {
     externalPadding: 20,
     inlinePadding: 16
-  }
+  },
+  calendars: {}
 });
 
 export default class Home extends Component<IHomeProps, IState> {
