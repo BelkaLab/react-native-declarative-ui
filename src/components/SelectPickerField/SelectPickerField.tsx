@@ -161,7 +161,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       return String(itemValue[displayProperty]);
     }
 
-    if (options && displayProperty && keyProperty) {
+    if (options && options.length > 0 && displayProperty && keyProperty) {
       return String(find(options as ComposableItem[], item => item[keyProperty] === itemValue)![displayProperty]);
     }
 

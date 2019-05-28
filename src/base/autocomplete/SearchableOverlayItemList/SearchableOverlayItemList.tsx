@@ -56,7 +56,7 @@ export default class SearchableOverlayItemList extends Component<ISearchableOver
             <Text>Loader</Text>
           </View>
         ) : (
-          <FlatList
+          <FlatList<string | ComposableItem>
             keyboardShouldPersistTaps="handled"
             data={this.state.items}
             //   contentContainerStyle={styles.listContainer}
