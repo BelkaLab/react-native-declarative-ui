@@ -28,10 +28,14 @@ export default class OverlayCalendar extends Component<IOverlayCalendarProps, IS
       <View style={globalStyles.pickerContainer}>
         <View style={styles.listHeaderContainer}>
           <TouchableWithoutFeedback onPress={this.props.onCancel}>
-            <Text style={styles.buttonContainer}>Annulla</Text>
+            <View style={styles.buttonContainer}>
+              <Text>Annulla</Text>
+            </View>
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback onPress={this.onConfirmPressed}>
-            <Text style={styles.buttonContainer}>Conferma</Text>
+            <View style={styles.buttonContainer}>
+              <Text>Conferma</Text>
+            </View>
           </TouchableWithoutFeedback>
         </View>
         <SingleDayCalendar
@@ -70,5 +74,5 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.GRAY_200,
     paddingHorizontal: 16
   },
-  buttonContainer: { height: HEADER_HEIGHT, textAlignVertical: 'center' }
+  buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' }
 });
