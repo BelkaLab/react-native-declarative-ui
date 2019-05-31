@@ -4,18 +4,18 @@ export type FormField = {
   id: string;
   label: string;
   type:
-    | 'text'
-    | 'number'
-    | 'checkbox'
-    | 'select'
-    | 'autocomplete'
-    | 'date'
-    | 'toggle'
-    | 'group'
-    | 'inline'
-    | 'header'
-    | 'title'
-    | 'separator';
+  | 'text'
+  | 'number'
+  | 'checkbox'
+  | 'select'
+  | 'autocomplete'
+  | 'date'
+  | 'toggle'
+  | 'group'
+  | 'inline'
+  | 'header'
+  | 'title'
+  | 'separator';
   // text props
   nextField?: string;
   autoFocus?: boolean;
@@ -24,6 +24,9 @@ export type FormField = {
   isPassword?: boolean;
   keyboard?: 'email-address' | 'default';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  // number props
+  isPercentage?: boolean;
+  currency?: string;
   // checkbox props
   checkboxTextPosition?: 'left' | 'right';
   urlLink?: string;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Image, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableOpacity, View, ViewStyle } from 'react-native';
-import { Colors } from '../../../../src/styles/colors';
+import { Colors } from '../../../styles/colors';
 
 export interface ISearchBarProps extends TextInputProperties {
   onSearch?: (text: string) => void;
@@ -28,7 +28,10 @@ export default class SearchBar extends Component<ISearchBarProps, IState> {
     return (
       <View style={[styles.searchBarContainer, contentContainerStyle]}>
         <View style={styles.inputContainer}>
-          <Image source={require('../../../assets/search.png')} style={{ width: 16, height: 16, marginHorizontal: 8 }} />
+          <Image
+            source={require('../../../assets/search.png')}
+            style={{ width: 16, height: 16, marginHorizontal: 8 }}
+          />
           <TextInput
             {...props}
             style={styles.input}

@@ -16,7 +16,8 @@ export interface ITextFieldProps extends TextInputProperties {
   error?: string;
   disableErrorMessage?: boolean;
   isPassword?: boolean;
-  //   isPercentage?: boolean;
+  isPercentage?: boolean;
+  currency?: string;
 }
 
 type State = {
@@ -53,14 +54,12 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
               globalStyles.input,
               this.retrieveBorderColor(),
               rightContent && rightContentVisibility && { paddingRight: 28 }
-              //   this.props.currency && this.props.value
-              //     ? { paddingLeft: this.getPaddingBySymbolLenght(this.props.currency.symbol) }
-              //     : this.props.isPercentage && this.props.value
-              //       ? { paddingLeft: 16 }
-              //       : { paddingLeft: 0 }
             ]}
             labelStyle={{
               backgroundColor: 'transparent',
+              color: !this.props.editable ? Colors.GRAY_500 : Colors.GRAY_600
+            }}
+            currencyStyle={{
               color: !this.props.editable ? Colors.GRAY_500 : Colors.GRAY_600
             }}
             inputStyle={[styles.inputStyle, { color: !this.props.editable ? Colors.GRAY_600 : Colors.BLACK }]}

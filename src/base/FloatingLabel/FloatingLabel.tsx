@@ -16,7 +16,7 @@ const defaultDirtyStyle = {
 
 const floatingLabelStyle: StyleProp<TextStyle> = {
   marginTop: 22,
-  paddingLeft: 10,
+  left: 10,
   color: Colors.WHITE,
   position: 'absolute'
 };
@@ -25,6 +25,7 @@ interface IFloatingLabelProps extends TextInputProperties {
   onRef?: (ref: TextInput | null) => void;
   inputStyle?: StyleProp<TextStyle>;
   labelStyle?: StyleProp<TextStyle>;
+  currencyStyle?: StyleProp<TextStyle>;
   dirtyStyle?: {
     fontSize: number;
     top: number;
@@ -36,8 +37,8 @@ interface IFloatingLabelProps extends TextInputProperties {
   disabled?: boolean;
   isSelectField?: boolean;
   isPassword?: boolean;
-  //   isPercentage: boolean;
-  //   currency: any;
+  isPercentage?: boolean;
+  currency?: string;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -87,19 +88,27 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
   }
 
   render() {
-    const { style, isSelectField } = this.props;
+    const { style, isSelectField, isPercentage, currency, value } = this.props;
+    const { isFocused } = this.state;
+
+    const hasSymbol = (isFocused || !!value) && (!!currency || !!isPercentage);
 
     return (
       <View style={[styles.element, style]}>
         {/* {isCurrency && this.renderSymbol(this.props.currency.symbol)}
         {isPercentage && this.renderSymbol('%')} */}
+        {hasSymbol && this.renderSymbol(currency || '%')}
+        {isSelectField ? (
+          <View pointerEvents="none">{this.renderTextField(hasSymbol)}</View>
+        ) : (
+          this.renderTextField(hasSymbol)
+        )}
         {this.renderLabel()}
-        {isSelectField ? <View pointerEvents="none">{this.renderTextField()}</View> : this.renderTextField()}
       </View>
     );
   }
 
-  private renderTextField = () => {
+  private renderTextField = (hasSymbol: boolean) => {
     const { children, style, onFocus, onBlur, onEndEditing, isPassword, inputStyle, value, ...rest } = this.props;
 
     return (
@@ -119,7 +128,10 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
               paddingBottom: this.state.height > INPUT_HEIGHT ? 6 : 0,
               paddingTop: this.state.height > INPUT_HEIGHT ? 4 : 0
             }
-          })
+          }),
+          hasSymbol && {
+            paddingLeft: 0
+          }
         ]}
         secureTextEntry={isPassword}
         onContentSizeChange={event => {
@@ -141,7 +153,8 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
   };
 
   renderSymbol(symbol: string) {
-    return <Text style={styles.symbol}>{symbol}</Text>;
+    const { currencyStyle } = this.props;
+    return <Text style={[styles.symbol, currencyStyle]}>{symbol}</Text>;
   }
 
   renderLabel() {
@@ -216,10 +229,12 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
 
 const styles = StyleSheet.create({
   element: {
-    position: 'relative'
+    position: 'relative',
+    flexDirection: 'row'
   },
   input: {
     height: INPUT_HEIGHT + 5,
+    flexGrow: 1,
     borderColor: 'gray',
     backgroundColor: 'transparent',
     justifyContent: 'center',
@@ -230,6 +245,6 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: 20
   },
-  symbol: { position: 'absolute', bottom: 8, left: 8, fontSize: 17 },
+  symbol: { fontSize: 17, paddingLeft: 10, paddingRight: 8, marginTop: Platform.select({ android: 26, ios: 27 }) },
   label: floatingLabelStyle
 });

@@ -10,7 +10,6 @@ import React, { Component } from 'react';
 import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import Modal from 'react-native-modal';
-import { Colors } from '../../src/styles/colors';
 import { SearchableOverlayItemList } from '../base/autocomplete/SearchableOverlayItemList';
 import { OverlayCalendar } from '../base/calendar/OverlayCalendar';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
@@ -25,6 +24,7 @@ import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
 import { showOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions } from '../options/SharedOptions';
+import { Colors } from '../styles/colors';
 
 numbro.registerLanguage(languages['it-IT']);
 numbro.setLanguage('it-IT');
@@ -421,8 +421,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
         editable={!field.disabled}
-        // currency={field.isCurrency ? this.props.currency : undefined}
-        // isPercentage={field.isPercentage}
+        currency={field.currency}
+        isPercentage={field.isPercentage}
         keyboardType="decimal-pad"
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
@@ -443,7 +443,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }}
         onFocus={() => {
           // if (this.props.onFocus) {
-          //   this.props.onFocus(this.inputsRef[field.id]);
+          //   this.props.onFocus(this.fieldRefs[field.id]);
           // }
         }}
         error={errors[field.id]}
