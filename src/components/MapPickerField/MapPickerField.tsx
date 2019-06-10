@@ -1,5 +1,6 @@
 import React from 'react';
 import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { FloatingLabel } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { Colors } from '../../styles/colors';
@@ -15,7 +16,8 @@ export interface IMapPickerFieldProps extends TextInputProperties {
   inputStyle?: StyleProp<ViewStyle>;
   error?: string;
   disableErrorMessage?: boolean;
-  
+  positionValue?: GooglePlaceDetail;
+
   // options?: ComposableItem[] | string[];
   // displayProperty?: string;
   // keyProperty?: string;
@@ -47,6 +49,7 @@ export default class MapPickerField extends React.Component<IMapPickerFieldProps
       // keyProperty,
       // itemValue,
       // options,
+      positionValue,
       error,
       ...rest
     } = this.props;
@@ -67,6 +70,7 @@ export default class MapPickerField extends React.Component<IMapPickerFieldProps
                   onRef(input);
                 }
               }}
+              value={this.retrieveDisplayValue(positionValue)}
               editable={false}
               isSelectField={true}
               style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
@@ -110,6 +114,22 @@ export default class MapPickerField extends React.Component<IMapPickerFieldProps
       </View>
     );
   }
+
+  private retrieveDisplayValue = (positionValue?: GooglePlaceDetail) => {
+    if (!positionValue) {
+      return undefined;
+    }
+
+    // if (displayProperty && typeof itemValue === 'object') {
+    //   return String(itemValue[displayProperty]);
+    // }
+
+    // if (options && options.length > 0 && displayProperty && keyProperty) {
+    //   return String(find(options as ComposableItem[], item => item[keyProperty] === itemValue)![displayProperty]);
+    // }
+
+    return String(positionValue.formatted_address);
+  };
 
   private renderError = (error: string, disableErrorMessage: boolean) => {
     if (disableErrorMessage) {

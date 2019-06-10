@@ -9,6 +9,7 @@ import languages from 'numbro/dist/languages.min.js';
 import React, { Component } from 'react';
 import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
+import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import Modal from 'react-native-modal';
 import { SearchableOverlayItemList } from '../base/autocomplete/SearchableOverlayItemList';
 import { OverlayCalendar } from '../base/calendar/OverlayCalendar';
@@ -799,6 +800,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         onPress={() => this.openMapPicker(field, model)}
+        positionValue={model[field.id] as GooglePlaceDetail}
         // itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
         // displayProperty={field.displayProperty}
@@ -831,11 +833,12 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return (
       <OverlayMap
         apiKey={this.props.googleApiKey!}
+        pickedPosition={model[field.id] as GooglePlaceDetail}
         // pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
         // isAlreadyPicked={Boolean(model[field.id])}
         // mode="single-day"
         onCancel={closeOverlay}
-        onConfirm={(selectedItem: string) => {
+        onConfirm={(pickedPosition: GooglePlaceDetail) => {
           this.setState({
             errors: {
               ...this.state.errors,
@@ -843,7 +846,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             }
           });
 
-          this.props.onChange(field.id, selectedItem);
+          this.props.onChange(field.id, pickedPosition);
 
           closeOverlay();
         }}
