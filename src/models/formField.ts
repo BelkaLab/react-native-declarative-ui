@@ -10,6 +10,7 @@ export type FormField = {
   | 'select'
   | 'autocomplete'
   | 'date'
+  | 'map'
   | 'toggle'
   | 'group'
   | 'inline'

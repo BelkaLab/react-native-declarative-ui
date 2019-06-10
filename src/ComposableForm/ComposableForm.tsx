@@ -13,10 +13,12 @@ import Modal from 'react-native-modal';
 import { SearchableOverlayItemList } from '../base/autocomplete/SearchableOverlayItemList';
 import { OverlayCalendar } from '../base/calendar/OverlayCalendar';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
+import { OverlayMap } from '../base/map/OverlayMap';
 import { OverlayItemList } from '../base/OverlayItemList';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
 import { CheckBoxField } from '../components/CheckBoxField';
 import { DatePickerField } from '../components/DatePickerField';
+import { MapPickerField } from '../components/MapPickerField';
 import { SelectPickerField } from '../components/SelectPickerField';
 import { TextField } from '../components/TextField';
 import { ComposableItem } from '../models/composableItem';
@@ -47,6 +49,7 @@ interface IComposableFormProps<T> {
   externalModel?: T;
   customStyle?: ComposableFormOptions;
   customComponents?: ComposableFormCustomComponents;
+  googleApiKey?: string;
 }
 
 interface IState {
@@ -77,6 +80,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   }
 
   private validateStructureWithProps = (structure: ComposableStructure, props: IComposableFormProps<T>) => {
+    // add all fields check here
+    // if props.googleApiKey is undefined, cannot use MapField
     return;
   };
 
@@ -312,7 +317,16 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             key={index}
             style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderDatePickerField(field, model, errors, isInline, customStyle)}
+            {this.renderDateField(field, model, errors, isInline, customStyle)}
+          </View>
+        );
+      case 'map':
+        return (
+          <View
+            key={index}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+          >
+            {this.renderMapField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'inline':
@@ -700,7 +714,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   };
 
   // This is a date picker field renderer for fields of type date
-  private renderDatePickerField = (
+  private renderDateField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -750,6 +764,76 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
         isAlreadyPicked={Boolean(model[field.id])}
         mode="single-day"
+        onCancel={closeOverlay}
+        onConfirm={(selectedItem: string) => {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field.id]: ''
+            }
+          });
+
+          this.props.onChange(field.id, selectedItem);
+
+          closeOverlay();
+        }}
+        customFormOptions={this.getComposableFormOptions()}
+      />
+    );
+  };
+
+  // This is a map picker field renderer for fields of type date
+  private renderMapField = (
+    field: FormField,
+    model: T,
+    errors: Dictionary<string>,
+    isInline: boolean = false,
+    customStyle: StyleProp<ViewStyle> = {}
+  ) => {
+    return (
+      <MapPickerField
+        onRef={input => {
+          this.fieldRefs[field.id] = input;
+        }}
+        containerStyle={[{ flex: 1 }, customStyle]}
+        // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
+        label={field.label}
+        onPress={() => this.openMapPicker(field, model)}
+        // itemValue={model[field.id] as ComposableItem | string}
+        // isPercentage={field.isPercentage}
+        // displayProperty={field.displayProperty}
+        // keyProperty={field.keyProperty}
+        error={errors[field.id]}
+        disableErrorMessage={isInline}
+        // options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
+      />
+    );
+  };
+
+  private openMapPicker = (field: FormField, model: T) => {
+    Keyboard.dismiss();
+
+    if (SharedOptions.isRNNAvailable()) {
+      showOverlay((dismissOverlay: () => void) => this.renderMapPickerOverlay(field, model, dismissOverlay));
+    } else {
+      this.setState({
+        isModalVisible: true,
+        overlayComponent: this.renderMapPickerOverlay(field, model, () =>
+          this.setState({
+            isModalVisible: false
+          })
+        )
+      });
+    }
+  };
+
+  private renderMapPickerOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
+    return (
+      <OverlayMap
+        apiKey={this.props.googleApiKey!}
+        // pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
+        // isAlreadyPicked={Boolean(model[field.id])}
+        // mode="single-day"
         onCancel={closeOverlay}
         onConfirm={(selectedItem: string) => {
           this.setState({
