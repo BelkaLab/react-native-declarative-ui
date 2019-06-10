@@ -2492,6 +2492,11 @@ locate-path@^3.0.0:
     p-locate "^3.0.0"
     path-exists "^3.0.0"
 
+lodash.debounce@^4.0.8:
+  version "4.0.8"
+  resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
+  integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
+
 lodash.every@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.every/-/lodash.every-4.6.0.tgz#eb89984bebc4364279bb3aefbbd1ca19bfa6c6a7"
@@ -3472,6 +3477,11 @@ pseudomap@^1.0.2:
   resolved "https://registry.yarnpkg.com/pseudomap/-/pseudomap-1.0.2.tgz#f052a28da70e618917ef0a8ac34c1ae5a68286b3"
   integrity sha1-8FKijacOYYkX7wqKw0wa5aaChrM=
 
+qs@^5.2.0:
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-5.2.1.tgz#801fee030e0b9450d6385adc48a4cc55b44aedfc"
+  integrity sha1-gB/uAw4LlFDWOFrcSKTMVbRK7fw=
+
 randomatic@^3.0.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/randomatic/-/randomatic-3.1.1.tgz#b776efc59375984e36c537b2f51a1f0aff0da1ed"
@@ -3527,9 +3537,9 @@ react-native-animatable@^1.2.4:
     prop-types "^15.5.10"
 
 react-native-calendars@^1.22.0:
-  version "1.155.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.155.0.tgz#c54484761113a5e9d281c0f08dd62e6a98f8cc91"
-  integrity sha512-1n5ShSfS2Kmh6ch55sAbAp03suflNKZZOpotujrMCvQNWoFcChX8d31sGdnK75F1WxIVrG2OFiL0lZZaoHHvNQ==
+  version "1.185.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.185.0.tgz#8846c11374738e0180f65774de59fdb7c8bf0eca"
+  integrity sha512-/YiO+HycYd54+ka3Xyv5I1HvQiR5nR7KMMMoF3kqaHZnCiYJjVlDcUcuMGTvQkY4ckGbSkji9Vu1lujU3ESLJA==
   dependencies:
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
@@ -3537,9 +3547,9 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.1.3:
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.14.tgz#ef58027abd2cb9353f35988ab4e03fbdac795697"
-  integrity sha512-gdHZefcKhtgB7srvLJlYdeU/fOcqBj13v25U0t5fauPlkjonrI1Pzsi23adXzyIU2v24rZAjVL4wz6dxF/0n2A==
+  version "0.1.15"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.15.tgz#b1f624967e9482a72d779e8835cc9f63fc6c500b"
+  integrity sha512-Mv8/tg6bAWAETMrCydNLW3+SjuFrU2W19++xfjxOK3enhlEkfVvx9YzQhTTY8XhNSFTsNoPD/NdsLGGdrpDN2g==
   dependencies:
     lodash.every "^4.6.0"
     lodash.filter "^4.6.0"
@@ -3551,7 +3561,17 @@ react-native-declarative-ui@^0.1.3:
     moment "^2.24.0"
     numbro "^2.1.2"
     react-native-calendars "^1.22.0"
+    react-native-google-places-autocomplete "^1.3.9"
     react-native-modal "^9.0.0"
+
+react-native-google-places-autocomplete@^1.3.9:
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/react-native-google-places-autocomplete/-/react-native-google-places-autocomplete-1.3.9.tgz#34c2e8b51df40ecb55ef3ccf57caba4c89ff9b56"
+  integrity sha512-bMZRYLpkuhvWE+UYmONw5fsEBM9cyJcSBESHTCKT8ZIydi+HKEM4rKZ+qLvgeHMPD2wpWRNwMJFDhR+ja/datQ==
+  dependencies:
+    lodash.debounce "^4.0.8"
+    prop-types "^15.5.10"
+    qs "^5.2.0"
 
 react-native-iphone-x-helper@^1.0.3:
   version "1.2.0"
