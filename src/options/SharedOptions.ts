@@ -16,7 +16,8 @@ export type ComposableFormOptions = {
     singleDayTheme?: CalendarTheme;
   };
   pickers: {
-    headerBackgroundColors?: string | string[];
+    headerBackgroundColor?: string;
+    headerCustomBackground?: React.ReactElement<{}>;
   }
 };
 

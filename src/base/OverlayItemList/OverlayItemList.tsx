@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -13,7 +12,8 @@ export interface IOverlayItemListProps {
   onPick: (item: ComposableItem | string) => void;
   topLabel?: string;
   isObjectMappedToKey?: boolean;
-  headerBackgroundColors?: string | string[];
+  headerBackgroundColor?: string;
+  headerCustomBackground?: React.ReactElement<{}>;
   renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
 }
@@ -94,29 +94,25 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
   };
 
   private renderHeader = () => {
-    const { headerBackgroundColors } = this.props;
+    const { headerBackgroundColor, headerCustomBackground } = this.props;
 
-    if (!Array.isArray(headerBackgroundColors)) {
-      return (
-        <View
-          style={[
-            styles.listHeaderContainer,
-            {
-              backgroundColor: headerBackgroundColors || Colors.WHITE
-            }
-          ]}
-        />
-      );
-    } else {
+    if (headerCustomBackground) {
       return (
         <View style={styles.listHeaderContainer}>
-          <LinearGradient
-            colors={headerBackgroundColors}
-            style={{ position: 'absolute', height: HEADER_HEIGHT, width: '100%' }}
-          />
+          <View style={{ position: 'absolute', height: HEADER_HEIGHT, width: '100%' }}>{headerCustomBackground}</View>
         </View>
       );
     }
+    return (
+      <View
+        style={[
+          styles.listHeaderContainer,
+          {
+            backgroundColor: headerBackgroundColor || Colors.WHITE
+          }
+        ]}
+      />
+    );
   };
 
   private renderTopLabel = () => {
