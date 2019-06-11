@@ -577,6 +577,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         items={items}
         displayProperty={field.displayProperty}
         keyProperty={field.keyProperty}
+        topLabel={field.pickerLabel}
+        headerBackgroundColors={this.getComposableFormOptions().pickers.headerBackgroundColors}
         onPick={(selectedItem: ComposableItem | string) => {
           this.setState({
             errors: {
@@ -590,7 +592,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
               throw new Error(
                 `Field ${
                   field.id
-                } is setted as "isObjectMappedToKey" but your picker is returning a string instead of an object`
+                } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
               );
             }
             this.props.onChange(field.id, selectedItem[field.keyProperty!]);
@@ -611,6 +613,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           closeOverlay();
         }}
         renderSelectPickerItem={this.getComposableFormCustomComponents().renderOverlayItem}
+        renderTopLabelItem={this.getComposableFormCustomComponents().renderTopLabelItem}
       />
     );
   };

@@ -110,7 +110,6 @@ const styles = StyleSheet.create({
   },
   overlayContainer: {
     overflow: 'hidden',
-    maxHeight: deviceHeight * 0.8,
     borderTopRightRadius: 8,
     borderTopLeftRadius: 8
   }

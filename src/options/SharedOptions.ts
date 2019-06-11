@@ -15,10 +15,14 @@ export type ComposableFormOptions = {
   calendars: {
     singleDayTheme?: CalendarTheme;
   };
+  pickers: {
+    headerBackgroundColors?: string | string[];
+  }
 };
 
 export type ComposableFormCustomComponents = {
   renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>
 };
 
 class SharedOptions {
@@ -31,7 +35,8 @@ class SharedOptions {
       inlinePadding: 16,
       backgroundColor: Colors.WHITE
     },
-    calendars: {}
+    calendars: {},
+    pickers: {}
   };
   private _customComponents: ComposableFormCustomComponents = {};
 

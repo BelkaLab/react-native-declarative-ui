@@ -36,6 +36,7 @@ export type FormField = {
   options?: ComposableItem[] | string[];
   keyProperty?: string;
   displayProperty?: string;
+  pickerLabel?: string;
   shouldReturnKey?: boolean;
   updateFieldId?: string;
   updateFieldKeyProperty?: string;

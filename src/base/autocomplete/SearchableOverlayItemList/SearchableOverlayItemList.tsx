@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ComposableItem } from '../../../models/composableItem';
 import { Colors } from '../../../styles/colors';
 import { globalStyles } from '../../../styles/globalStyles';
@@ -42,7 +42,7 @@ export default class SearchableOverlayItemList extends Component<ISearchableOver
     const { currentText, isLoading } = this.state;
 
     return (
-      <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height * 0.8 }]}>
+      <View style={[globalStyles.pickerContainer, { flex: 0.8 }]}>
         <SearchBar
           // placeholder={'Cerca'}
           value={currentText}

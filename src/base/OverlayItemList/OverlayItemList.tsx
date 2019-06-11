@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -12,7 +13,9 @@ export interface IOverlayItemListProps {
   onPick: (item: ComposableItem | string) => void;
   topLabel?: string;
   isObjectMappedToKey?: boolean;
+  headerBackgroundColors?: string | string[];
   renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
 }
 
 interface IState {
@@ -33,18 +36,15 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
 
   render() {
     const { isLoading } = this.state;
-    const { topLabel } = this.props;
 
     return (
       <View style={globalStyles.pickerContainer}>
-        <View style={styles.listHeaderContainer}>
-          <Text>{topLabel}</Text>
-        </View>
-
+        {this.renderHeader()}
+        {this.renderTopLabel()}
         {isLoading ? (
           <View>Loader</View>
         ) : (
-          <FlatList
+          <FlatList<string | ComposableItem>
             // contentContainerStyle={{ flex: 1 }}
             keyboardShouldPersistTaps="handled"
             data={this.state.items}
@@ -93,6 +93,48 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
     );
   };
 
+  private renderHeader = () => {
+    const { headerBackgroundColors } = this.props;
+
+    if (!Array.isArray(headerBackgroundColors)) {
+      return (
+        <View
+          style={[
+            styles.listHeaderContainer,
+            {
+              backgroundColor: headerBackgroundColors || Colors.WHITE
+            }
+          ]}
+        />
+      );
+    } else {
+      return (
+        <View style={styles.listHeaderContainer}>
+          <LinearGradient
+            colors={headerBackgroundColors}
+            style={{ position: 'absolute', height: HEADER_HEIGHT, width: '100%' }}
+          />
+        </View>
+      );
+    }
+  };
+
+  private renderTopLabel = () => {
+    const { topLabel, renderTopLabelItem } = this.props;
+
+    if (topLabel) {
+      return renderTopLabelItem ? (
+        renderTopLabelItem(topLabel)
+      ) : (
+        <View style={styles.topLabelContainer}>
+          <Text style={{ fontSize: 15 }}>{topLabel}</Text>
+        </View>
+      );
+    }
+
+    return null;
+  };
+
   private toggleLoadingIndicator = (show: boolean) => {
     this.setState({
       isLoading: show
@@ -100,7 +142,8 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
   };
 }
 
-const HEADER_HEIGHT = 52;
+const HEADER_HEIGHT = 48;
+const TOP_LABEL_HEIGHT = 40;
 
 const styles = StyleSheet.create({
   searchBar: {
@@ -108,9 +151,20 @@ const styles = StyleSheet.create({
   },
   listHeaderContainer: {
     height: HEADER_HEIGHT,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopRightRadius: 6,
+    borderTopLeftRadius: 6,
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: 16
+  },
+  buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
+  topLabelContainer: {
+    height: TOP_LABEL_HEIGHT,
     backgroundColor: Colors.GRAY_200,
     paddingLeft: 16,
     paddingBottom: 8,
-    justifyContent: 'flex-end'
+    paddingTop: 14
   }
 });

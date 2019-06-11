@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { ComposableFormOptions } from '../../../options/SharedOptions';
 import { Colors } from '../../../styles/colors';
 import { globalStyles } from '../../../styles/globalStyles';
-
-const deviceHeight = Dimensions.get('window').height;
 
 export interface IOverlayMapProps {
   apiKey: string;
@@ -27,14 +25,7 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
 
   render() {
     return (
-      <View
-        style={[
-          globalStyles.pickerContainer,
-          {
-            height: deviceHeight * 0.8
-          }
-        ]}
-      >
+      <View style={[globalStyles.pickerContainer, { flex: 0.8 }]}>
         <View style={styles.listHeaderContainer}>
           <TouchableWithoutFeedback onPress={this.props.onCancel}>
             <View style={styles.buttonContainer}>
@@ -61,7 +52,7 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
           placeholder="Cerca"
           minLength={3}
           debounce={200}
-          autoFocus={false}
+          autoFocus={true}
           query={{
             key: this.props.apiKey,
             language: 'it', // language of the results
@@ -103,6 +94,8 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
             // available options for GooglePlacesDetails API : https://developers.google.com/places/web-service/details
             fields: 'formatted_address'
           }}
+          currentLocation={true}
+          currentLocationLabel="Usa la mia posizione"
         />
       </View>
     );
