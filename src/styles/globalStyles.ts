@@ -23,7 +23,7 @@ export const globalStyles = StyleSheet.create({
     borderColor: 'transparent'
   },
   pickerContainer: {
-    paddingBottom: 52,
+    paddingBottom: 32,
     borderTopRightRadius: 6,
     borderTopLeftRadius: 6, 
     backgroundColor: Colors.WHITE

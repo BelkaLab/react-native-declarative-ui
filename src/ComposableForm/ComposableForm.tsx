@@ -579,7 +579,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         keyProperty={field.keyProperty}
         topLabel={field.pickerLabel}
         headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
-        renderCustomBackground={this.getComposableFormOptions().pickers.headerCustomBackground}
+        renderCustomBackground={this.getComposableFormOptions().pickers.renderCustomBackground}
         onPick={(selectedItem: ComposableItem | string) => {
           this.setState({
             errors: {
@@ -613,7 +613,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
           closeOverlay();
         }}
-        renderSelectPickerItem={this.getComposableFormCustomComponents().renderOverlayItem}
+        renderOverlayItem={this.getComposableFormCustomComponents().renderOverlayItem}
         renderTopLabelItem={this.getComposableFormCustomComponents().renderTopLabelItem}
       />
     );

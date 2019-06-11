@@ -14,7 +14,7 @@ export interface IOverlayItemListProps {
   isObjectMappedToKey?: boolean;
   headerBackgroundColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
-  renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
 }
 
@@ -70,22 +70,35 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
   }
 
   private renderItem = (item: ComposableItem | string) => {
-    const { renderSelectPickerItem } = this.props;
+    const { renderOverlayItem, keyProperty, displayProperty } = this.props;
 
     return (
       <TouchableOpacity onPress={() => this.props.onPick(item)}>
-        {renderSelectPickerItem
-          ? renderSelectPickerItem(item, this.props.displayProperty)
-          : this.renderDefaultItem(item)}
+        {renderOverlayItem
+          ? renderOverlayItem(item, displayProperty)
+          : this.renderDefaultItem(item, keyProperty, displayProperty)}
       </TouchableOpacity>
     );
   };
 
-  private renderDefaultItem = (item: ComposableItem | string) => {
+  private renderDefaultItem = (item: ComposableItem | string, keyProperty?: string, displayProperty?: string) => {
+    const { pickedItem } = this.props;
+    if (typeof item === 'object' && typeof pickedItem === 'object' && keyProperty && displayProperty) {
+      const isSelected = item[keyProperty] === pickedItem[keyProperty];
+
+      return (
+        <View style={{ padding: 16 }}>
+          <Text style={{ color: isSelected ? Colors.PRIMARY_BLUE : Colors.BLACK }}>
+            {String(item[displayProperty])}
+          </Text>
+        </View>
+      );
+    }
+
     return (
       <View style={{ padding: 16 }}>
-        {typeof item === 'object' && this.props.displayProperty ? (
-          <Text>{String(item[this.props.displayProperty])}</Text>
+        {typeof item === 'object' && displayProperty ? (
+          <Text>{String(item[displayProperty])}</Text>
         ) : (
           <Text>{item}</Text>
         )}
@@ -94,12 +107,12 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
   };
 
   private renderHeader = () => {
-    const { headerBackgroundColor, renderCustomBackground: headerCustomBackground } = this.props;
+    const { headerBackgroundColor, renderCustomBackground } = this.props;
 
-    if (headerCustomBackground) {
+    if (renderCustomBackground) {
       return (
-        <View style={styles.listHeaderContainer}>
-          <View style={{ position: 'absolute', height: HEADER_HEIGHT, width: '100%' }}>{headerCustomBackground}</View>
+        <View style={styles.listHeaderCustomerContainer}>
+          <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
         </View>
       );
     }
@@ -154,6 +167,21 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     backgroundColor: Colors.WHITE,
     paddingHorizontal: 16
+  },
+  listHeaderCustomerContainer: {
+    height: HEADER_HEIGHT,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopRightRadius: 6,
+    borderTopLeftRadius: 6
+  },
+  customBackgroundContainer: {
+    position: 'absolute',
+    height: HEADER_HEIGHT,
+    width: '100%',
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6
   },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
   topLabelContainer: {
