@@ -13,7 +13,7 @@ export interface IOverlayItemListProps {
   topLabel?: string;
   isObjectMappedToKey?: boolean;
   headerBackgroundColor?: string;
-  headerCustomBackground?: React.ReactElement<{}>;
+  renderCustomBackground?: () => React.ReactElement<{}>;
   renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
 }
@@ -94,12 +94,12 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
   };
 
   private renderHeader = () => {
-    const { headerBackgroundColor, headerCustomBackground } = this.props;
+    const { headerBackgroundColor, renderCustomBackground: headerCustomBackground } = this.props;
 
     if (headerCustomBackground) {
       return (
-        <View style={styles.listHeaderContainer}>
-          <View style={{ position: 'absolute', height: HEADER_HEIGHT, width: '100%' }}>{headerCustomBackground}</View>
+        <View style={styles.listHeaderCustomerContainer}>
+          <View style={{ position: 'absolute', height: HEADER_HEIGHT, width: '100%', borderTopLeftRadius: 6, borderTopRightRadius: 6 }}>{headerCustomBackground()}</View>
         </View>
       );
     }
@@ -154,6 +154,14 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     backgroundColor: Colors.WHITE,
     paddingHorizontal: 16
+  },
+  listHeaderCustomerContainer: {
+    height: HEADER_HEIGHT,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopRightRadius: 6,
+    borderTopLeftRadius: 6
   },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
   topLabelContainer: {

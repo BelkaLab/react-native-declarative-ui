@@ -28,17 +28,17 @@ declare module 'react-native-declarative-ui' {
   export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> { }
 
   export type ComposableFormOptions = {
-    formContainer: {
+    formContainer?: {
       externalPadding?: number;
       inlinePadding?: number;
       backgroundColor?: string;
     };
-    calendars: {
+    calendars?: {
       singleDayTheme?: CalendarTheme;
     };
-    pickers: {
+    pickers?: {
       headerBackgroundColor?: string;
-      headerCustomBackground?: React.ReactElement<{}>;
+      renderCustomBackground?: () => React.ReactElement<{}>;
     }
   };
 

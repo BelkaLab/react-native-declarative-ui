@@ -7,6 +7,21 @@ import { Colors } from '../styles/colors';
 import { requireWrapper } from '../utils/helper';
 
 export type ComposableFormOptions = {
+  formContainer?: {
+    externalPadding?: number;
+    inlinePadding?: number;
+    backgroundColor?: string;
+  };
+  calendars?: {
+    singleDayTheme?: CalendarTheme;
+  };
+  pickers?: {
+    headerBackgroundColor?: string;
+    renderCustomBackground?: () => React.ReactElement<{}>;
+  }
+};
+
+type DefinedComposableFormOptions = {
   formContainer: {
     externalPadding?: number;
     inlinePadding?: number;
@@ -17,7 +32,7 @@ export type ComposableFormOptions = {
   };
   pickers: {
     headerBackgroundColor?: string;
-    headerCustomBackground?: React.ReactElement<{}>;
+    renderCustomBackground?: () => React.ReactElement<{}>;
   }
 };
 
@@ -30,7 +45,7 @@ class SharedOptions {
   private static instance: SharedOptions;
 
   private _isRNNAvailable: boolean = false;
-  private _options: ComposableFormOptions = {
+  private _options: DefinedComposableFormOptions = {
     formContainer: {
       externalPadding: 16,
       inlinePadding: 16,
