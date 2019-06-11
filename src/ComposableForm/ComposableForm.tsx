@@ -578,7 +578,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         displayProperty={field.displayProperty}
         keyProperty={field.keyProperty}
         topLabel={field.pickerLabel}
-        headerBackgroundColors={this.getComposableFormOptions().pickers.headerBackgroundColors}
+        headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
+        headerCustomBackground={this.getComposableFormOptions().pickers.headerCustomBackground}
         onPick={(selectedItem: ComposableItem | string) => {
           this.setState({
             errors: {

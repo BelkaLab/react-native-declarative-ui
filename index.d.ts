@@ -25,7 +25,7 @@ declare module 'react-native-declarative-ui' {
     googleApiKey?: string;
   }
 
-  export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> {}
+  export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> { }
 
   export type ComposableFormOptions = {
     formContainer: {
@@ -37,7 +37,8 @@ declare module 'react-native-declarative-ui' {
       singleDayTheme?: CalendarTheme;
     };
     pickers: {
-      headerBackgroundColors?: string | string[];
+      headerBackgroundColor?: string;
+      headerCustomBackground?: React.ReactElement<{}>;
     }
   };
 
