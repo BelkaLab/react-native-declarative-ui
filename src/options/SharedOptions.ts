@@ -17,7 +17,7 @@ export type ComposableFormOptions = {
   };
   pickers: {
     headerBackgroundColor?: string;
-    headerCustomBackground?: React.ReactElement<{}>;
+    headerCustomBackground?: () => React.ReactElement<{}>;
   }
 };
 

@@ -13,7 +13,7 @@ export interface IOverlayItemListProps {
   topLabel?: string;
   isObjectMappedToKey?: boolean;
   headerBackgroundColor?: string;
-  headerCustomBackground?: React.ReactElement<{}>;
+  renderCustomBackground?: () => React.ReactElement<{}>;
   renderSelectPickerItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
 }
@@ -94,7 +94,7 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
   };
 
   private renderHeader = () => {
-    const { headerBackgroundColor, headerCustomBackground } = this.props;
+    const { headerBackgroundColor, renderCustomBackground: headerCustomBackground } = this.props;
 
     if (headerCustomBackground) {
       return (
