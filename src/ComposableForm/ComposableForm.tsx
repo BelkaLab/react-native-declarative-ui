@@ -613,7 +613,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
           closeOverlay();
         }}
-        renderSelectPickerItem={this.getComposableFormCustomComponents().renderOverlayItem}
+        renderOverlayItem={this.getComposableFormCustomComponents().renderOverlayItem}
         renderTopLabelItem={this.getComposableFormCustomComponents().renderTopLabelItem}
       />
     );
