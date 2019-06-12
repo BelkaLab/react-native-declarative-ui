@@ -2497,6 +2497,11 @@ lodash.debounce@^4.0.8:
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
   integrity sha1-gteb/zCmfEAF/9XiUVMArZyk168=
 
+lodash.delay@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/lodash.delay/-/lodash.delay-4.1.1.tgz#8a3b424988252ab912356d8e3ce93eb172d9f231"
+  integrity sha1-ijtCSYglKrkSNW2OPOk+sXLZ8jE=
+
 lodash.every@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.every/-/lodash.every-4.6.0.tgz#eb89984bebc4364279bb3aefbbd1ca19bfa6c6a7"
@@ -2511,6 +2516,11 @@ lodash.find@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.find/-/lodash.find-4.6.0.tgz#cb0704d47ab71789ffa0de8b97dd926fb88b13b1"
   integrity sha1-ywcE1Hq3F4n/oN6Ll92Sb7iLE7E=
+
+lodash.first@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/lodash.first/-/lodash.first-3.0.0.tgz#5dae180d7f818ee65fc5b210b104a7bbef98a16a"
+  integrity sha1-Xa4YDX+BjuZfxbIQsQSnu++YoWo=
 
 lodash.get@^4.4.2:
   version "4.4.2"
@@ -3537,9 +3547,9 @@ react-native-animatable@^1.2.4:
     prop-types "^15.5.10"
 
 react-native-calendars@^1.22.0:
-  version "1.185.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.185.0.tgz#8846c11374738e0180f65774de59fdb7c8bf0eca"
-  integrity sha512-/YiO+HycYd54+ka3Xyv5I1HvQiR5nR7KMMMoF3kqaHZnCiYJjVlDcUcuMGTvQkY4ckGbSkji9Vu1lujU3ESLJA==
+  version "1.186.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.186.0.tgz#83b7219daf60c4c3a7640baee74636084a5dd549"
+  integrity sha512-e83bwEY2iAV7hnR6J2KxoEm7WqlBVxXrBTS1DY15QBlEqQ4aJgupUmnCpx54ahJ96/V+nSLS3ItK6uPbYdBPeg==
   dependencies:
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
@@ -3547,13 +3557,15 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.1.3:
-  version "0.1.19"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.19.tgz#7ba4ad9a22e6f2e59c9fe8b466a9fb3144cb5bc6"
-  integrity sha512-uCeEdvXXFoFr3YTlyMaiqmeDhP5TqFvqPRMM3XHmPs5UiyHQ/KzputMdnibz1NyC0AXO5i0Rb5NiOuwJaB4GMg==
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.20.tgz#95b5adf22f0ad09d9e203ce74aad01b4afbcc1f8"
+  integrity sha512-ArowkAxEvI6DHuFAGb1vln0O0QscbxEsqIvbyaJesP+up1FMq66oJ4IU7ChgINs6v822JPyPXEGb9n8oRU63OQ==
   dependencies:
+    lodash.delay "^4.1.1"
     lodash.every "^4.6.0"
     lodash.filter "^4.6.0"
     lodash.find "^4.6.0"
+    lodash.first "^3.0.0"
     lodash.isequal "^4.5.0"
     lodash.map "^4.6.0"
     lodash.merge "^4.6.1"
