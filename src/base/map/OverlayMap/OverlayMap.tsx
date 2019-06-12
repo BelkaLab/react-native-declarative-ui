@@ -15,6 +15,7 @@ export interface IOverlayMapProps {
   customFormOptions: ComposableFormOptions;
   headerBackgroundColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
+  renderCustomCancelButton?: () => React.ReactElement<{}>;
 }
 
 interface IState {
@@ -104,7 +105,6 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
         <View style={styles.listHeaderCustomerContainer}>
           <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
           {this.renderCancelButton()}
-          {this.renderConfirmButton()}
         </View>
       );
     }
@@ -119,12 +119,20 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
         ]}
       >
         {this.renderCancelButton()}
-        {this.renderConfirmButton()}
       </View>
     );
   };
 
   private renderCancelButton = () => {
+    const { renderCustomCancelButton } = this.props;
+    if (renderCustomCancelButton) {
+      return (
+        <TouchableWithoutFeedback onPress={this.props.onCancel}>
+          <View style={styles.buttonContainer}>{renderCustomCancelButton()}</View>
+        </TouchableWithoutFeedback>
+      );
+    }
+
     return (
       <TouchableWithoutFeedback onPress={this.props.onCancel}>
         <View style={styles.buttonContainer}>
@@ -132,23 +140,6 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
         </View>
       </TouchableWithoutFeedback>
     );
-  };
-
-  private renderConfirmButton = () => {
-    return (
-      <TouchableWithoutFeedback onPress={this.onConfirmPressed}>
-        <View style={styles.buttonContainer}>
-          <Text>Conferma</Text>
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  };
-
-  private onConfirmPressed = () => {
-    const picked = this.state.pickedPosition || this.props.pickedPosition;
-    if (this.props.onConfirm && picked) {
-      this.props.onConfirm(picked);
-    }
   };
 }
 

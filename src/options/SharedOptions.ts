@@ -18,6 +18,7 @@ export type ComposableFormOptions = {
   pickers?: {
     headerBackgroundColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
+    renderCustomCancelButton?: () => React.ReactElement<{}>;
   }
 };
 
@@ -33,6 +34,7 @@ type DefinedComposableFormOptions = {
   pickers: {
     headerBackgroundColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
+    renderCustomCancelButton?: () => React.ReactElement<{}>;
   }
 };
 

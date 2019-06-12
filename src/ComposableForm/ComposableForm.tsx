@@ -859,6 +859,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         pickedPosition={model[field.id] as GooglePlaceDetail}
         headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
         renderCustomBackground={this.getComposableFormOptions().pickers.renderCustomBackground}
+        renderCustomCancelButton={this.getComposableFormOptions().pickers.renderCustomCancelButton}
         onCancel={closeOverlay}
         onConfirm={(pickedPosition: GooglePlaceDetail) => {
           this.setState({
