@@ -1,5 +1,6 @@
 import every from 'lodash.every';
 import find from 'lodash.find';
+import first from 'lodash.first';
 import isEqual from 'lodash.isequal';
 import merge from 'lodash.merge';
 import some from 'lodash.some';
@@ -28,6 +29,7 @@ import { FormField } from '../models/formField';
 import { showOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
+import { getValueByKey, isObject } from '../utils/helper';
 
 numbro.registerLanguage(languages['it-IT']);
 numbro.setLanguage('it-IT');
@@ -568,12 +570,24 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
   };
 
+  private retrievePickedItem = (
+    items: ComposableItem[] | string[],
+    value: ComposableItem | string,
+    keyProperty?: string
+  ) => {
+    if (!keyProperty || !isObject(first<ComposableItem | string>(items))) {
+      return value;
+    }
+
+    return find<ComposableItem>(items as ComposableItem[], item => getValueByKey(item, keyProperty) === value);
+  };
+
   private renderSelectPickerOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
     const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
     return (
       <OverlayItemList
-        pickedItem={model[field.id] as ComposableItem | string}
+        pickedItem={this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty)}
         items={items}
         displayProperty={field.displayProperty}
         keyProperty={field.keyProperty}
@@ -589,14 +603,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           });
 
           if (field.shouldReturnKey) {
-            if (typeof selectedItem !== 'object') {
+            if (!isObject(selectedItem)) {
               throw new Error(
                 `Field ${
                   field.id
                 } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
               );
             }
-            this.props.onChange(field.id, selectedItem[field.keyProperty!]);
+            if (!field.keyProperty) {
+              throw new Error(
+                `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
+              );
+            }
+            this.props.onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
           } else {
             this.props.onChange(field.id, selectedItem);
           }
@@ -838,9 +857,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <OverlayMap
         apiKey={this.props.googleApiKey!}
         pickedPosition={model[field.id] as GooglePlaceDetail}
-        // pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
-        // isAlreadyPicked={Boolean(model[field.id])}
-        // mode="single-day"
+        headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
+        renderCustomBackground={this.getComposableFormOptions().pickers.renderCustomBackground}
         onCancel={closeOverlay}
         onConfirm={(pickedPosition: GooglePlaceDetail) => {
           this.setState({

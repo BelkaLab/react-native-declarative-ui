@@ -4,7 +4,7 @@ import { Colors } from '../../styles/colors';
 import { requireWrapper } from '../../utils/helper';
 
 const deviceHeight = Dimensions.get('window').height;
-const ANIM_DURATION = 200;
+export const ANIM_DURATION = 200;
 
 interface ISlideBottomOverlayProps {
   componentId?: string;

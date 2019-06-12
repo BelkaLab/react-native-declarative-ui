@@ -290,7 +290,7 @@ declare module 'react-native-google-places-autocomplete' {
         rankby?: string
         type?: T
         // deprecated. see https://github.com/FaridSafi/react-native-google-places-autocomplete/pull/384
-        types?: T
+        types?: T | T[]
     }
 
     interface Styles {

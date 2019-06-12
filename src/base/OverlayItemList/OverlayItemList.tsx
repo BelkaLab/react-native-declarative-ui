@@ -5,8 +5,8 @@ import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
 export interface IOverlayItemListProps {
-  pickedItem: ComposableItem | string;
   items: ComposableItem[] | string[];
+  pickedItem?: ComposableItem | string;
   displayProperty?: string;
   keyProperty?: string;
   onPick: (item: ComposableItem | string) => void;
