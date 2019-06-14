@@ -135,14 +135,16 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
         ]}
         secureTextEntry={isPassword}
         onContentSizeChange={event => {
-          const height = event.nativeEvent.contentSize.height;
+          if (this.props.multiline) {
+            const height = event.nativeEvent.contentSize.height;
 
-          this.setState({
-            height: Platform.select({
-              android: height,
-              ios: this.props.multiline && height > INPUT_HEIGHT ? height + 14 : height
-            })
-          });
+            this.setState({
+              height: Platform.select({
+                android: height,
+                ios: this.props.multiline && height > INPUT_HEIGHT ? height + 14 : height
+              })
+            });
+          }
         }}
         onBlur={this.onBlur}
         onFocus={this.onFocus}

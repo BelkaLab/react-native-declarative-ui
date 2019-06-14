@@ -459,9 +459,12 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, this.convertStringToNumber(val));
         }}
         onFocus={() => {
-          // if (this.props.onFocus) {
-          //   this.props.onFocus(this.fieldRefs[field.id]);
-          // }
+          if (this.props.onFocus) {
+            this.props.onFocus(this.fieldRefs[field.id]);
+          }
+        }}
+        onBlur={() => {
+          this.props.onChange(field.id, this.restoreNumberWithLocale(model[field.id] as string | number | undefined));
         }}
         error={errors[field.id]}
         disableErrorMessage={isInline}
@@ -469,7 +472,24 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
+  private restoreNumberWithLocale = (val?: string | number): number | undefined => {
+    if (!val) {
+      return undefined;
+    }
+
+    if (!isNaN(Number(val))) {
+      return numbro(val).value();
+    }
+
+    return numbro.unformat(String(val));
+  };
+
   private formatNumberWithLocale = (n?: string | number): string | undefined => {
+    if (!!n && this.isSeparatorLastChar(String(n))) {
+      const numberString = String(n);
+      return `${numberString.slice(0, numberString.length - 1)},`;
+    }
+
     if (Number(n) || n === 0) {
       return numbro(n).format();
     }
