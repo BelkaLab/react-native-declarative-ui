@@ -62,6 +62,7 @@ interface IState {
   isKeyboardOpened: boolean;
   isModalVisible: boolean;
   overlayComponent?: React.ReactElement<{}>;
+  isAutoFocused: boolean;
 }
 
 export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
@@ -78,7 +79,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       errors: {},
       isFormFilled: false,
       isKeyboardOpened: false,
-      isModalVisible: false
+      isModalVisible: false,
+      isAutoFocused: false
     };
   }
 
@@ -88,13 +90,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return;
   };
 
-  componentDidMount() {
-    const focusField = find(this.state.structure.fields, f => f.autoFocus && this.fieldRefs[f.id]) as
-      | FormField
-      | undefined;
+  componentDidUpdate() {
+    if (!this.state.isAutoFocused) {
+      const focusField = find(this.state.structure.fields, f => f.autoFocus && this.fieldRefs[f.id]) as
+        | FormField
+        | undefined;
 
-    if (focusField) {
-      this.fieldRefs[focusField.id].focus();
+      if (focusField) {
+        this.fieldRefs[focusField.id].focus();
+      }
+
+      this.setState({
+        isAutoFocused: true
+      });
     }
   }
 
@@ -381,8 +389,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
         selectionColor={Colors.PRIMARY_BLUE}
-        onSubmitEditing={() => {
-          if (field.nextField && this.fieldRefs[field.nextField]) {
+        onSubmitEditing={event => {
+          if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
             this.fieldRefs[field.nextField].focus();
           }
         }}
@@ -445,7 +453,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         blurOnSubmit={field.multiline ? false : !field.nextField}
         selectionColor={Colors.PRIMARY_BLUE}
         onSubmitEditing={() => {
-          if (field.nextField && this.fieldRefs[field.nextField]) {
+          if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
             this.fieldRefs[field.nextField].focus();
           }
         }}
@@ -502,7 +510,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       return undefined;
     }
 
-    if (this.isSeparatorLastChar(val)) {
+    if (this.isSeparatorLastChar(val) || ((val.includes(',') || val.includes('.')) && val.slice(-1) === '0')) {
       return val;
     }
 
