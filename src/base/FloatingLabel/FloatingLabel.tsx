@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
 
@@ -44,14 +44,15 @@ interface IFloatingLabelProps extends TextInputProperties {
 
 interface IState {
   height: number;
-  isDirty: boolean;
   text?: string;
   isFocused: boolean;
   fontSize: Animated.Value;
   top: Animated.Value;
 }
 
-export default class FloatingLabel extends Component<IFloatingLabelProps, IState> {
+export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IState> {
+  private input: TextInput | null = null;
+
   constructor(props: IFloatingLabelProps) {
     super(props);
 
@@ -61,7 +62,6 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
 
     this.state = {
       text: props.value,
-      isDirty,
       isFocused: this.props.autoFocus || false,
       height: 0,
       fontSize: new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize),
@@ -72,26 +72,25 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
   componentWillReceiveProps(props: IFloatingLabelProps) {
     if (props.value !== undefined && props.value !== this.state.text) {
       const shouldAnimate = Boolean(props.value);
-      this.setState({ text: props.value, isDirty: !!Boolean(props.value) });
+      this.setState({ text: props.value });
       if (props.isSelectField) {
         this.animate(!!props.value);
       } else {
-        this.animate(shouldAnimate || this.state.isFocused);
+        this.animate(shouldAnimate || (!!this.input && this.input.isFocused()));
       }
     } else if (!props.value && !!this.state.text) {
       if (!isNaN(+this.state.text)) {
         return;
       }
-      this.setState({ text: props.value, isDirty: false });
+      this.setState({ text: props.value });
       this.animate(false);
     }
   }
 
   render() {
     const { style, isSelectField, isPercentage, currency, value } = this.props;
-    const { isFocused } = this.state;
 
-    const hasSymbol = (isFocused || !!value) && (!!currency || !!isPercentage);
+    const hasSymbol = ((!!this.input && this.input.isFocused()) || !!value) && (!!currency || !!isPercentage);
 
     return (
       <View style={[styles.element, style]}>
@@ -115,7 +114,13 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
       <TextInput
         {...rest}
         value={value}
-        ref={input => this.props.onRef && this.props.onRef(input)}
+        ref={input => {
+          this.input = input;
+
+          if (this.props.onRef) {
+            this.props.onRef(input);
+          }
+        }}
         style={[
           styles.input,
           inputStyle,
@@ -194,13 +199,12 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
     Animated.parallel([
       Animated.timing(this.state.fontSize, {
         toValue: nextStyle.fontSize,
-        duration: 150,
+        duration: 80,
         easing: Easing.ease
-        // useNativeDriver: true
       }),
       Animated.timing(this.state.top, {
         toValue: nextStyle.top,
-        duration: 150,
+        duration: 80,
         easing: Easing.ease,
         useNativeDriver: false
       })
@@ -209,7 +213,7 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
 
   private onFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     this.animate(true);
-    this.setState({ isDirty: true, isFocused: true });
+
     if (this.props.onFocus) {
       this.props.onFocus(e);
     }
@@ -218,10 +222,7 @@ export default class FloatingLabel extends Component<IFloatingLabelProps, IState
   private onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     if (!this.state.text) {
       this.animate(false);
-      this.setState({ isDirty: false });
     }
-
-    this.setState({ isFocused: false });
 
     if (this.props.onBlur) {
       this.props.onBlur(e);
