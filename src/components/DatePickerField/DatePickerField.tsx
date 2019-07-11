@@ -9,8 +9,8 @@ export interface IDatePickerFieldProps extends TextInputProperties {
   onRef?: (input: TextInput) => void;
   label: string;
   onPress: () => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocusLabel?: () => void;
+  onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
   error?: string;
@@ -36,7 +36,7 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
   }
 
   render() {
-    const { onRef, onFocus, onBlur, onPress, error, ...rest } = this.props;
+    const { onRef, onFocusLabel: onFocus, onBlurLabel: onBlur, onPress, error, ...rest } = this.props;
 
     return (
       <View style={[styles.containerStyle, this.props.containerStyle]}>
@@ -67,24 +67,24 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
                 fontSize: 17,
                 top: Platform.select({ ios: 0, android: -2 })
               }}
-              onFocus={() => {
+              onFocusLabel={() => {
                 if (!this.state.isFocused) {
                   this.setState({
                     isFocused: true
                   });
                 }
 
-                if (this.props.onFocus) {
-                  this.props.onFocus();
+                if (this.props.onFocusLabel) {
+                  this.props.onFocusLabel();
                 }
               }}
-              onBlur={() => {
+              onBlurLabel={() => {
                 if (this.state.isFocused) {
                   this.setState({ isFocused: false });
                 }
 
-                if (this.props.onBlur) {
-                  this.props.onBlur();
+                if (this.props.onBlurLabel) {
+                  this.props.onBlurLabel();
                 }
               }}
             >
