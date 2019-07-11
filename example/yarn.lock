@@ -2538,9 +2538,9 @@ lodash.map@^4.6.0:
   integrity sha1-dx7Hg540c9nEzeKLGTlMNWL09tM=
 
 lodash.merge@^4.6.1:
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.1.tgz#adc25d9cb99b9391c59624f379fbba60d7111d54"
-  integrity sha512-AOYza4+Hf5z1/0Hztxpm2/xiPZgi/cjMqdnKTUWTBSKchJlxXXuUSxCCl8rJlf4g6yww/j6mA8nC8Hw/EZWxKQ==
+  version "4.6.2"
+  resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
+  integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
 lodash.pad@^4.1.0:
   version "4.5.1"
@@ -3547,9 +3547,9 @@ react-native-animatable@^1.2.4:
     prop-types "^15.5.10"
 
 react-native-calendars@^1.22.0:
-  version "1.194.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.194.0.tgz#2b769cd85b4782628918482a9c75e49c4ad4dac1"
-  integrity sha512-cA1MTPrjD7Vkzpv5huYX4uhd5qSyDxtA6ZXrnKUYPYZc0KHh/1v4tkhhDu5CeDn7hCcAiGXptlJSMoriSri+Kg==
+  version "1.196.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.196.0.tgz#24f41d0a80cd78123ca9892e9cdcc22b1bd943c1"
+  integrity sha512-jW9t+VOIUC0RCvEDsUXj6KNxG5ugncjzBuZisoTNcrymBnj7am9cEzwzaOr6oYFoGWbeZyKpb3WbOaUGr71RSw==
   dependencies:
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
@@ -3557,9 +3557,9 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.1.3:
-  version "0.1.24"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.24.tgz#45bde87413b2492aa7e777a0dcf19be4d80d2b7b"
-  integrity sha512-3fOSxCxbRe54hSEPu58zXvLW9PoP+GiuTqLPPUow5+I5VsgCujg3/m7ed9LUyGYuB5Qags8qLICmixpxB5sqUQ==
+  version "0.1.25"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.25.tgz#d95ac296b4c94f021d73830443c022211e01d256"
+  integrity sha512-svvWD6hbfrMBGH1K7R1c0LWRnoTEp6luMl9RGD8WWN4850zjLuf5oiCgxQVhKbwWJfT5JsCfk/ba/rFlJGw+qg==
   dependencies:
     lodash.delay "^4.1.1"
     lodash.every "^4.6.0"
