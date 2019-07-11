@@ -418,7 +418,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           />
         }
         rightContentVisibility={!!model[field.id]}
-        onFocus={() => {
+        onFocusLabel={() => {
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
           }
@@ -466,12 +466,12 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           });
           this.props.onChange(field.id, this.convertStringToNumber(val));
         }}
-        onFocus={() => {
+        onFocusLabel={() => {
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
           }
         }}
-        onBlur={() => {
+        onBlurLabel={() => {
           this.props.onChange(field.id, this.restoreNumberWithLocale(model[field.id] as string | number | undefined));
         }}
         error={errors[field.id]}

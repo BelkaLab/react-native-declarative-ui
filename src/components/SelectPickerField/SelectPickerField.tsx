@@ -11,8 +11,8 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   onRef?: (input: TextInput) => void;
   label: string;
   onPress: () => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocusLabel?: () => void;
+  onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
   error?: string;
@@ -42,8 +42,8 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
     // const { isPercentage } = this.props;
     const {
       onRef,
-      onFocus,
-      onBlur,
+      onFocusLabel: onFocus,
+      onBlurLabel: onBlur,
       onPress,
       displayProperty,
       keyProperty,
@@ -83,24 +83,24 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
                 fontSize: 17,
                 top: Platform.select({ ios: 0, android: -2 })
               }}
-              onFocus={() => {
+              onFocusLabel={() => {
                 if (!this.state.isFocused) {
                   this.setState({
                     isFocused: true
                   });
                 }
 
-                if (this.props.onFocus) {
-                  this.props.onFocus();
+                if (this.props.onFocusLabel) {
+                  this.props.onFocusLabel();
                 }
               }}
-              onBlur={() => {
+              onBlurLabel={() => {
                 if (this.state.isFocused) {
                   this.setState({ isFocused: false });
                 }
 
-                if (this.props.onBlur) {
-                  this.props.onBlur();
+                if (this.props.onBlurLabel) {
+                  this.props.onBlurLabel();
                 }
               }}
             >

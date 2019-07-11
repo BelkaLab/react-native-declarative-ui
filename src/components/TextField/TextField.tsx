@@ -7,8 +7,8 @@ import { globalStyles } from '../../styles/globalStyles';
 export interface ITextFieldProps extends TextInputProperties {
   onRef?: (input: TextInput) => void;
   label: string;
-  onFocus?: () => void;
-  onBlur?: () => void;
+  onFocusLabel?: () => void;
+  onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
   rightContent?: JSX.Element;
@@ -33,7 +33,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
   }
 
   render() {
-    const { onFocus, onBlur, onRef, error, rightContent, rightContentVisibility, ...rest } = this.props;
+    const { onFocusLabel, onBlurLabel, onRef, error, rightContent, rightContentVisibility, ...rest } = this.props;
 
     return (
       <View style={[styles.containerStyle, this.props.containerStyle]}>
@@ -71,24 +71,24 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
               fontSize: 17,
               top: Platform.select({ ios: 0, android: -2 })
             }}
-            onFocus={() => {
+            onFocusLabel={() => {
               if (!this.state.isFocused) {
                 this.setState({
                   isFocused: true
                 });
               }
 
-              if (this.props.onFocus) {
-                this.props.onFocus();
+              if (this.props.onFocusLabel) {
+                this.props.onFocusLabel();
               }
             }}
-            onBlur={() => {
+            onBlurLabel={() => {
               if (this.state.isFocused) {
                 this.setState({ isFocused: false });
               }
 
-              if (this.props.onBlur) {
-                this.props.onBlur();
+              if (this.props.onBlurLabel) {
+                this.props.onBlurLabel();
               }
             }}
           >
