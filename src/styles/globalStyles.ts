@@ -12,7 +12,7 @@ export const globalStyles = StyleSheet.create({
     borderColor: Colors.GRAY_400,
     borderRadius: 4,
     backgroundColor: Colors.WHITE,
-    paddingTop: 6
+    // paddingTop: 6
   },
   inputContainer: {
     flexDirection: 'row',

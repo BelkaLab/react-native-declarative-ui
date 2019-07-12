@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, View, ViewStyle } from 'react-native';
+import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
 
 const INPUT_HEIGHT = 35;
@@ -92,8 +92,7 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   render() {
     const { style, isSelectField, isPercentage, currency, value } = this.props;
 
-    // const hasSymbol = ((!!this.input && this.input.isFocused()) || !!value) && (!!currency || !!isPercentage);
-    const hasSymbol = false;
+    const hasSymbol = ((!!this.input && this.input.isFocused()) || !!value) && (!!currency || !!isPercentage);
 
     return (
       <View style={[styles.element, style]}>
@@ -111,54 +110,75 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   }
 
   private renderTextField = (hasSymbol: boolean) => {
-    const { children, style, onFocusLabel: onFocus, onBlurLabel: onBlur, onEndEditing, isPassword, inputStyle, value, ...rest } = this.props;
+    const {
+      children,
+      style,
+      onFocusLabel,
+      onBlurLabel,
+      onEndEditing,
+      isPassword,
+      inputStyle,
+      value,
+      ...rest
+    } = this.props;
 
     return (
-      <TextInput
-        {...rest}
-        value={value}
-        ref={input => {
-          this.input = input;
-
-          if (this.props.onRef) {
-            this.props.onRef(input);
-          }
-        }}
-        style={[
-          styles.input,
-          inputStyle,
-          {
-            height: Math.max(INPUT_HEIGHT, this.state.height)
-          },
-          Platform.select({ ios: this.props.multiline && { paddingTop: 6 } }),
-          Platform.select({
-            android: {
-              paddingBottom: this.state.height > INPUT_HEIGHT ? 6 : 0,
-              paddingTop: this.state.height > INPUT_HEIGHT ? 4 : 0
+      <View style={styles.inputContainer}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            if (this.input && !this.input.isFocused()) {
+              this.input.focus();
             }
-          }),
-          hasSymbol && {
-            paddingLeft: 0
-          }
-        ]}
-        secureTextEntry={isPassword}
-        onContentSizeChange={event => {
-          if (this.props.multiline) {
-            const height = event.nativeEvent.contentSize.height;
+          }}
+        >
+          <View style={{ flexGrow: 1, height: 20 }} />
+        </TouchableWithoutFeedback>
+        <TextInput
+          {...rest}
+          value={value}
+          ref={input => {
+            this.input = input;
 
-            this.setState({
-              height: Platform.select({
-                android: height,
-                ios: this.props.multiline && height > INPUT_HEIGHT ? height + 14 : height
-              })
-            });
-          }
-        }}
-        onBlur={this.onBlur}
-        onFocus={this.onFocus}
-        onChangeText={this.onChangeText}
-        onEndEditing={this.onEndEditing}
-      />
+            if (this.props.onRef) {
+              this.props.onRef(input);
+            }
+          }}
+          style={[
+            styles.input,
+            inputStyle,
+            {
+              height: Math.max(INPUT_HEIGHT, this.state.height)
+            },
+            Platform.select({ ios: this.props.multiline && { paddingTop: 6 } }),
+            Platform.select({
+              android: {
+                paddingBottom: this.state.height > INPUT_HEIGHT ? 6 : 0,
+                paddingTop: this.state.height > INPUT_HEIGHT ? 4 : 0
+              }
+            }),
+            hasSymbol && {
+              paddingLeft: 0
+            }
+          ]}
+          secureTextEntry={isPassword}
+          onContentSizeChange={event => {
+            if (this.props.multiline) {
+              const height = event.nativeEvent.contentSize.height;
+
+              this.setState({
+                height: Platform.select({
+                  android: height,
+                  ios: this.props.multiline && height > INPUT_HEIGHT ? height + 14 : height
+                })
+              });
+            }
+          }}
+          onBlur={this.onBlur}
+          onFocus={this.onFocus}
+          onChangeText={this.onChangeText}
+          onEndEditing={this.onEndEditing}
+        />
+      </View>
     );
   };
 
@@ -240,17 +260,18 @@ const styles = StyleSheet.create({
   },
   input: {
     height: INPUT_HEIGHT + 5,
-    flexGrow: 1,
-    borderColor: 'gray',
     backgroundColor: 'transparent',
-    justifyContent: 'center',
-    borderWidth: 1,
     color: 'black',
     fontSize: 20,
     borderRadius: 4,
-    paddingLeft: 10,
-    marginTop: 20
+    paddingLeft: 10
   },
-  symbol: { fontSize: 17, paddingLeft: 10, paddingRight: 8, marginTop: Platform.select({ android: 26, ios: 27 }) },
+  inputContainer: {
+    flexGrow: 1,
+    borderColor: 'gray',
+    backgroundColor: 'transparent',
+    borderRadius: 4
+  },
+  symbol: { fontSize: 17, paddingLeft: 10, paddingRight: 8, marginTop: Platform.select({ android: 29, ios: 30 }) },
   label: floatingLabelStyle
 });

@@ -53,7 +53,10 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
             style={[
               globalStyles.input,
               this.retrieveBorderColor(),
-              rightContent && rightContentVisibility && { paddingRight: 28 }
+              rightContent &&
+                rightContentVisibility && {
+                  paddingRight: !!rest.value && (!!rest.currency || !!rest.isPercentage) ? 46 : 28
+                }
             ]}
             labelStyle={{
               backgroundColor: 'transparent',

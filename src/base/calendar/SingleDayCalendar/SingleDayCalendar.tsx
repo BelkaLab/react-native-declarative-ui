@@ -7,6 +7,7 @@ export interface ISingleDayCalendarProps {
   onRef?: (ref: SingleDayCalendar | null) => void;
   pickedDate?: string;
   isAlreadyPicked?: boolean;
+  onPickDate?: (date: string) => void;
   theme?: CalendarTheme;
 }
 
@@ -72,6 +73,10 @@ export default class SingleDayCalendar extends Component<ISingleDayCalendarProps
               },
               selectedDay: date.dateString
             });
+
+            if (this.props.onPickDate) {
+              this.props.onPickDate(date.dateString);
+            }
           }}
           theme={theme}
         />

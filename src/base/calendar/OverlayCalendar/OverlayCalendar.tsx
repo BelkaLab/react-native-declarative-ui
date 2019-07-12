@@ -32,21 +32,21 @@ export default class OverlayCalendar extends Component<IOverlayCalendarProps, IS
               <Text>Annulla</Text>
             </View>
           </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={this.onConfirmPressed}>
-            <View style={styles.buttonContainer}>
-              <Text>Conferma</Text>
-            </View>
-          </TouchableWithoutFeedback>
         </View>
         <SingleDayCalendar
           pickedDate={this.props.pickedDate}
           isAlreadyPicked={this.props.isAlreadyPicked}
+          onPickDate={pickedDate => {
+            if (this.props.onConfirm) {
+              this.props.onConfirm(pickedDate);
+            }
+          }}
           onRef={calendar => {
             if (calendar) {
               this.calendar = calendar;
             }
           }}
-          theme={this.props.customFormOptions.calendars.singleDayTheme}
+          theme={this.props.customFormOptions.calendars && this.props.customFormOptions.calendars.singleDayTheme}
         />
       </View>
     );
