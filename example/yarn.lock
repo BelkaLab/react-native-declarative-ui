@@ -3751,9 +3751,9 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.1.3:
-  version "0.1.28"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.28.tgz#ee8ba183334af8bbd015315b96eaf1e42f6ace5f"
-  integrity sha512-aBLTvuB5DMFUxCQ157rtajun1CC4ECY5PiaXXr6jpFhwbHaM7dPqOyzm+FYrVhZcwQunBjLQM+JntYECOoUYXw==
+  version "0.1.29"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.1.29.tgz#95852eebf9beecc58783a2deec21f5c1841814ce"
+  integrity sha512-sIdq3i1w5obHqB9V98YG/X9tWcWpHhRjxgrYsMLEH9kWyP1nCRt8gQIgdQyG+2i1uZ2n5+jWKGTGjBzvtjtt/w==
   dependencies:
     lodash.delay "^4.1.1"
     lodash.every "^4.6.0"
