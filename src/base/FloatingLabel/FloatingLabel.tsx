@@ -78,7 +78,7 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       if (props.isSelectField) {
         this.animate(!!props.value);
       } else {
-        this.animate(shouldAnimate || (!!this.input && this.input.isFocused()));
+        this.animate(shouldAnimate || this.state.isFocused);
       }
     } else if (!props.value && !!this.state.text) {
       if (!isNaN(+this.state.text)) {
@@ -92,19 +92,19 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   render() {
     const { style, isSelectField, isPercentage, currency, value } = this.props;
 
-    const hasSymbol = ((!!this.input && this.input.isFocused()) || !!value) && (!!currency || !!isPercentage);
+    const hasSymbol = (this.state.isFocused || !!value) && (!!currency || !!isPercentage);
 
     return (
       <View style={[styles.element, style]}>
         {/* {isCurrency && this.renderSymbol(this.props.currency.symbol)}
         {isPercentage && this.renderSymbol('%')} */}
         {hasSymbol && this.renderSymbol(currency || '%')}
+        {this.renderLabel()}
         {isSelectField ? (
           <View pointerEvents="none">{this.renderTextField(hasSymbol)}</View>
         ) : (
           this.renderTextField(hasSymbol)
         )}
-        {this.renderLabel()}
       </View>
     );
   }
@@ -113,6 +113,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
     const {
       children,
       style,
+      onFocus,
+      onBlur,
       onFocusLabel,
       onBlurLabel,
       onEndEditing,
@@ -126,7 +128,7 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       <View style={styles.inputContainer}>
         <TouchableWithoutFeedback
           onPress={() => {
-            if (this.input && !this.input.isFocused()) {
+            if (this.input && !this.state.isFocused) {
               this.input.focus();
             }
           }}
@@ -173,8 +175,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
               });
             }
           }}
-          onBlur={this.onBlur}
-          onFocus={this.onFocus}
+          onBlur={this._onBlur}
+          onFocus={this._onFocus}
           onChangeText={this.onChangeText}
           onEndEditing={this.onEndEditing}
         />
@@ -234,22 +236,27 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
     ]).start();
   };
 
-  private onFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    this.animate(true);
-
-    if (this.props.onFocusLabel) {
-      this.props.onFocusLabel(e);
+  private _onFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    if (!this.state.isFocused) {
+      this.animate(true);
+      this.setState({ isFocused: true }, () => {
+        if (this.props.onFocusLabel) {
+          this.props.onFocusLabel(e);
+        }
+      });
     }
   };
 
-  private onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  private _onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     if (!this.state.text) {
       this.animate(false);
     }
 
-    if (this.props.onBlurLabel) {
-      this.props.onBlurLabel(e);
-    }
+    this.setState({ isFocused: false }, () => {
+      if (this.props.onBlurLabel) {
+        this.props.onBlurLabel(e);
+      }
+    });
   };
 }
 
