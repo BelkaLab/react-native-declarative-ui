@@ -1,4 +1,5 @@
 declare module 'react-native-declarative-ui' {
+  import { ScrollViewProperties } from 'react-native';
   import { CalendarTheme } from 'react-native-calendars';
 
   export type ComposableItem = {
@@ -62,4 +63,12 @@ declare module 'react-native-declarative-ui' {
   const SharedOptions: SharedOptionsManager;
 
   export { SharedOptions };
+
+  interface IKeyboardAvoidingScrollViewProps extends ScrollViewProperties {
+    focusedField?: TextInput;
+    marginBottom?: number;
+    additionalOffset?: number;
+  }
+
+  export class KeyboardAvoidingScrollView extends React.Component<IKeyboardAvoidingScrollViewProps, any> { }
 }

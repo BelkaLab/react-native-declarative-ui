@@ -1,8 +1,7 @@
 import filter from 'lodash.filter';
 import React, { Component } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { ComposableForm, SharedOptions } from 'react-native-declarative-ui';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { ComposableForm, KeyboardAvoidingScrollView, SharedOptions } from 'react-native-declarative-ui';
 import { Colors } from '../styles/colors';
 
 type City = {
@@ -49,7 +48,7 @@ export default class Home extends Component<IHomeProps, IState> {
   render() {
     return (
       <View style={styles.root}>
-        <KeyboardAwareScrollView style={{ flex: 1 }} keyboardShouldPersistTaps="handled">
+        <KeyboardAvoidingScrollView style={{ flex: 1 }}>
           <ComposableForm
             model={this.state.model}
             onChange={this.onChangeHandler}
@@ -81,7 +80,7 @@ export default class Home extends Component<IHomeProps, IState> {
             <Text>Model: </Text>
             <Text>{JSON.stringify(this.state.model)}</Text>
           </View>
-        </KeyboardAwareScrollView>
+        </KeyboardAvoidingScrollView>
       </View>
     );
   }
