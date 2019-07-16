@@ -321,6 +321,7 @@ declare module 'react-native-google-places-autocomplete' {
         onPress?: (data: GooglePlaceData, detail: GooglePlaceDetail | null) => void
         getDefaultValue?: () => string
         styles?: Partial<Styles>
+        enableHighAccuracyLocation?: boolean;
 
         // Will add a 'Current location' button at the top of the predefined places list
         currentLocation?: boolean
