@@ -19,8 +19,8 @@ export interface IOverlayMapProps {
 }
 
 interface IState {
-  pickedPosition?: GooglePlaceDetail;
   visible: boolean;
+  pickedPosition?: GooglePlaceDetail;
 }
 
 export default class OverlayMap extends Component<IOverlayMapProps, IState> {
@@ -49,6 +49,8 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
             debounce={200}
             autoFocus={true}
             enableHighAccuracyLocation={false}
+            timeout={30000}
+            filterReverseGeocodingByTypes={['street_address']}
             query={{
               key: this.props.apiKey,
               language: 'it', // language of the results
