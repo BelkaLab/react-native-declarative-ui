@@ -48,6 +48,7 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
             minLength={3}
             debounce={200}
             autoFocus={true}
+            enableHighAccuracyLocation={false}
             query={{
               key: this.props.apiKey,
               language: 'it', // language of the results
@@ -80,7 +81,11 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
             getDefaultValue={() => {
               return this.props.pickedPosition ? this.props.pickedPosition.formatted_address : '';
             }}
-            nearbyPlacesAPI="GooglePlacesSearch" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+            nearbyPlacesAPI="GoogleReverseGeocoding" // Which API to use: GoogleReverseGeocoding or GooglePlacesSearch
+            GoogleReverseGeocodingQuery={{
+              // available options for GoogleReverseGeocoding API : https://developers.google.com/maps/documentation/geocoding/intro
+              language: 'it'
+            }}
             GooglePlacesSearchQuery={{
               // available options for GooglePlacesSearch API : https://developers.google.com/places/web-service/search
               rankby: 'distance'
