@@ -322,7 +322,9 @@ declare module 'react-native-google-places-autocomplete' {
         getDefaultValue?: () => string
         styles?: Partial<Styles>
         enableHighAccuracyLocation?: boolean;
-
+        timeout?: number;
+        onGetCurrentLocationError?: (err: any) => void;
+        
         // Will add a 'Current location' button at the top of the predefined places list
         currentLocation?: boolean
         currentLocationLabel?: string
