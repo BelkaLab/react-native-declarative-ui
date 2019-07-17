@@ -50,7 +50,7 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
             autoFocus={true}
             enableHighAccuracyLocation={false}
             timeout={30000}
-            filterReverseGeocodingByTypes={['street_address']}
+            filterReverseGeocodingByTypes={['route', 'street_address', 'locality']}
             query={{
               key: this.props.apiKey,
               language: 'it', // language of the results
