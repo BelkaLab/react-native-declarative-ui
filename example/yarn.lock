@@ -2650,6 +2650,11 @@ lodash.first@^3.0.0:
   resolved "https://registry.yarnpkg.com/lodash.first/-/lodash.first-3.0.0.tgz#5dae180d7f818ee65fc5b210b104a7bbef98a16a"
   integrity sha1-Xa4YDX+BjuZfxbIQsQSnu++YoWo=
 
+lodash.foreach@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.foreach/-/lodash.foreach-4.5.0.tgz#1a6a35eace401280c7f06dddec35165ab27e3e53"
+  integrity sha1-Gmo16s5AEoDH8G3d7DUWWrJ+PlM=
+
 lodash.get@^4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
@@ -3782,9 +3787,9 @@ react-native-animatable@^1.2.4:
     prop-types "^15.5.10"
 
 react-native-calendars@^1.22.0:
-  version "1.198.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.198.0.tgz#ba225e3c13b03e76974077bbd375083e48eb216c"
-  integrity sha512-B05dSQLuM11/aVQgJHCAUKLJTosGRdN47uAaL949qhAxnLV9xj+CGnE3Lhd8sHC99IcAzH8s3PHbxrd+wW249Q==
+  version "1.200.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.200.0.tgz#d352e34f946c94d34d0c45522c1ed8cca77a2267"
+  integrity sha512-hWJMQfR0FMToieFukZIsmhH/X8PfwtTHX+wBSGrR8XxRSmtYHf4vTniJvqplnFP0IgcGp90f2T/sUZf8M6l5yg==
   dependencies:
     lodash.get "^4.4.2"
     lodash.isequal "^4.5.0"
@@ -3792,15 +3797,16 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.2.0:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.1.tgz#4f60e781d130d85c3767602f29e7d865fe418a22"
-  integrity sha512-xUEDlKiG2RbeIjpWqFC9YlA1LyceHf1tqvC30XlLv7kzFdFe1L24+VuBuz8xtOEo3zFfcs2SSUx1vCQuN+WJpA==
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.2.tgz#40eb33c5708299cbe39747e8c099c8a4b6a720d9"
+  integrity sha512-Vg0DY9oA2O7uRjg2wCG7JFp6ai66hBKchUd9HJc+vJFe81dNwA3Rpxyo5SenBT31zGKZm8kG17M+xMK7DfJWFw==
   dependencies:
     lodash.delay "^4.1.1"
     lodash.every "^4.6.0"
     lodash.filter "^4.6.0"
     lodash.find "^4.6.0"
     lodash.first "^3.0.0"
+    lodash.foreach "^4.5.0"
     lodash.isequal "^4.5.0"
     lodash.map "^4.6.0"
     lodash.merge "^4.6.1"
