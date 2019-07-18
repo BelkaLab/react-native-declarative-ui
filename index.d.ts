@@ -58,6 +58,8 @@ declare module 'react-native-declarative-ui' {
 
     setCustomComponents: (customRenderers: ComposableFormCustomComponents) => void;
     getCustomComponents: () => ComposableFormCustomComponents;
+
+    setLocale: (locale: string) => void;
   }
 
   const SharedOptions: SharedOptionsManager;

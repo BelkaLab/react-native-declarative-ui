@@ -1,3 +1,4 @@
+import delay from 'lodash.delay';
 import React, { PureComponent } from 'react';
 import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
@@ -86,6 +87,21 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       }
       this.setState({ text: props.value });
       this.animate(false);
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.isSelectField && this.input) {
+      delay(
+        () =>
+          this.input!.setNativeProps({
+            selection: {
+              start: 0,
+              end: 0
+            }
+          }),
+        10
+      );
     }
   }
 
@@ -250,6 +266,15 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   private _onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
     if (!this.state.text) {
       this.animate(false);
+    }
+
+    if (Platform.OS === 'android' && this.input) {
+      this.input.setNativeProps({
+        selection: {
+          start: 0,
+          end: 0
+        }
+      });
     }
 
     this.setState({ isFocused: false }, () => {

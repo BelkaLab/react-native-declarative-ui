@@ -1,14 +1,14 @@
 import every from 'lodash.every';
 import find from 'lodash.find';
 import first from 'lodash.first';
+import forEach from 'lodash.foreach';
 import isEqual from 'lodash.isequal';
 import merge from 'lodash.merge';
 import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
-import languages from 'numbro/dist/languages.min.js';
 import React, { Component } from 'react';
-import { Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
+import { EmitterSubscription, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import Modal from 'react-native-modal';
@@ -30,9 +30,6 @@ import { showOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
-
-numbro.registerLanguage(languages['it-IT']);
-numbro.setLanguage('it-IT');
 
 const ANIM_DURATION = 200;
 
@@ -68,6 +65,7 @@ interface IState {
 export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
   private fieldRefs: Dictionary<TextInput> = {};
   private errors: Dictionary<string> = {};
+  private subscriptions!: EmitterSubscription[];
 
   constructor(props: IComposableFormProps<T>) {
     super(props);
@@ -88,6 +86,26 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     // add all fields check here
     // if props.googleApiKey is undefined, cannot use MapField
     return;
+  };
+
+  componentWillMount() {
+    this.subscriptions = [
+      Keyboard.addListener('keyboardDidShow', this.keyboardDidShow),
+      Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
+    ];
+  }
+
+  keyboardDidShow = () => {
+    this.setState({
+      isKeyboardOpened: true
+    });
+  };
+
+  keyboardDidHide = () => {
+    this.setState({
+      isKeyboardOpened: false
+    });
+    this.blurTextFields();
   };
 
   componentDidUpdate() {
@@ -160,6 +178,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       </View>
     );
   }
+
+  private blurTextFields = () => {
+    // Check if input has focus and remove it
+    forEach(this.fieldRefs, input => {
+      if (input.isFocused()) {
+        input.blur();
+      }
+    });
+  };
 
   private isFieldNotVisible = (field: FormField, model: T) => {
     if (field.visibilityFieldId !== undefined && field.visibilityFieldValue !== undefined) {
