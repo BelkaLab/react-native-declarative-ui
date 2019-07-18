@@ -246,7 +246,7 @@ declare module 'react-native-calendars' {
     | CustomMarkingProps
     | {};
 
-  export class Calendar extends React.Component<CalendarMarkingProps & CalendarBaseProps> {}
+  export class Calendar extends React.Component<CalendarMarkingProps & CalendarBaseProps> { }
 
   export interface CalendarListBaseProps extends CalendarBaseProps {
     /**
@@ -290,7 +290,7 @@ declare module 'react-native-calendars' {
     calendarWidth?: boolean;
   }
 
-  export class CalendarList extends React.Component<CalendarListBaseProps & CalendarMarkingProps> {}
+  export class CalendarList extends React.Component<CalendarListBaseProps & CalendarMarkingProps> { }
 
   export interface AgendaProps<T> {
     /**
@@ -450,5 +450,21 @@ declare module 'react-native-calendars' {
     style?: StyleProp<ViewProps>;
   }
 
-  export class Agenda<T> extends React.Component<AgendaProps<T> & CalendarMarkingProps> {}
+  export class Agenda<T> extends React.Component<AgendaProps<T> & CalendarMarkingProps> { }
+
+  class CalendarLocaleConfig {
+    defaultLocale: string;
+    locales: {
+      [key: string]: {
+        monthNames?: string[];
+        monthNamesShort?: string[];
+        dayNames?: string[];
+        dayNamesShort?: string[];
+        amDesignator?: string;
+        pmDesignator?: string;
+      }
+    };
+  }
+
+  export const LocaleConfig: CalendarLocaleConfig;
 }

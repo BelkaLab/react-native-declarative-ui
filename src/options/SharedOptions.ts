@@ -1,5 +1,7 @@
+import numbro from 'numbro';
+import Languages from 'numbro/dist/languages.min.js';
 import React from 'react';
-import { CalendarTheme } from 'react-native-calendars';
+import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
 import { ComposableItem } from '../models/composableItem';
 import { SLIDE_BOTTOM_OVERLAY_KEY } from '../navigation/integration';
 import { SlideBottomOverlay } from '../overlays/SlideBottomOverlay';
@@ -108,6 +110,12 @@ class SharedOptions {
 
   getCustomComponents() {
     return this._customComponents;
+  }
+
+  setLocale(locale: string) {
+    LocaleConfig.defaultLocale = locale;
+    numbro.registerLanguage(Languages[locale]);
+    numbro.setLanguage(locale);
   }
 }
 
