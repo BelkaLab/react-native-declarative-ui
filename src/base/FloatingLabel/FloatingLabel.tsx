@@ -90,6 +90,12 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
     }
   }
 
+  componentWillUnmount() {
+    if (this.props.onRef) {
+      this.props.onRef(null);
+    }
+  }
+
   componentDidUpdate() {
     if (this.props.isSelectField && this.input) {
       delay(

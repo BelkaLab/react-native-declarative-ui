@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -16,6 +16,8 @@ export interface IOverlayItemListProps {
   renderCustomBackground?: () => React.ReactElement<{}>;
   renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
+  createNewItemLabel?: string;
+  onCreateNewItemPressed?: () => void;
 }
 
 interface IState {
@@ -40,6 +42,7 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
     return (
       <View style={globalStyles.pickerContainer}>
         {this.renderHeader()}
+        {this.props.createNewItemLabel && this.renderCreateNewItem()}
         {this.renderTopLabel()}
         {isLoading ? (
           <View>Loader</View>
@@ -87,10 +90,11 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
       const isSelected = item[keyProperty] === pickedItem[keyProperty];
 
       return (
-        <View style={{ padding: 16 }}>
+        <View style={styles.createNewItemContainer}>
           <Text style={{ color: isSelected ? Colors.PRIMARY_BLUE : Colors.BLACK }}>
             {String(item[displayProperty])}
           </Text>
+          <Image source={require('../../assets/ic_check.png')} style={{ tintColor: Colors.PRIMARY_BLUE }} />
         </View>
       );
     }
@@ -125,6 +129,17 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
           }
         ]}
       />
+    );
+  };
+
+  private renderCreateNewItem = () => {
+    return (
+      <TouchableWithoutFeedback onPress={this.props.onCreateNewItemPressed}>
+        <View style={styles.createNewItemButton}>
+        <Image source={require('../../assets/ic_plus.png')} style={{ tintColor: Colors.PRIMARY_BLUE, marginEnd: 8 }} />
+          <Text style={styles.createNewItemText}>{this.props.createNewItemLabel}</Text>
+        </View>
+      </TouchableWithoutFeedback>
     );
   };
 
@@ -190,5 +205,8 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingBottom: 8,
     paddingTop: 14
-  }
+  },
+  createNewItemContainer: { padding: 16, flexDirection: 'row', justifyContent: 'space-between' },
+  createNewItemButton: { height: 48, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 },
+  createNewItemText: { fontSize: 17, color: Colors.PRIMARY_BLUE }
 });
