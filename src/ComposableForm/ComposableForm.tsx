@@ -90,8 +90,14 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
   componentWillMount() {
     this.subscriptions = [
-      Keyboard.addListener('keyboardDidShow', this.keyboardDidShow),
-      Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
+      Keyboard.addListener(
+        Platform.select({ ios: 'keyboardWillHide', android: 'keyboardDidHide' }),
+        this.keyboardDidShow
+      ),
+      Keyboard.addListener(
+        Platform.select({ ios: 'keyboardWillHide', android: 'keyboardDidHide' }),
+        this.keyboardDidHide
+      )
     ];
   }
 
