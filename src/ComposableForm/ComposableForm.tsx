@@ -65,7 +65,7 @@ interface IState {
   isModalVisible: boolean;
   overlayComponent?: React.ReactElement<{}>;
   isAutoFocused: boolean;
-  lastFocusedInput?: TextInput;
+  isFocusingMultiline?: boolean;
 }
 
 export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
@@ -122,9 +122,11 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       isKeyboardOpened: false
     });
 
-    if (!!this.state.lastFocusedInput) {
+    if (!!this.state.isFocusingMultiline) {
+      console.log('keyboard hide');
       this.blurTextFields();
     }
+    // }
   };
 
   componentDidUpdate() {
@@ -465,11 +467,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
         rightContentVisibility={!!model[field.id]}
         onFocusLabel={() => {
-          this.setState({
-            lastFocusedInput: this.fieldRefs[field.id]
-          });
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
+          }
+        }}
+        onTouchStart={() => {
+          if (field.multiline) {
+            this.setState({
+              isFocusingMultiline: true
+            });
           }
         }}
         error={errors[field.id]}
@@ -516,10 +522,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, this.convertStringToNumber(val));
         }}
         onFocusLabel={() => {
-          this.setState({
-            lastFocusedInput: this.fieldRefs[field.id]
-          });
-
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
           }
