@@ -65,6 +65,7 @@ interface IState {
   isModalVisible: boolean;
   overlayComponent?: React.ReactElement<{}>;
   isAutoFocused: boolean;
+  lastFocusedInput?: TextInput;
 }
 
 export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
@@ -120,7 +121,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     this.setState({
       isKeyboardOpened: false
     });
-    this.blurTextFields();
+
+    if (!!this.state.lastFocusedInput) {
+      this.blurTextFields();
+    }
   };
 
   componentDidUpdate() {
@@ -461,6 +465,9 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
         rightContentVisibility={!!model[field.id]}
         onFocusLabel={() => {
+          this.setState({
+            lastFocusedInput: this.fieldRefs[field.id]
+          });
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
           }
@@ -509,6 +516,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, this.convertStringToNumber(val));
         }}
         onFocusLabel={() => {
+          this.setState({
+            lastFocusedInput: this.fieldRefs[field.id]
+          });
+
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
           }
