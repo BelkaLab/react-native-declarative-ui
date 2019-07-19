@@ -1,3 +1,4 @@
-import SlideBottomOverlay from './SlideBottomOverlay';
+import SlideBottomOverlay, { ANIM_DURATION } from './SlideBottomOverlay';
 
-export { SlideBottomOverlay };
+export { SlideBottomOverlay, ANIM_DURATION };
+

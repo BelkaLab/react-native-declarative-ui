@@ -1,14 +1,14 @@
+import delay from 'lodash.delay';
 import every from 'lodash.every';
 import find from 'lodash.find';
 import first from 'lodash.first';
-import forEach from 'lodash.foreach';
 import isEqual from 'lodash.isequal';
 import merge from 'lodash.merge';
 import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import { EmitterSubscription, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
+import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import Modal from 'react-native-modal';
@@ -28,10 +28,9 @@ import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
 import { showOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions } from '../options/SharedOptions';
+import { ANIM_DURATION } from '../overlays/SlideBottomOverlay';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
-
-const ANIM_DURATION = 200;
 
 interface IComposableFormProps<T> {
   model: T;
@@ -45,6 +44,12 @@ interface IComposableFormProps<T> {
   };
   searchMapper?: {
     [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
+  };
+  createNewItemMapper?: {
+    [id: string]: {
+      label: string;
+      callback: () => void;
+    };
   };
   externalModel?: T;
   customStyle?: ComposableFormOptions;
@@ -99,6 +104,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         this.keyboardDidHide
       )
     ];
+  }
+
+  componentWillUnmount() {
+    this.subscriptions.forEach(sub => sub.remove());
   }
 
   keyboardDidShow = () => {
@@ -187,11 +196,11 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
   private blurTextFields = () => {
     // Check if input has focus and remove it
-    forEach(this.fieldRefs, input => {
-      if (input.isFocused()) {
+    for (const [_, input] of Object.entries(this.fieldRefs)) {
+      if (input && input.isFocused() && findNodeHandle(input)) {
         input.blur();
       }
-    });
+    }
   };
 
   private isFieldNotVisible = (field: FormField, model: T) => {
@@ -655,6 +664,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         topLabel={field.pickerLabel}
         headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
         renderCustomBackground={this.getComposableFormOptions().pickers.renderCustomBackground}
+        onCreateNewItemPressed={() => {
+          if (this.props.createNewItemMapper) {
+            closeOverlay();
+
+            // we should find a way to proper wait the callback of overlay dismission and fire our callback
+            delay(() => this.props.createNewItemMapper![field.id].callback(), ANIM_DURATION + 50);
+          }
+        }}
+        createNewItemLabel={this.props.createNewItemMapper && this.props.createNewItemMapper[field.id].label}
         onPick={(selectedItem: ComposableItem | string) => {
           this.setState({
             errors: {
