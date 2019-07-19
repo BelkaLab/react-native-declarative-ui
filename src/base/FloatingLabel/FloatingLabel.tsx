@@ -97,17 +97,17 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   }
 
   componentDidUpdate() {
-    if (this.props.isSelectField && this.input) {
-      delay(
-        () =>
-          this.input!.setNativeProps({
+    if (Platform.OS === 'android' && this.props.isSelectField && this.input) {
+      delay(() => {
+        if (this.input) {
+          this.input.setNativeProps({
             selection: {
               start: 0,
               end: 0
             }
-          }),
-        10
-      );
+          });
+        }
+      }, 10);
     }
   }
 

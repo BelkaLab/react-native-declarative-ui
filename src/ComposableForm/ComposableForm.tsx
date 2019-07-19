@@ -122,11 +122,9 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       isKeyboardOpened: false
     });
 
-    if (!!this.state.isFocusingMultiline) {
-      console.log('keyboard hide');
+    if (!this.state.isFocusingMultiline) {
       this.blurTextFields();
     }
-    // }
   };
 
   componentDidUpdate() {
@@ -470,6 +468,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
           }
+
+          this.setState({
+            isFocusingMultiline: false
+          });
         }}
         onTouchStart={() => {
           if (field.multiline) {
