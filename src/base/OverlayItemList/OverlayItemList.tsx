@@ -94,7 +94,9 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
           <Text style={{ color: isSelected ? Colors.PRIMARY_BLUE : Colors.BLACK }}>
             {String(item[displayProperty])}
           </Text>
-          <Image source={require('../../assets/ic_check.png')} style={{ tintColor: Colors.PRIMARY_BLUE }} />
+          {isSelected && (
+            <Image source={require('../../assets/ic_check.png')} style={{ tintColor: Colors.PRIMARY_BLUE }} />
+          )}
         </View>
       );
     }
@@ -136,7 +138,10 @@ export default class OverlayItemList extends Component<IOverlayItemListProps, IS
     return (
       <TouchableWithoutFeedback onPress={this.props.onCreateNewItemPressed}>
         <View style={styles.createNewItemButton}>
-        <Image source={require('../../assets/ic_plus.png')} style={{ tintColor: Colors.PRIMARY_BLUE, marginEnd: 8 }} />
+          <Image
+            source={require('../../assets/ic_plus.png')}
+            style={{ tintColor: Colors.PRIMARY_BLUE, marginEnd: 8 }}
+          />
           <Text style={styles.createNewItemText}>{this.props.createNewItemLabel}</Text>
         </View>
       </TouchableWithoutFeedback>
