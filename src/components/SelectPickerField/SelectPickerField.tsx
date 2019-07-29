@@ -1,6 +1,6 @@
 import find from 'lodash.find';
 import React from 'react';
-import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { FloatingLabel } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { ComposableItem } from '../../models/composableItem';
@@ -15,9 +15,9 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
+  placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
   disableErrorMessage?: boolean;
-
   options?: ComposableItem[] | string[];
   displayProperty?: string;
   keyProperty?: string;
@@ -42,12 +42,14 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
     // const { isPercentage } = this.props;
     const {
       onRef,
-      onFocusLabel: onFocus,
-      onBlurLabel: onBlur,
+      onFocusLabel,
+      onBlurLabel,
       onPress,
       displayProperty,
       keyProperty,
       itemValue,
+      placeholderStyle,
+      inputStyle,
       options,
       error,
       ...rest
@@ -73,8 +75,8 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
               isSelectField={true}
               value={this.retrieveDisplayValue(itemValue)}
               style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
-              labelStyle={{ backgroundColor: 'transparent', color: Colors.GRAY_600 }}
-              inputStyle={styles.inputStyle}
+              labelStyle={[{ backgroundColor: 'transparent', color: Colors.GRAY_600 }, placeholderStyle]}
+              inputStyle={[styles.inputStyle, inputStyle]}
               dirtyStyle={{
                 fontSize: 15,
                 top: Platform.select({ ios: -14, android: -16 })

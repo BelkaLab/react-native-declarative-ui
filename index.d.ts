@@ -34,6 +34,10 @@ declare module 'react-native-declarative-ui' {
       inlinePadding?: number;
       backgroundColor?: string;
     };
+    labels?: {
+      placeholderStyle?: StyleProp<TextStyle>;
+      inputStyle?: StyleProp<TextStyle>;
+    },
     calendars?: {
       singleDayTheme?: CalendarTheme;
     };
@@ -46,7 +50,8 @@ declare module 'react-native-declarative-ui' {
 
   export type ComposableFormCustomComponents = {
     renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
-    renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>
+    renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
+    renderHeaderTitle?: (header: string) => React.ReactElement<{}>;
   };
 
   class SharedOptionsManager {

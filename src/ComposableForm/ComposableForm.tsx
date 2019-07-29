@@ -27,7 +27,7 @@ import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
 import { showOverlay } from '../navigation/integration';
-import SharedOptions, { ComposableFormOptions } from '../options/SharedOptions';
+import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
 import { ANIM_DURATION } from '../overlays/SlideBottomOverlay';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
@@ -143,7 +143,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
   }
 
-  async componentWillReceiveProps(nextProps: IComposableFormProps<T>) {
+  async UNSAFE_componentWillReceiveProps(nextProps: IComposableFormProps<T>) {
     if (!isEqual(nextProps.model, this.props.model)) {
       // this.checkIfFormIsFilled(nextProps.model);
 
@@ -312,16 +312,25 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     switch (field.type) {
       case 'header':
         return (
-          <Text
+          <View
             key={index}
             style={{
-              color: Colors.BLACK,
-              fontSize: 16,
               marginTop: this.getComposableFormOptions().formContainer.inlinePadding
             }}
           >
-            {field.label}
-          </Text>
+            {!!this.getComposableFormCustomComponents().renderHeaderTitle ? (
+              this.getComposableFormCustomComponents().renderHeaderTitle!(field.label)
+            ) : (
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: Colors.BLACK
+                }}
+              >
+                {field.label}
+              </Text>
+            )}
+          </View>
         );
       case 'text':
         return (
@@ -424,6 +433,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={model[field.id] as string | undefined}
         editable={!field.disabled}
         multiline={field.multiline}
@@ -501,6 +512,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
         editable={!field.disabled}
         currency={field.currency}
@@ -624,6 +637,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.fieldRefs[field.id] = input;
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         onPress={() => this.openSelectPicker(field, model)}
@@ -747,6 +762,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.fieldRefs[field.id] = input;
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         onPress={() => this.openAutocompletePicker(field, model)}
@@ -847,6 +864,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.fieldRefs[field.id] = input;
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={date}
         // floatingLabel={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
@@ -914,6 +933,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.fieldRefs[field.id] = input;
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         onPress={() => this.openMapPicker(field, model)}
@@ -972,13 +993,13 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private getComposableFormOptions = () => {
+  private getComposableFormOptions = (): DefinedComposableFormOptions => {
     const { customStyle } = this.props;
 
     return merge({}, SharedOptions.getDefaultOptions(), customStyle);
   };
 
-  private getComposableFormCustomComponents = () => {
+  private getComposableFormCustomComponents = (): ComposableFormCustomComponents => {
     const { customComponents } = this.props;
 
     return merge({}, SharedOptions.getCustomComponents(), customComponents);

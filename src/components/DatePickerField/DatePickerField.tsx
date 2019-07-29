@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { FloatingLabel } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { Colors } from '../../styles/colors';
@@ -13,9 +13,9 @@ export interface IDatePickerFieldProps extends TextInputProperties {
   onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
+  placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
   disableErrorMessage?: boolean;
-
   onRightIconClick?: () => void;
   rightContent?: JSX.Element;
 }
@@ -25,9 +25,6 @@ type State = {
 } & React.ComponentState;
 
 export default class DatePickerField extends React.Component<IDatePickerFieldProps, State> {
-  private inputRef!: FloatingLabel;
-  private textInput!: FloatingLabel;
-
   constructor(props: IDatePickerFieldProps) {
     super(props);
     this.state = {
@@ -36,7 +33,7 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
   }
 
   render() {
-    const { onRef, onFocusLabel: onFocus, onBlurLabel: onBlur, onPress, error, ...rest } = this.props;
+    const { onRef, onFocusLabel, onBlurLabel, onPress, error, placeholderStyle, inputStyle, ...rest } = this.props;
 
     return (
       <View style={[styles.containerStyle, this.props.containerStyle]}>
@@ -57,8 +54,8 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
               editable={false}
               isSelectField={true} // Check if needed
               style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
-              labelStyle={{ backgroundColor: 'transparent', color: Colors.GRAY_600 }}
-              inputStyle={styles.inputStyle}
+              labelStyle={[{ backgroundColor: 'transparent', color: Colors.GRAY_600 }, placeholderStyle]}
+              inputStyle={[styles.inputStyle, inputStyle]}
               dirtyStyle={{
                 fontSize: 15,
                 top: Platform.select({ ios: -14, android: -16 })

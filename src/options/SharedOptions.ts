@@ -1,6 +1,7 @@
 import numbro from 'numbro';
 import Languages from 'numbro/dist/languages.min.js';
 import React from 'react';
+import { StyleProp, TextStyle } from 'react-native';
 import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
 import { ComposableItem } from '../models/composableItem';
 import { SLIDE_BOTTOM_OVERLAY_KEY } from '../navigation/integration';
@@ -14,6 +15,10 @@ export type ComposableFormOptions = {
     inlinePadding?: number;
     backgroundColor?: string;
   };
+  labels?: {
+    placeholderStyle?: StyleProp<TextStyle>;
+    inputStyle?: StyleProp<TextStyle>;
+  };
   calendars?: {
     singleDayTheme?: CalendarTheme;
   };
@@ -24,12 +29,16 @@ export type ComposableFormOptions = {
   }
 };
 
-type DefinedComposableFormOptions = {
+export type DefinedComposableFormOptions = {
   formContainer: {
     externalPadding?: number;
     inlinePadding?: number;
     backgroundColor?: string;
   };
+  labels: {
+    placeholderStyle?: StyleProp<TextStyle>;
+    inputStyle?: StyleProp<TextStyle>;
+  },
   calendars: {
     singleDayTheme?: CalendarTheme;
   };
@@ -42,7 +51,8 @@ type DefinedComposableFormOptions = {
 
 export type ComposableFormCustomComponents = {
   renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
-  renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>
+  renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
+  renderHeaderTime?: (header: string) => React.ReactElement<{}>;
 };
 
 class SharedOptions {
@@ -55,6 +65,7 @@ class SharedOptions {
       inlinePadding: 16,
       backgroundColor: Colors.WHITE
     },
+    labels: {},
     calendars: {},
     pickers: {}
   };

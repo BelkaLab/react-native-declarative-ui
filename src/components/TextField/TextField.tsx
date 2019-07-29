@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, View, ViewStyle } from 'react-native';
 import { FloatingLabel } from '../../base/FloatingLabel';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -11,6 +11,7 @@ export interface ITextFieldProps extends TextInputProperties {
   onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
+  placeholderStyle?: StyleProp<TextStyle>;
   rightContent?: JSX.Element;
   rightContentVisibility?: boolean;
   error?: string;
@@ -33,7 +34,17 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
   }
 
   render() {
-    const { onFocusLabel, onBlurLabel, onRef, error, rightContent, rightContentVisibility, ...rest } = this.props;
+    const {
+      onFocusLabel,
+      onBlurLabel,
+      onRef,
+      error,
+      rightContent,
+      rightContentVisibility,
+      placeholderStyle,
+      inputStyle,
+      ...rest
+    } = this.props;
 
     return (
       <View style={[styles.containerStyle, this.props.containerStyle]}>
@@ -58,14 +69,17 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
                   paddingRight: !!rest.value && (!!rest.currency || !!rest.isPercentage) ? 46 : 28
                 }
             ]}
-            labelStyle={{
-              backgroundColor: 'transparent',
-              color: !this.props.editable ? Colors.GRAY_500 : Colors.GRAY_600
-            }}
+            labelStyle={[
+              {
+                backgroundColor: 'transparent',
+                color: !this.props.editable ? Colors.GRAY_500 : Colors.GRAY_600
+              },
+              placeholderStyle
+            ]}
             currencyStyle={{
               color: !this.props.editable ? Colors.GRAY_500 : Colors.GRAY_600
             }}
-            inputStyle={[styles.inputStyle, { color: !this.props.editable ? Colors.GRAY_600 : Colors.BLACK }]}
+            inputStyle={[styles.inputStyle, { color: !this.props.editable ? Colors.GRAY_600 : Colors.BLACK }, inputStyle]}
             dirtyStyle={{
               fontSize: 15,
               top: Platform.select({ ios: -14, android: -16 })
