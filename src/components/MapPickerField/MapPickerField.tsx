@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { FloatingLabel } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
@@ -14,6 +14,7 @@ export interface IMapPickerFieldProps extends TextInputProperties {
   onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
+  placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
   disableErrorMessage?: boolean;
   positionValue?: GooglePlaceDetail;
@@ -42,13 +43,15 @@ export default class MapPickerField extends React.Component<IMapPickerFieldProps
     // const { isPercentage } = this.props;
     const {
       onRef,
-      onFocusLabel: onFocus,
-      onBlurLabel: onBlur,
+      onFocusLabel,
+      onBlurLabel,
       onPress,
       // displayProperty,
       // keyProperty,
       // itemValue,
       // options,
+      placeholderStyle,
+      inputStyle,
       positionValue,
       error,
       ...rest
@@ -74,8 +77,8 @@ export default class MapPickerField extends React.Component<IMapPickerFieldProps
               editable={false}
               isSelectField={true}
               style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
-              labelStyle={{ backgroundColor: 'transparent', color: Colors.GRAY_600 }}
-              inputStyle={styles.inputStyle}
+              labelStyle={[{ backgroundColor: 'transparent', color: Colors.GRAY_600 }, placeholderStyle]}
+              inputStyle={[styles.inputStyle, inputStyle]}
               dirtyStyle={{
                 fontSize: 15,
                 top: Platform.select({ ios: -14, android: -16 })

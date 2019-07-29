@@ -1,6 +1,6 @@
 import find from 'lodash.find';
 import React from 'react';
-import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { FloatingLabel } from '../../base/FloatingLabel';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { ComposableItem } from '../../models/composableItem';
@@ -15,9 +15,9 @@ export interface IAutocompletePickerFieldProps extends TextInputProperties {
   onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
   inputStyle?: StyleProp<ViewStyle>;
+  placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
   disableErrorMessage?: boolean;
-
   options?: ComposableItem[] | string[];
   displayProperty?: string;
   keyProperty?: string;
@@ -42,12 +42,13 @@ export default class AutocompletePickerField extends React.Component<IAutocomple
     // const { isPercentage } = this.props;
     const {
       onRef,
-      onFocusLabel: onFocus,
-      onBlurLabel: onBlur,
+      onFocusLabel,
+      onBlurLabel,
       onPress,
       displayProperty,
       keyProperty,
       itemValue,
+      placeholderStyle,
       options,
       error,
       ...rest
@@ -73,7 +74,7 @@ export default class AutocompletePickerField extends React.Component<IAutocomple
               isSelectField={true}
               value={this.retrieveDisplayValue(itemValue)}
               style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
-              labelStyle={{ backgroundColor: 'transparent', color: Colors.GRAY_600 }}
+              labelStyle={[{ backgroundColor: 'transparent', color: Colors.GRAY_600 }, placeholderStyle]}
               inputStyle={styles.inputStyle}
               dirtyStyle={{
                 fontSize: 15,
