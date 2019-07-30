@@ -6,7 +6,7 @@ import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
 import { Navigation } from 'react-native-navigation';
 import { OverlayItemList } from '../base/OverlayItemList';
 import { ComposableItem } from '../models/composableItem';
-import { PICKER_OVERLAY_KEY } from '../navigation/integration';
+import { SELECT_PICKER_OVERLAY } from '../overlays/SelectPickerOverlay/SelectPickerOverlay';
 import { Colors } from '../styles/colors';
 
 export type ComposableFormOptions = {
@@ -82,7 +82,7 @@ class SharedOptions {
     }
 
     try {
-      Navigation.registerComponent(PICKER_OVERLAY_KEY, () => OverlayItemList);
+      Navigation.registerComponent(SELECT_PICKER_OVERLAY, () => OverlayItemList);
       SharedOptions.instance.setRNNAvailable(true);
     } catch (err) {
       SharedOptions.instance.setRNNAvailable(false);
