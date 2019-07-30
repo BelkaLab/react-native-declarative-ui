@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { ComposableItem } from 'react-native-declarative-ui';
-import { IRNNBottomSheetProps, withRNNBottomSheet } from '../../hoc/RNNBottomSheet';
+import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
@@ -27,8 +27,8 @@ interface IState {
   isFirstLoad: boolean;
 }
 
-class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBottomSheetProps, IState> {
-  constructor(props: ISelectPickerOverlayProps & IRNNBottomSheetProps) {
+class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBottomOverlayProps, IState> {
+  constructor(props: ISelectPickerOverlayProps & IRNNBottomOverlayProps) {
     super(props);
     this.state = {
       items: props.items,
@@ -76,7 +76,12 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBott
     const { renderOverlayItem, keyProperty, displayProperty } = this.props;
 
     return (
-      <TouchableOpacity onPress={() => this.props.onPick(item)}>
+      <TouchableOpacity
+        onPress={() => {
+          this.props.onPick(item);
+          this.props.dismissOverlay();
+        }}
+      >
         {renderOverlayItem
           ? renderOverlayItem(item, displayProperty)
           : this.renderDefaultItem(item, keyProperty, displayProperty)}
@@ -214,4 +219,4 @@ const styles = StyleSheet.create({
   createNewItemText: { fontSize: 17, color: Colors.PRIMARY_BLUE }
 });
 
-export default withRNNBottomSheet(SelectPickerOverlay);
+export default withRNNBottomOverlay(SelectPickerOverlay);

@@ -8,7 +8,7 @@ import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimat
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 
-export interface IRNNBottomSheetProps {
+export interface IRNNBottomOverlayProps {
   componentId: string;
   dismissOverlay: (onDismissedCallback?: () => void) => void;
   isScrollable?: boolean;
@@ -20,13 +20,13 @@ interface IState {
   onDismissedCallback?: () => void;
 }
 
-export const withRNNBottomSheet = <P extends {}>(ChildComponent: ComponentType<P>) =>
-  class WithRNNBottomSheet extends Component<P & IRNNBottomSheetProps, IState> {
+export const withRNNBottomOverlay = <P extends {}>(ChildComponent: ComponentType<P>) =>
+  class WithRNNBottomOverlay extends Component<P & IRNNBottomOverlayProps, IState> {
     private backButtonSubscription?: NativeEventSubscription;
     private bottomSheet = React.createRef<BottomSheetBehavior>();
     private animationState: Animated.Value<number> = new Animated.Value(0);
 
-    constructor(props: P & IRNNBottomSheetProps) {
+    constructor(props: P & IRNNBottomOverlayProps) {
       super(props);
 
       this.state = {

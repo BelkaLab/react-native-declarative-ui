@@ -1,4 +1,3 @@
-import delay from 'lodash.delay';
 import every from 'lodash.every';
 import find from 'lodash.find';
 import first from 'lodash.first';
@@ -11,12 +10,7 @@ import React, { Component } from 'react';
 import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
-import Modal from 'react-native-modal';
-import { SearchableOverlayItemList } from '../base/autocomplete/SearchableOverlayItemList';
-import { OverlayCalendar } from '../base/calendar/OverlayCalendar';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
-import { OverlayMap } from '../base/map/OverlayMap';
-import { OverlayItemList } from '../base/OverlayItemList';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
 import { CheckBoxField } from '../components/CheckBoxField';
 import { DatePickerField } from '../components/DatePickerField';
@@ -26,9 +20,8 @@ import { TextField } from '../components/TextField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import { showOverlay, showPickerOverlay } from '../navigation/integration';
+import { showAutocompleteOverlay, showCalendarOverlay, showMapOverlay, showSelectOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
-// import { ANIM_DURATION } from '../overlays/SlideBottomOverlay';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
 
@@ -65,7 +58,6 @@ interface IState {
   isFormFilled: boolean;
   isKeyboardOpened: boolean;
   isModalVisible: boolean;
-  overlayComponent?: React.ReactElement<{}>;
   isAutoFocused: boolean;
   isFocusingMultiline?: boolean;
 }
@@ -178,24 +170,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         >
           {structure.fields.map((field, index) => this.renderFields(field, index, model, errors))}
         </View>
-        {this.state.overlayComponent && (
-          <Modal
-            animationInTiming={ANIM_DURATION}
-            animationOutTiming={ANIM_DURATION}
-            backdropTransitionInTiming={ANIM_DURATION}
-            backdropTransitionOutTiming={ANIM_DURATION}
-            backdropColor={Colors.OVERLAY_OPACITY}
-            onBackdropPress={() => {
-              this.setState({
-                isModalVisible: false
-              });
-            }}
-            isVisible={this.state.isModalVisible}
-            style={styles.overlayContainer}
-          >
-            {this.state.overlayComponent}
-          </Modal>
-        )}
       </View>
     );
   }
@@ -658,74 +632,61 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openSelectPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    if (SharedOptions.isRNNAvailable()) {
-      const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
+    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
-      showPickerOverlay({
-        pickedItem: this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
-        items,
-        displayProperty: field.displayProperty,
-        keyProperty: field.keyProperty,
-        topLabel: field.pickerLabel,
-        headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
-        renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-        onCreateNewItemPressed: () => {
-          if (this.props.createNewItemMapper) {
-            this.props.createNewItemMapper[field.id].callback();
+    showSelectOverlay({
+      pickedItem: this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
+      items,
+      displayProperty: field.displayProperty,
+      keyProperty: field.keyProperty,
+      topLabel: field.pickerLabel,
+      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      onCreateNewItemPressed: () => {
+        if (this.props.createNewItemMapper) {
+          this.props.createNewItemMapper[field.id].callback();
+        }
+      },
+      createNewItemLabel: this.props.createNewItemMapper && this.props.createNewItemMapper[field.id].label,
+      onPick: (selectedItem: ComposableItem | string) => {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field.id]: ''
           }
-        },
-        createNewItemLabel: this.props.createNewItemMapper && this.props.createNewItemMapper[field.id].label,
-        onPick: (selectedItem: ComposableItem | string) => {
+        });
+
+        if (field.shouldReturnKey) {
+          if (!isObject(selectedItem)) {
+            throw new Error(
+              `Field ${
+                field.id
+              } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
+            );
+          }
+          if (!field.keyProperty) {
+            throw new Error(
+              `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
+            );
+          }
+          this.props.onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
+        } else {
+          this.props.onChange(field.id, selectedItem);
+        }
+
+        if (field.updateFieldId && field.updateFieldKeyProperty) {
+          this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
           this.setState({
             errors: {
               ...this.state.errors,
-              [field.id]: ''
+              [field.updateFieldId]: ''
             }
           });
-
-          if (field.shouldReturnKey) {
-            if (!isObject(selectedItem)) {
-              throw new Error(
-                `Field ${
-                  field.id
-                } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
-              );
-            }
-            if (!field.keyProperty) {
-              throw new Error(
-                `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
-              );
-            }
-            this.props.onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
-          } else {
-            this.props.onChange(field.id, selectedItem);
-          }
-
-          if (field.updateFieldId && field.updateFieldKeyProperty) {
-            this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
-            this.setState({
-              errors: {
-                ...this.state.errors,
-                [field.updateFieldId]: ''
-              }
-            });
-          }
-
-          // closeOverlay();
-        },
-        renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
-        renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem
-      });
-    } else {
-      this.setState({
-        isModalVisible: true,
-        overlayComponent: this.renderSelectPickerOverlay(field, model, () =>
-          this.setState({
-            isModalVisible: false
-          })
-        )
-      });
-    }
+        }
+      },
+      renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
+      renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem
+    });
   };
 
   private retrievePickedItem = (
@@ -738,71 +699,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
 
     return find<ComposableItem>(items as ComposableItem[], item => getValueByKey(item, keyProperty) === value);
-  };
-
-  private renderSelectPickerOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
-    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
-
-    return (
-      <OverlayItemList
-        pickedItem={this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty)}
-        items={items}
-        displayProperty={field.displayProperty}
-        keyProperty={field.keyProperty}
-        topLabel={field.pickerLabel}
-        headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
-        renderCustomBackground={this.getComposableFormOptions().pickers.renderCustomBackground}
-        onCreateNewItemPressed={() => {
-          if (this.props.createNewItemMapper) {
-            closeOverlay();
-
-            // we should find a way to proper wait the callback of overlay dismission and fire our callback
-            delay(() => this.props.createNewItemMapper![field.id].callback(), ANIM_DURATION + 50);
-          }
-        }}
-        createNewItemLabel={this.props.createNewItemMapper && this.props.createNewItemMapper[field.id].label}
-        onPick={(selectedItem: ComposableItem | string) => {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.id]: ''
-            }
-          });
-
-          if (field.shouldReturnKey) {
-            if (!isObject(selectedItem)) {
-              throw new Error(
-                `Field ${
-                  field.id
-                } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
-              );
-            }
-            if (!field.keyProperty) {
-              throw new Error(
-                `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
-              );
-            }
-            this.props.onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
-          } else {
-            this.props.onChange(field.id, selectedItem);
-          }
-
-          if (field.updateFieldId && field.updateFieldKeyProperty) {
-            this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
-            this.setState({
-              errors: {
-                ...this.state.errors,
-                [field.updateFieldId]: ''
-              }
-            });
-          }
-
-          closeOverlay();
-        }}
-        renderOverlayItem={this.getComposableFormCustomComponents().renderOverlayItem}
-        renderTopLabelItem={this.getComposableFormCustomComponents().renderTopLabelItem}
-      />
-    );
   };
 
   private renderAutocompleteField = (
@@ -839,71 +735,47 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openAutocompletePicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    if (SharedOptions.isRNNAvailable()) {
-      showOverlay((dismissOverlay: () => void) => this.renderAutocompleteOverlay(field, model, dismissOverlay));
-    } else {
-      this.setState({
-        isModalVisible: true,
-        overlayComponent: this.renderAutocompleteOverlay(field, model, () =>
-          this.setState({
-            isModalVisible: false
-          })
-        )
-      });
-    }
-  };
-
-  private renderAutocompleteOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
     const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
-    return (
-      <SearchableOverlayItemList
-        pickedItem={model[field.id] as ComposableItem | string}
-        items={items}
-        displayProperty={field.displayProperty}
-        keyProperty={field.keyProperty}
-        renderOverlayItem={this.getComposableFormCustomComponents().renderOverlayItem}
-        onFilterItems={text => {
-          return this.props.searchMapper![field.id](text);
-        }}
-        onPick={(selectedItem: ComposableItem | string) => {
+    showAutocompleteOverlay({
+      pickedItem: model[field.id] as ComposableItem | string,
+      items,
+      displayProperty: field.displayProperty,
+      keyProperty: field.keyProperty,
+      renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
+      onFilterItems: text => this.props.searchMapper![field.id](text),
+      onPick: (selectedItem: ComposableItem | string) => {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field.id]: ''
+          }
+        });
+        if (field.shouldReturnKey) {
+          if (typeof selectedItem === 'string') {
+            this.props.onChange(field.id, selectedItem);
+            if (field.updateFieldId && field.updateFieldKeyProperty) {
+              this.props.onChange(field.updateFieldId, undefined);
+            }
+          } else {
+            this.props.onChange(field.id, selectedItem[field.keyProperty!] as string);
+            if (field.updateFieldId && field.updateFieldKeyProperty) {
+              this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
+            }
+          }
+        } else {
+          this.props.onChange(field.id, selectedItem);
+        }
+        if (field.updateFieldId && field.updateFieldKeyProperty) {
           this.setState({
             errors: {
               ...this.state.errors,
-              [field.id]: ''
+              [field.updateFieldId]: ''
             }
           });
-          if (field.shouldReturnKey) {
-            if (typeof selectedItem === 'string') {
-              this.props.onChange(field.id, selectedItem);
-              if (field.updateFieldId && field.updateFieldKeyProperty) {
-                this.props.onChange(field.updateFieldId, undefined);
-              }
-            } else {
-              this.props.onChange(field.id, selectedItem[field.keyProperty!] as string);
-              if (field.updateFieldId && field.updateFieldKeyProperty) {
-                this.props.onChange(
-                  field.updateFieldId,
-                  (selectedItem as ComposableItem)[field.updateFieldKeyProperty]
-                );
-              }
-            }
-          } else {
-            this.props.onChange(field.id, selectedItem);
-          }
-          if (field.updateFieldId && field.updateFieldKeyProperty) {
-            this.setState({
-              errors: {
-                ...this.state.errors,
-                [field.updateFieldId]: ''
-              }
-            });
-          }
-
-          closeOverlay();
-        }}
-      />
-    );
+        }
+      }
+    });
   };
 
   // This is a date picker field renderer for fields of type date
@@ -939,42 +811,22 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openCalendar = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    if (SharedOptions.isRNNAvailable()) {
-      showOverlay((dismissOverlay: () => void) => this.renderCalendarOverlay(field, model, dismissOverlay));
-    } else {
-      this.setState({
-        isModalVisible: true,
-        overlayComponent: this.renderCalendarOverlay(field, model, () =>
-          this.setState({
-            isModalVisible: false
-          })
-        )
-      });
-    }
-  };
+    showCalendarOverlay({
+      pickedDate: model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date(),
+      isAlreadyPicked: Boolean(model[field.id]),
+      mode: 'single-day',
+      onConfirm: (selectedItem: string) => {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field.id]: ''
+          }
+        });
 
-  private renderCalendarOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
-    return (
-      <OverlayCalendar
-        pickedDate={model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date()}
-        isAlreadyPicked={Boolean(model[field.id])}
-        mode="single-day"
-        onCancel={closeOverlay}
-        onConfirm={(selectedItem: string) => {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.id]: ''
-            }
-          });
-
-          this.props.onChange(field.id, selectedItem);
-
-          closeOverlay();
-        }}
-        customFormOptions={this.getComposableFormOptions()}
-      />
-    );
+        this.props.onChange(field.id, selectedItem);
+      },
+      customFormOptions: this.getComposableFormOptions()
+    });
   };
 
   // This is a map picker field renderer for fields of type date
@@ -1011,44 +863,24 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openMapPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    if (SharedOptions.isRNNAvailable()) {
-      showOverlay((dismissOverlay: () => void) => this.renderMapPickerOverlay(field, model, dismissOverlay));
-    } else {
-      this.setState({
-        isModalVisible: true,
-        overlayComponent: this.renderMapPickerOverlay(field, model, () =>
-          this.setState({
-            isModalVisible: false
-          })
-        )
-      });
-    }
-  };
+    showMapOverlay({
+      apiKey: this.props.googleApiKey!,
+      pickedPosition: model[field.id] as GooglePlaceDetail,
+      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      renderCustomCancelButton: this.getComposableFormOptions().pickers.renderCustomCancelButton,
+      onConfirm: (pickedPosition: GooglePlaceDetail) => {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field.id]: ''
+          }
+        });
 
-  private renderMapPickerOverlay = (field: FormField, model: T, closeOverlay: () => void) => {
-    return (
-      <OverlayMap
-        apiKey={this.props.googleApiKey!}
-        pickedPosition={model[field.id] as GooglePlaceDetail}
-        headerBackgroundColor={this.getComposableFormOptions().pickers.headerBackgroundColor}
-        renderCustomBackground={this.getComposableFormOptions().pickers.renderCustomBackground}
-        renderCustomCancelButton={this.getComposableFormOptions().pickers.renderCustomCancelButton}
-        onCancel={closeOverlay}
-        onConfirm={(pickedPosition: GooglePlaceDetail) => {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.id]: ''
-            }
-          });
-
-          this.props.onChange(field.id, pickedPosition);
-
-          closeOverlay();
-        }}
-        customFormOptions={this.getComposableFormOptions()}
-      />
-    );
+        this.props.onChange(field.id, pickedPosition);
+      },
+      customFormOptions: this.getComposableFormOptions()
+    });
   };
 
   private getComposableFormOptions = (): DefinedComposableFormOptions => {
