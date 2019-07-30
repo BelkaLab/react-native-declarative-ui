@@ -5,8 +5,6 @@ import { IRNNBottomSheetProps, withRNNBottomSheet } from '../../hoc/RNNBottomShe
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
-export const SELECT_PICKER_OVERLAY = 'SELECT_PICKER_OVERLAY';
-
 export interface ISelectPickerOverlayProps {
   items: ComposableItem[] | string[];
   pickedItem?: ComposableItem | string;

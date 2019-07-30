@@ -5,9 +5,9 @@ import { StyleProp, TextStyle } from 'react-native';
 import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { Navigation } from 'react-native-navigation';
-import { OverlayItemList } from '../base/OverlayItemList';
 import { ComposableItem } from '../models/composableItem';
-import { SELECT_PICKER_OVERLAY } from '../overlays/SelectPickerOverlay/SelectPickerOverlay';
+import { SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import { SelectPickerOverlay } from '../overlays/SelectPickerOverlay';
 import { Colors } from '../styles/colors';
 
 export type ComposableFormOptions = {
@@ -83,7 +83,7 @@ class SharedOptions {
     }
 
     try {
-      Navigation.registerComponent(SELECT_PICKER_OVERLAY, () => gestureHandlerRootHOC(OverlayItemList));
+      Navigation.registerComponent(SELECT_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(SelectPickerOverlay));
 
       SharedOptions.instance.setRNNAvailable(true);
     } catch (err) {
