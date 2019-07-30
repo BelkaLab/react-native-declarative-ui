@@ -62,7 +62,6 @@ export type ComposableFormCustomComponents = {
 class SharedOptions {
   private static instance: SharedOptions;
 
-  private _isRNNAvailable: boolean = false;
   private _options: DefinedComposableFormOptions = {
     formContainer: {
       externalPadding: 16,
