@@ -124,7 +124,7 @@ class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProp
             style={{ padding: 8, marginHorizontal: 16 }}
           >
             <Image
-              source={require('../../../assets/android_clear_input.png')}
+              source={require('../../assets/android_clear_input.png')}
               style={{ tintColor: Colors.RED, width: 16, height: 16 }}
             />
           </TouchableOpacity>
