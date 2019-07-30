@@ -1,6 +1,7 @@
 import React from 'react';
+import { ISelectPickerOverlayProps, SELECT_PICKER_OVERLAY } from '../overlays/SelectPickerOverlay/SelectPickerOverlay';
 import { requireWrapper } from '../utils/helper';
-export const SLIDE_BOTTOM_OVERLAY_KEY = 'react-native-declarative-ui-slide-bottom-overlay';
+export const PICKER_OVERLAY_KEY = 'react-native-declarative-ui-picker-overlay';
 
 export function showOverlay(renderOverlayComponent: (dismissOverlay: () => void) => React.ReactElement<{}>) {
   try {
@@ -8,13 +9,13 @@ export function showOverlay(renderOverlayComponent: (dismissOverlay: () => void)
 
     Navigation.showOverlay({
       component: {
-        name: SLIDE_BOTTOM_OVERLAY_KEY,
+        name: PICKER_OVERLAY_KEY,
         passProps: {
           renderOverlayComponent
         },
         options: {
           overlay: {
-            interceptTouchOutside: true
+            interceptTouchOutside: false
           },
           layout: {
             backgroundColor: 'transparent'
@@ -23,6 +24,29 @@ export function showOverlay(renderOverlayComponent: (dismissOverlay: () => void)
       }
     });
   } catch (err) {
-    console.log('Cannot use RNN showOverlay before installing dependency');
+    console.log('Cannot use RNN showPickerOverlay before installing dependency');
+  }
+}
+
+export function showPickerOverlay(passProps: ISelectPickerOverlayProps) {
+  try {
+    const Navigation = requireWrapper('react-native-navigation');
+
+    Navigation.showOverlay({
+      component: {
+        name: SELECT_PICKER_OVERLAY,
+        passProps,
+        options: {
+          overlay: {
+            interceptTouchOutside: false
+          },
+          layout: {
+            backgroundColor: 'transparent'
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.log('Cannot use RNN showPickerOverlay before installing dependency');
   }
 }

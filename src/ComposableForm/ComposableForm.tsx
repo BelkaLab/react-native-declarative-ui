@@ -26,11 +26,13 @@ import { TextField } from '../components/TextField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import { showOverlay } from '../navigation/integration';
+import { showOverlay, showPickerOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
-import { ANIM_DURATION } from '../overlays/SlideBottomOverlay';
+// import { ANIM_DURATION } from '../overlays/SlideBottomOverlay';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
+
+const ANIM_DURATION = 200;
 
 interface IComposableFormProps<T> {
   model: T;
@@ -657,7 +659,63 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     Keyboard.dismiss();
 
     if (SharedOptions.isRNNAvailable()) {
-      showOverlay((dismissOverlay: () => void) => this.renderSelectPickerOverlay(field, model, dismissOverlay));
+      const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
+
+      showPickerOverlay({
+        pickedItem: this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
+        items,
+        displayProperty: field.displayProperty,
+        keyProperty: field.keyProperty,
+        topLabel: field.pickerLabel,
+        headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+        renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+        onCreateNewItemPressed: () => {
+          if (this.props.createNewItemMapper) {
+            this.props.createNewItemMapper[field.id].callback();
+          }
+        },
+        createNewItemLabel: this.props.createNewItemMapper && this.props.createNewItemMapper[field.id].label,
+        onPick: (selectedItem: ComposableItem | string) => {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field.id]: ''
+            }
+          });
+
+          if (field.shouldReturnKey) {
+            if (!isObject(selectedItem)) {
+              throw new Error(
+                `Field ${
+                  field.id
+                } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
+              );
+            }
+            if (!field.keyProperty) {
+              throw new Error(
+                `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
+              );
+            }
+            this.props.onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
+          } else {
+            this.props.onChange(field.id, selectedItem);
+          }
+
+          if (field.updateFieldId && field.updateFieldKeyProperty) {
+            this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
+            this.setState({
+              errors: {
+                ...this.state.errors,
+                [field.updateFieldId]: ''
+              }
+            });
+          }
+
+          // closeOverlay();
+        },
+        renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
+        renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem
+      });
     } else {
       this.setState({
         isModalVisible: true,
