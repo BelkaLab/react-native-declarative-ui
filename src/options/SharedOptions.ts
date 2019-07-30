@@ -3,6 +3,7 @@ import Languages from 'numbro/dist/languages.min.js';
 import React from 'react';
 import { StyleProp, TextStyle } from 'react-native';
 import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { Navigation } from 'react-native-navigation';
 import { OverlayItemList } from '../base/OverlayItemList';
 import { ComposableItem } from '../models/composableItem';
@@ -82,7 +83,8 @@ class SharedOptions {
     }
 
     try {
-      Navigation.registerComponent(SELECT_PICKER_OVERLAY, () => OverlayItemList);
+      Navigation.registerComponent(SELECT_PICKER_OVERLAY, () => gestureHandlerRootHOC(OverlayItemList));
+
       SharedOptions.instance.setRNNAvailable(true);
     } catch (err) {
       SharedOptions.instance.setRNNAvailable(false);
