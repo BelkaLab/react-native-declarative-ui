@@ -6,7 +6,10 @@ import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { Navigation } from 'react-native-navigation';
 import { ComposableItem } from '../models/composableItem';
-import { SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import { AutocompletePickerOverlay } from '../overlays/AutocompletePickerOverlay';
+import { CalendarPickerOverlay } from '../overlays/CalendarPickerOverlay';
+import { MapPickerOverlay } from '../overlays/MapPickerOverlay';
 import { SelectPickerOverlay } from '../overlays/SelectPickerOverlay';
 import { Colors } from '../styles/colors';
 
@@ -82,23 +85,12 @@ class SharedOptions {
       // ... any one time initialization goes here ...
     }
 
-    try {
-      Navigation.registerComponent(SELECT_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(SelectPickerOverlay));
-
-      SharedOptions.instance.setRNNAvailable(true);
-    } catch (err) {
-      SharedOptions.instance.setRNNAvailable(false);
-    }
+    Navigation.registerComponent(SELECT_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(SelectPickerOverlay));
+    Navigation.registerComponent(AUTOCOMPLETE_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(AutocompletePickerOverlay));
+    Navigation.registerComponent(CALENDAR_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(CalendarPickerOverlay));
+    Navigation.registerComponent(MAP_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(MapPickerOverlay));
 
     return SharedOptions.instance;
-  }
-
-  setRNNAvailable(isAvailable: boolean) {
-    this._isRNNAvailable = isAvailable;
-  }
-
-  isRNNAvailable() {
-    return this._isRNNAvailable;
   }
 
   setDefaultOptions(newOptions: ComposableFormOptions) {
