@@ -39,7 +39,8 @@
   },
   "peerDependencies": {
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "react-native-navigation": "^2.1.0"
   },
   "dependencies": {
     "lodash": "^4.17.13",
