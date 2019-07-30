@@ -2,11 +2,11 @@ import delay from 'lodash.delay';
 import React, { Component, ComponentType } from 'react';
 import { BackHandler, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { isIphoneX } from 'react-native-iphone-x-helper';
+import { Navigation } from 'react-native-navigation';
 import Animated from 'react-native-reanimated';
 import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
-import { requireWrapper } from '../utils/helper';
 
 export interface IRNNBottomSheetProps {
   componentId: string;
@@ -81,7 +81,6 @@ export const withRNNBottomSheet = <P extends {}>(ChildComponent: ComponentType<P
                 // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
                 if (animationStateValue >= 0.97) {
                   try {
-                    const Navigation = requireWrapper('react-native-navigation');
                     await Navigation.dismissOverlay(this.props.componentId);
 
                     if (this.state.onDismissedCallback) {
