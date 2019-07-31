@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { ComposableFormOptions } from '../../../options/SharedOptions';
-// import { ANIM_DURATION } from '../../../overlays/SlideBottomOverlay/SlideBottomOverlay';
-import { Colors } from '../../../styles/colors';
-import { globalStyles } from '../../../styles/globalStyles';
+import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { ComposableFormOptions } from '../../options/SharedOptions';
+import { Colors } from '../../styles/colors';
+import { globalStyles } from '../../styles/globalStyles';
 
-export interface IOverlayMapProps {
+export interface IMapPickerOverlayProps {
   apiKey: string;
   pickedPosition?: GooglePlaceDetail;
-  onCancel?: () => void;
   onConfirm?: (pickedPosition: GooglePlaceDetail) => void;
   customFormOptions: ComposableFormOptions;
   headerBackgroundColor?: string;
@@ -22,8 +21,8 @@ interface IState {
   pickedPosition?: GooglePlaceDetail;
 }
 
-export default class OverlayMap extends Component<IOverlayMapProps, IState> {
-  constructor(props: IOverlayMapProps) {
+class MapPickerOverlay extends Component<IMapPickerOverlayProps & IRNNBottomOverlayProps, IState> {
+  constructor(props: IMapPickerOverlayProps & IRNNBottomOverlayProps) {
     super(props);
     this.state = {
       visible: false
@@ -32,7 +31,7 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
 
   render() {
     return (
-      <View style={[globalStyles.pickerContainer, { flex: 0.8 }]}>
+      <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
         {this.renderHeader()}
         <GooglePlacesAutocomplete
           placeholder="Cerca"
@@ -70,6 +69,8 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
             if (this.props.onConfirm && picked) {
               this.props.onConfirm(picked);
             }
+
+            this.props.dismissOverlay();
           }}
           getDefaultValue={() => {
             return this.props.pickedPosition ? this.props.pickedPosition.formatted_address : '';
@@ -124,14 +125,14 @@ export default class OverlayMap extends Component<IOverlayMapProps, IState> {
     const { renderCustomCancelButton } = this.props;
     if (renderCustomCancelButton) {
       return (
-        <TouchableWithoutFeedback onPress={this.props.onCancel}>
+        <TouchableWithoutFeedback onPress={() => this.props.dismissOverlay()}>
           <View style={styles.buttonContainer}>{renderCustomCancelButton()}</View>
         </TouchableWithoutFeedback>
       );
     }
 
     return (
-      <TouchableWithoutFeedback onPress={this.props.onCancel}>
+      <TouchableWithoutFeedback onPress={() => this.props.dismissOverlay()}>
         <View style={styles.buttonContainer}>
           <Text>Annulla</Text>
         </View>
@@ -170,3 +171,5 @@ const styles = StyleSheet.create({
   },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' }
 });
+
+export default withRNNBottomOverlay(MapPickerOverlay);

@@ -10,6 +10,7 @@ export enum Colors {
   /* Gray */
 
   BLACK = '#333333',
+  TOTAL_BLACK = '#000000',
   GRAY_100 = '#fafafa',
   GRAY_200 = '#efeff4',
   GRAY_300 = '#e5e5ea',

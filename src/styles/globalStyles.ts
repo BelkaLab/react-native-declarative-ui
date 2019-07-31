@@ -23,9 +23,12 @@ export const globalStyles = StyleSheet.create({
     borderColor: 'transparent'
   },
   pickerContainer: {
-    paddingBottom: 32,
     borderTopRightRadius: 6,
-    borderTopLeftRadius: 6, 
+    borderTopLeftRadius: 6,
     backgroundColor: Colors.WHITE
-  }
+  },
+  iPhoneXBottomView: {
+    height: 34,
+    backgroundColor: Colors.GRAY_200
+  },
 });
