@@ -1,6 +1,6 @@
 import delay from 'lodash.delay';
 import React, { Component, ComponentType } from 'react';
-import { BackHandler, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { BackHandler, EmitterSubscription, Keyboard, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { Navigation } from 'react-native-navigation';
 import Animated from 'react-native-reanimated';
@@ -12,17 +12,22 @@ export interface IRNNBottomOverlayProps {
   componentId: string;
   dismissOverlay: (onDismissedCallback?: () => void) => void;
   isScrollable?: boolean;
+  canExtendFullScreen?: boolean;
+  hasTextInput?: boolean;
+  minHeight?: number;
 }
 
 interface IState {
   height: number;
   backgroundColor: string;
   onDismissedCallback?: () => void;
+  snaps: Array<string | number>;
 }
 
 export const withRNNBottomOverlay = <P extends {}>(ChildComponent: ComponentType<P>) =>
   class WithRNNBottomOverlay extends Component<P & IRNNBottomOverlayProps, IState> {
     private backButtonSubscription?: NativeEventSubscription;
+    private subscriptions!: EmitterSubscription[];
     private bottomSheet = React.createRef<BottomSheetBehavior>();
     private animationState: Animated.Value<number> = new Animated.Value(0);
 
@@ -31,19 +36,55 @@ export const withRNNBottomOverlay = <P extends {}>(ChildComponent: ComponentType
 
       this.state = {
         height: 0,
-        backgroundColor: 'transparent'
+        backgroundColor: 'transparent',
+        snaps: this.calcuateSnaps(props, 0)
       };
     }
 
-    componentDidMount() {
+    private calcuateSnaps = (props: P & IRNNBottomOverlayProps, currentHeight: number) => {
+      if (props.minHeight && currentHeight <= props.minHeight) {
+        currentHeight = props.minHeight;
+      }
+
+      if (props.hasTextInput) {
+        return [0, '94%'];
+      }
+
+      if (props.canExtendFullScreen) {
+        return [0, 150, '94%'];
+      }
+
+      return [0, currentHeight || 250];
+    };
+
+    componentWillMount() {
+      this.subscriptions = [
+        Keyboard.addListener('keyboardDidShow', this.keyboardDidShow),
+        Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
+      ];
+
       this.backButtonSubscription = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
     }
 
     componentWillUnmount() {
+      this.subscriptions.forEach(sub => sub.remove());
+
       if (this.backButtonSubscription) {
         this.backButtonSubscription.remove();
       }
     }
+
+    keyboardDidShow = () => {
+      if (this.bottomSheet.current) {
+        // this.bottomSheet.current.snapTo(1);
+      }
+    };
+
+    keyboardDidHide = () => {
+      if (this.bottomSheet.current) {
+        // this.bottomSheet.current.snapTo(1);
+      }
+    };
 
     handleBackButton = () => {
       this.dismissOverlay();
@@ -61,13 +102,15 @@ export const withRNNBottomOverlay = <P extends {}>(ChildComponent: ComponentType
     };
 
     render() {
-      const { backgroundColor, height } = this.state;
+      const { backgroundColor, snaps } = this.state;
 
       return (
         <View style={styles.root}>
           <Animated.Code
             exec={Animated.block([
               Animated.call([this.animationState], async ([animationStateValue]) => {
+                // console.log(animationStateValue);
+
                 if (animationStateValue >= 0 && this.state.backgroundColor === 'transparent') {
                   delay(
                     () =>
@@ -79,7 +122,8 @@ export const withRNNBottomOverlay = <P extends {}>(ChildComponent: ComponentType
                 }
                 // when animationState is equal to 1, sheet is to bottom (out of viewport)
                 // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
-                if (animationStateValue >= 0.97) {
+                // if (animationStateValue >= 0.97) {
+                if (animationStateValue === 1) {
                   try {
                     await Navigation.dismissOverlay(this.props.componentId);
 
@@ -112,19 +156,21 @@ export const withRNNBottomOverlay = <P extends {}>(ChildComponent: ComponentType
           <BottomSheet
             ref={this.bottomSheet}
             callbackNode={this.animationState}
-            // Add check for bigger components
-            snapPoints={[0, height || 100]}
+            snapPoints={snaps}
             enabledGestureInteraction={this.props.isScrollable}
             enabledInnerScrolling={false}
             renderContent={() => (
               <View
                 onLayout={({ nativeEvent }) => {
-                  this.setState({
-                    height: nativeEvent.layout.height
-                  });
+                  if (this.state.height === 0) {
+                    this.setState({
+                      height: nativeEvent.layout.height,
+                      snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
+                    });
 
-                  if (this.bottomSheet.current) {
-                    this.bottomSheet.current.snapTo(1);
+                    if (this.bottomSheet.current) {
+                      this.bottomSheet.current.snapTo(1);
+                    }
                   }
                 }}
               >

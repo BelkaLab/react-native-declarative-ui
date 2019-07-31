@@ -35,7 +35,12 @@ export function showAutocompleteOverlay(passProps: IAutocompletePickerOverlayPro
     Navigation.showOverlay({
       component: {
         name: AUTOCOMPLETE_PICKER_OVERLAY_KEY,
-        passProps,
+        passProps: {
+          ...passProps,
+          canExtendFullScreen: true,
+          hasTextInput: true,
+          minHeight: 350
+        },
         options: {
           overlay: {
             interceptTouchOutside: false
@@ -77,10 +82,15 @@ export function showMapOverlay(passProps: IMapPickerOverlayProps) {
     Navigation.showOverlay({
       component: {
         name: MAP_PICKER_OVERLAY_KEY,
-        passProps,
+        passProps: {
+          ...passProps,
+          canExtendFullScreen: true,
+          hasTextInput: true,
+          minHeight: 350
+        },
         options: {
           overlay: {
-            interceptTouchOutside: false
+            interceptTouchOutside: true
           },
           layout: {
             backgroundColor: 'transparent'

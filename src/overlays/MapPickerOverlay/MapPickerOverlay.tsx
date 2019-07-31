@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
@@ -31,7 +31,7 @@ class MapPickerOverlay extends Component<IMapPickerOverlayProps & IRNNBottomOver
 
   render() {
     return (
-      <View style={[globalStyles.pickerContainer, { flex: 0.8 }]}>
+      <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
         {this.renderHeader()}
         <GooglePlacesAutocomplete
           placeholder="Cerca"

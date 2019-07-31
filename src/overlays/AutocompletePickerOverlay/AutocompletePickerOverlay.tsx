@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SearchBar } from '../../base/autocomplete/SearchBar';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
@@ -43,7 +43,7 @@ class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProp
     const { currentText, isLoading } = this.state;
 
     return (
-      <View style={[globalStyles.pickerContainer, { flex: 0.8 }]}>
+      <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
         <SearchBar
           // placeholder={'Cerca'}
           value={currentText}
