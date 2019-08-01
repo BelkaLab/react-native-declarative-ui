@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { FlatList, Image, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
@@ -13,12 +13,13 @@ export interface ISelectPickerOverlayProps {
   onPick: (item: ComposableItem | string) => void;
   topLabel?: string;
   isObjectMappedToKey?: boolean;
-  headerBackgroundColor?: string;
-  renderCustomBackground?: () => React.ReactElement<{}>;
   renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
   createNewItemLabel?: string;
   onCreateNewItemPressed?: () => void;
+  onListLayout?: (event: LayoutChangeEvent) => void;
+  headerBackgroundColor?: string;
+  renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
 interface IState {
@@ -41,20 +42,19 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBott
     const { isLoading } = this.state;
 
     return (
-      <View style={globalStyles.pickerContainer}>
-        {this.renderHeader()}
+      <View style={[globalStyles.pickerContainer]}>
         {this.props.createNewItemLabel && this.renderCreateNewItem()}
         {this.renderTopLabel()}
         {isLoading ? (
           <View>Loader</View>
         ) : (
           <FlatList<string | ComposableItem>
-            // contentContainerStyle={{ flex: 1 }}
+            onLayout={this.props.onListLayout}
             keyboardShouldPersistTaps="handled"
             data={this.state.items}
-            //   contentContainerStyle={styles.listContainer}
+            scrollEnabled={false}
+            contentContainerStyle={{ paddingBottom: 34 }}
             renderItem={({ item }) => this.renderItem(item)}
-            //   ListEmptyComponent={this.props.emptySetPlaceholder}
             ItemSeparatorComponent={() => (
               <View
                 style={{

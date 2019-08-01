@@ -16,6 +16,8 @@ export interface IAutocompletePickerOverlayProps {
   topLabel?: string;
   isObjectMappedToKey?: boolean;
   renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
+  headerBackgroundColor?: string;
+  renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
 interface IState {

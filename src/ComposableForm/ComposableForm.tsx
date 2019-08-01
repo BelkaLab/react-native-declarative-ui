@@ -25,8 +25,6 @@ import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } fr
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
 
-const ANIM_DURATION = 200;
-
 interface IComposableFormProps<T> {
   model: T;
   structure: ComposableStructure;
@@ -743,6 +741,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       displayProperty: field.displayProperty,
       keyProperty: field.keyProperty,
       renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
+      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
       onFilterItems: text => this.props.searchMapper![field.id](text),
       onPick: (selectedItem: ComposableItem | string) => {
         this.setState({
@@ -815,6 +815,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       pickedDate: model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date(),
       isAlreadyPicked: Boolean(model[field.id]),
       mode: 'single-day',
+      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
       onConfirm: (selectedItem: string) => {
         this.setState({
           errors: {

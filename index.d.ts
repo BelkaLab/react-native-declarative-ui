@@ -20,6 +20,12 @@ declare module 'react-native-declarative-ui' {
     searchMapper?: {
       [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
     };
+    createNewItemMapper?: {
+      [id: string]: {
+        label: string;
+        callback: () => void;
+      };
+    };
     externalModel?: T;
     customStyle?: ComposableFormOptions;
     customComponents?: ComposableFormCustomComponents;

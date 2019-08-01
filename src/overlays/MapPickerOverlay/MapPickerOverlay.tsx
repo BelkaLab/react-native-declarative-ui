@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
@@ -17,27 +17,21 @@ export interface IMapPickerOverlayProps {
 }
 
 interface IState {
-  visible: boolean;
   pickedPosition?: GooglePlaceDetail;
 }
 
 class MapPickerOverlay extends Component<IMapPickerOverlayProps & IRNNBottomOverlayProps, IState> {
   constructor(props: IMapPickerOverlayProps & IRNNBottomOverlayProps) {
     super(props);
-    this.state = {
-      visible: false
-    };
   }
 
   render() {
     return (
       <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
-        {this.renderHeader()}
         <GooglePlacesAutocomplete
           placeholder="Cerca"
           minLength={3}
           debounce={200}
-          autoFocus={true}
           enableHighAccuracyLocation={false}
           timeout={30000}
           filterReverseGeocodingByTypes={['route', 'street_address', 'locality']}
@@ -94,51 +88,6 @@ class MapPickerOverlay extends Component<IMapPickerOverlayProps & IRNNBottomOver
       </View>
     );
   }
-
-  private renderHeader = () => {
-    const { headerBackgroundColor, renderCustomBackground } = this.props;
-
-    if (renderCustomBackground) {
-      return (
-        <View style={styles.listHeaderCustomerContainer}>
-          <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
-          {this.renderCancelButton()}
-        </View>
-      );
-    }
-
-    return (
-      <View
-        style={[
-          styles.listHeaderContainer,
-          {
-            backgroundColor: headerBackgroundColor || Colors.WHITE
-          }
-        ]}
-      >
-        {this.renderCancelButton()}
-      </View>
-    );
-  };
-
-  private renderCancelButton = () => {
-    const { renderCustomCancelButton } = this.props;
-    if (renderCustomCancelButton) {
-      return (
-        <TouchableWithoutFeedback onPress={() => this.props.dismissOverlay()}>
-          <View style={styles.buttonContainer}>{renderCustomCancelButton()}</View>
-        </TouchableWithoutFeedback>
-      );
-    }
-
-    return (
-      <TouchableWithoutFeedback onPress={() => this.props.dismissOverlay()}>
-        <View style={styles.buttonContainer}>
-          <Text>Annulla</Text>
-        </View>
-      </TouchableWithoutFeedback>
-    );
-  };
 }
 
 const HEADER_HEIGHT = 48;

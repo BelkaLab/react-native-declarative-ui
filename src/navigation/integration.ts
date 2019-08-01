@@ -14,7 +14,10 @@ export function showSelectOverlay(passProps: ISelectPickerOverlayProps) {
     Navigation.showOverlay({
       component: {
         name: SELECT_PICKER_OVERLAY_KEY,
-        passProps,
+        passProps: {
+          ...passProps,
+          isBackDropMode: true
+        },
         options: {
           overlay: {
             interceptTouchOutside: false

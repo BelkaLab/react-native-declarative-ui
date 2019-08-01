@@ -11,8 +11,7 @@ export const globalStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.GRAY_400,
     borderRadius: 4,
-    backgroundColor: Colors.WHITE,
-    // paddingTop: 6
+    backgroundColor: Colors.WHITE
   },
   inputContainer: {
     flexDirection: 'row',
@@ -23,8 +22,6 @@ export const globalStyles = StyleSheet.create({
     borderColor: 'transparent'
   },
   pickerContainer: {
-    borderTopRightRadius: 6,
-    borderTopLeftRadius: 6,
     backgroundColor: Colors.WHITE
   },
   iPhoneXBottomView: {

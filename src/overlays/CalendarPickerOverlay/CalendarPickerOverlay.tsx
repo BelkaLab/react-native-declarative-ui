@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { SingleDayCalendar } from '../../base/calendar/SingleDayCalendar';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
@@ -12,6 +12,8 @@ export interface ICalendarPickerOverlayProps {
   onConfirm?: (pickedDate: string) => void;
   isAlreadyPicked?: boolean;
   customFormOptions: ComposableFormOptions;
+  headerBackgroundColor?: string;
+  renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
 interface IState {}
@@ -25,14 +27,7 @@ class CalendarPickerOverlay extends Component<ICalendarPickerOverlayProps & IRNN
 
   render() {
     return (
-      <View style={globalStyles.pickerContainer}>
-        <View style={styles.listHeaderContainer}>
-          <TouchableWithoutFeedback onPress={() => this.props.dismissOverlay()}>
-            <View style={styles.buttonContainer}>
-              <Text>Annulla</Text>
-            </View>
-          </TouchableWithoutFeedback>
-        </View>
+      <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
         <SingleDayCalendar
           pickedDate={this.props.pickedDate}
           isAlreadyPicked={this.props.isAlreadyPicked}
