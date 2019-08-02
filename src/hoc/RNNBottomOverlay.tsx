@@ -1,6 +1,7 @@
 import delay from 'lodash.delay';
 import React, { Component, ComponentType } from 'react';
-import { BackHandler, Dimensions, EmitterSubscription, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Navigation } from 'react-native-navigation';
 import Animated from 'react-native-reanimated';
 import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimated-bottom-sheet';
@@ -22,6 +23,7 @@ interface IState {
   backgroundColor: string;
   onDismissedCallback?: () => void;
   snaps: Array<string | number>;
+  isHeightComputed: boolean;
 }
 
 type OverlayContent = {
@@ -36,6 +38,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
     private subscriptions!: EmitterSubscription[];
     private bottomSheet = React.createRef<BottomSheetBehavior>();
     private animationState: Animated.Value<number> = new Animated.Value(0);
+    private timerId?: number;
 
     constructor(props: P & IRNNBottomOverlayProps) {
       super(props);
@@ -43,7 +46,8 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
       this.state = {
         height: 0,
         backgroundColor: 'transparent',
-        snaps: this.calcuateSnaps(props, 0)
+        snaps: this.calcuateSnaps(props, 0),
+        isHeightComputed: !props.isBackDropMode
       };
     }
 
@@ -53,7 +57,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
       // }
 
       if (props.hasTextInput) {
-        return props.isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
+        return this.props.isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
       }
 
       if (props.canExtendFullScreen) {
@@ -63,9 +67,11 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
       // turn to backdrop mode
       if (currentHeight >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT) {
         return [Dimensions.get('window').height * 0.94, 350, 0];
+      } else {
+        return this.props.isBackDropMode
+          ? [currentHeight + HEADER_HEIGHT || 350, currentHeight + HEADER_HEIGHT || 350, 0]
+          : [currentHeight || 350, 0];
       }
-
-      return props.isBackDropMode ? ['94%', currentHeight || 350, 0] : [currentHeight || 350, 0];
     };
 
     componentWillMount() {
@@ -156,31 +162,44 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
               ]}
             />
           </TouchableWithoutFeedback>
-
-          <BottomSheet
-            ref={this.bottomSheet}
-            callbackNode={this.animationState}
-            snapPoints={snaps}
-            enabledGestureInteraction={this.props.isBackDropMode}
-            enabledInnerScrolling={this.props.isBackDropMode}
-            renderHeader={() => this.renderHeader()}
-            renderContent={() => this.renderContent()}
-            initialSnap={this.props.isBackDropMode ? 2 : 1}
-          />
+          {!this.state.isHeightComputed && (
+            <View style={{ position: 'absolute', bottom: -Dimensions.get('window').height * 10 }}>
+              {this.renderContent()}
+            </View>
+          )}
+          {this.state.isHeightComputed && (
+            <BottomSheet
+              ref={this.bottomSheet}
+              callbackNode={this.animationState}
+              snapPoints={snaps}
+              enabledGestureInteraction={this.props.isBackDropMode}
+              enabledInnerScrolling={
+                this.props.isBackDropMode && this.state.height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT
+              }
+              renderHeader={() => this.renderHeader()}
+              renderContent={() => this.renderContent()}
+              initialSnap={this.props.isBackDropMode ? 2 : 1}
+            />
+          )}
         </View>
       );
     }
 
     private renderHeader = () => {
-      const { headerBackgroundColor, renderCustomBackground, isBackDropMode } = this.props;
+      const { headerBackgroundColor, renderCustomBackground } = this.props;
 
       if (renderCustomBackground) {
         return (
           <View style={styles.listHeaderCustomContainer}>
             <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
-            {isBackDropMode && (
-              <View style={{ width: 32, height: 4, borderRadius: 4, backgroundColor: Colors.WHITE }} />
-            )}
+            <View style={{ width: 24, height: 24 }} />
+            <View style={styles.knob} />
+            <TouchableOpacity onPress={() => this.dismissOverlay()} style={styles.knobContainer}>
+              <Image
+                source={require('../assets/android_clear_input.png')}
+                style={{ tintColor: Colors.PRIMARY_BLUE, width: 16, height: 16 }}
+              />
+            </TouchableOpacity>
           </View>
         );
       }
@@ -203,22 +222,23 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
             {...this.props as P}
             dismissOverlay={this.dismissOverlay}
             onListLayout={({ nativeEvent }) => {
+              if (this.timerId) {
+                clearTimeout(this.timerId);
+
+                this.timerId = delay(() => {
+                  this.handleBackdropUpdate();
+                }, 100);
+              } else {
+                this.timerId = delay(() => {
+                  this.handleBackdropUpdate();
+                }, 100);
+              }
+
               if (nativeEvent.layout.height > this.state.height) {
                 this.setState({
                   height: nativeEvent.layout.height,
                   snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
                 });
-
-                delay(() => {
-                  this.setState({
-                    backgroundColor: Colors.TOTAL_BLACK
-                  });
-                }, 120);
-                delay(() => {
-                  if (this.bottomSheet.current) {
-                    this.bottomSheet.current.snapTo(1);
-                  }
-                }, 100);
               }
             }}
           />
@@ -247,9 +267,23 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
         </View>
       );
     };
+
+    private handleBackdropUpdate = () => {
+      this.setState({
+        isHeightComputed: true
+      });
+
+      if (this.bottomSheet.current) {
+        this.bottomSheet.current.snapTo(1);
+      }
+
+      delay(() => {
+        this.setState({ backgroundColor: Colors.TOTAL_BLACK });
+      }, 20);
+    };
   };
 
-const HEADER_HEIGHT = 48;
+const HEADER_HEIGHT = 40;
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: 'transparent' },
@@ -259,24 +293,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    borderTopRightRadius: 6,
-    borderTopLeftRadius: 6,
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12,
     backgroundColor: Colors.WHITE,
     paddingHorizontal: 16
   },
   listHeaderCustomContainer: {
     height: HEADER_HEIGHT,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderTopRightRadius: 6,
-    borderTopLeftRadius: 6
+    justifyContent: 'space-between',
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12
   },
   customBackgroundContainer: {
     position: 'absolute',
     height: HEADER_HEIGHT,
     width: '100%',
-    borderTopLeftRadius: 6,
-    borderTopRightRadius: 6
-  }
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12
+  },
+  knobContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
+    backgroundColor: Colors.WHITE,
+    marginRight: 8,
+    marginTop: 8
+  },
+  knob: { width: 32, height: 4, borderRadius: 4, backgroundColor: Colors.WHITE, marginTop: 8 }
 });
