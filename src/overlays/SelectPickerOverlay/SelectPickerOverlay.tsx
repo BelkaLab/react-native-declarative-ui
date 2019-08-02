@@ -42,14 +42,13 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBott
     const { isLoading } = this.state;
 
     return (
-      <View style={[globalStyles.pickerContainer]}>
+      <View style={[globalStyles.pickerContainer]} onLayout={this.props.onListLayout}>
         {this.props.createNewItemLabel && this.renderCreateNewItem()}
         {this.renderTopLabel()}
         {isLoading ? (
           <View>Loader</View>
         ) : (
           <FlatList<string | ComposableItem>
-            onLayout={this.props.onListLayout}
             keyboardShouldPersistTaps="handled"
             data={this.state.items}
             scrollEnabled={false}
