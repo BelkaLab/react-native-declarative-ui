@@ -20,10 +20,10 @@ export interface IRNNBottomOverlayProps {
 
 interface IState {
   height: number;
-  backgroundColor: string;
   onDismissedCallback?: () => void;
   snaps: Array<string | number>;
   isHeightComputed: boolean;
+  isContentEnoughBig: boolean;
 }
 
 type OverlayContent = {
@@ -37,16 +37,15 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
     private backButtonSubscription?: NativeEventSubscription;
     private subscriptions!: EmitterSubscription[];
     private bottomSheet = React.createRef<BottomSheetBehavior>();
-    private animationState: Animated.Value<number> = new Animated.Value(0);
+    private animationState: Animated.Value<number> = new Animated.Value(1);
     private timerId?: number;
-
     constructor(props: P & IRNNBottomOverlayProps) {
       super(props);
 
       this.state = {
         height: 0,
-        backgroundColor: 'transparent',
         snaps: this.calcuateSnaps(props, 0),
+        isContentEnoughBig: false,
         isHeightComputed: !props.isBackDropMode
       };
     }
@@ -119,7 +118,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
     };
 
     render() {
-      const { backgroundColor, snaps } = this.state;
+      const { snaps } = this.state;
 
       return (
         <View style={styles.root}>
@@ -131,7 +130,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                 // when animationState is equal to 1, sheet is to bottom (out of viewport)
                 // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
                 // if (animationStateValue >= 0.97) {
-                if (animationStateValue === 1) {
+                if (animationStateValue >= 0.99 && animationStateValue < 1) {
                   try {
                     await Navigation.dismissOverlay(this.props.componentId);
 
@@ -156,8 +155,9 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
               style={[
                 {
                   flex: 1,
-                  backgroundColor,
-                  opacity: Animated.sub(0.6, Animated.multiply(this.animationState, 0.9))
+                  // backgroundColor: this.state.isHeightComputed ? Colors.TOTAL_BLACK : 'transparent',
+                  backgroundColor: Colors.TOTAL_BLACK,
+                  opacity: Animated.sub(0.5, Animated.multiply(this.animationState, 0.9))
                 }
               ]}
             />
@@ -222,22 +222,42 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
             {...this.props as P}
             dismissOverlay={this.dismissOverlay}
             onListLayout={({ nativeEvent }) => {
-              if (this.timerId) {
-                clearTimeout(this.timerId);
+              if (!this.state.isHeightComputed) {
+                if (this.timerId) {
+                  clearTimeout(this.timerId);
+                  this.timerId = undefined;
+                }
+                // we're already over max, so it's backdrop mode officially
+                if (nativeEvent.layout.height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT) {
+                  this.setState({
+                    height: nativeEvent.layout.height,
+                    isContentEnoughBig: true,
+                    isHeightComputed: true,
+                    snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
+                  });
 
-                this.timerId = delay(() => {
-                  this.handleBackdropUpdate();
-                }, 100);
+                  delay(() => {
+                    if (this.bottomSheet.current) {
+                      this.bottomSheet.current.snapTo(1);
+                    }
+                  }, 20);
+                } else {
+                  if (!this.state.isContentEnoughBig) {
+                    this.setState({
+                      height: nativeEvent.layout.height,
+                      snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
+                    });
+
+                    this.timerId = setTimeout(() => {
+                      if (this.bottomSheet.current) {
+                        this.bottomSheet.current.snapTo(1);
+                      }
+                    }, 200);
+                  }
+                }
               } else {
-                this.timerId = delay(() => {
-                  this.handleBackdropUpdate();
-                }, 100);
-              }
-
-              if (nativeEvent.layout.height > this.state.height) {
                 this.setState({
-                  height: nativeEvent.layout.height,
-                  snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
+                  height: nativeEvent.layout.height
                 });
               }
             }}
@@ -254,32 +274,12 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
               if (this.bottomSheet.current) {
                 this.bottomSheet.current.snapTo(0);
               }
-
-              delay(() => {
-                this.setState({
-                  backgroundColor: Colors.TOTAL_BLACK
-                });
-              }, 20);
             }
           }}
         >
           <ChildComponent {...this.props as P} dismissOverlay={this.dismissOverlay} />
         </View>
       );
-    };
-
-    private handleBackdropUpdate = () => {
-      this.setState({
-        isHeightComputed: true
-      });
-
-      if (this.bottomSheet.current) {
-        this.bottomSheet.current.snapTo(1);
-      }
-
-      delay(() => {
-        this.setState({ backgroundColor: Colors.TOTAL_BLACK });
-      }, 20);
     };
   };
 

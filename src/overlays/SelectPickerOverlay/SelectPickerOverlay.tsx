@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { FlatList, Image, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { Dimensions, Image, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
+import { isIphoneX } from 'react-native-iphone-x-helper';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
@@ -52,7 +54,8 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBott
             keyboardShouldPersistTaps="handled"
             data={this.state.items}
             scrollEnabled={false}
-            contentContainerStyle={{ paddingBottom: 34 }}
+            style={{ maxHeight: Dimensions.get('window').height * 0.94 - 40 }}
+            contentContainerStyle={isIphoneX() && { paddingBottom: 34 }}
             renderItem={({ item }) => this.renderItem(item)}
             ItemSeparatorComponent={() => (
               <View
@@ -113,28 +116,6 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBott
           <Text>{item}</Text>
         )}
       </View>
-    );
-  };
-
-  private renderHeader = () => {
-    const { headerBackgroundColor, renderCustomBackground } = this.props;
-
-    if (renderCustomBackground) {
-      return (
-        <View style={styles.listHeaderCustomerContainer}>
-          <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
-        </View>
-      );
-    }
-    return (
-      <View
-        style={[
-          styles.listHeaderContainer,
-          {
-            backgroundColor: headerBackgroundColor || Colors.WHITE
-          }
-        ]}
-      />
     );
   };
 
