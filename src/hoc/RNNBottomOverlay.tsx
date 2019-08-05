@@ -20,10 +20,11 @@ export interface IRNNBottomOverlayProps {
 
 interface IState {
   height: number;
-  onDismissedCallback?: () => void;
+  isFirstOpening: boolean;
   snaps: Array<string | number>;
   isHeightComputed: boolean;
   isContentEnoughBig: boolean;
+  onDismissedCallback?: () => void;
 }
 
 type OverlayContent = {
@@ -44,6 +45,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
 
       this.state = {
         height: 0,
+        isFirstOpening: true,
         snaps: this.calcuateSnaps(props, 0),
         isContentEnoughBig: false,
         isHeightComputed: !props.isBackDropMode
@@ -130,7 +132,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                 // when animationState is equal to 1, sheet is to bottom (out of viewport)
                 // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
                 // if (animationStateValue >= 0.97) {
-                if (animationStateValue >= 0.99 && animationStateValue < 1) {
+                if (animationStateValue >= 0.99 && animationStateValue < 1 && !this.state.isFirstOpening) {
                   try {
                     await Navigation.dismissOverlay(this.props.componentId);
 
@@ -140,6 +142,10 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                   } catch (err) {
                     // Overlay already dismissed
                   }
+                } else if (animationStateValue === 0 && this.state.isFirstOpening) {
+                  this.setState({
+                    isFirstOpening: false
+                  });
                 }
               })
             ])}
@@ -155,7 +161,6 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
               style={[
                 {
                   flex: 1,
-                  // backgroundColor: this.state.isHeightComputed ? Colors.TOTAL_BLACK : 'transparent',
                   backgroundColor: Colors.TOTAL_BLACK,
                   opacity: Animated.sub(0.5, Animated.multiply(this.animationState, 0.9))
                 }
@@ -249,6 +254,10 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                     });
 
                     this.timerId = setTimeout(() => {
+                      this.setState({
+                        isHeightComputed: true
+                      });
+
                       if (this.bottomSheet.current) {
                         this.bottomSheet.current.snapTo(1);
                       }
