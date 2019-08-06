@@ -127,7 +127,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
           <Animated.Code
             exec={Animated.block([
               Animated.call([this.animationState], async ([animationStateValue]) => {
-                // console.log(animationStateValue);
+                // console.log(this.state.isFirstOpening, animationStateValue);
 
                 // when animationState is equal to 1, sheet is to bottom (out of viewport)
                 // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
@@ -142,7 +142,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                   } catch (err) {
                     // Overlay already dismissed
                   }
-                } else if (animationStateValue === 0 && this.state.isFirstOpening) {
+                } else if (animationStateValue < 1 && this.state.isFirstOpening) {
                   this.setState({
                     isFirstOpening: false
                   });
