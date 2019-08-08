@@ -142,7 +142,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                   } catch (err) {
                     // Overlay already dismissed
                   }
-                } else if (animationStateValue < 1 && this.state.isFirstOpening) {
+                } else if (animationStateValue < 0.99 && this.state.isFirstOpening) {
                   this.setState({
                     isFirstOpening: false
                   });
