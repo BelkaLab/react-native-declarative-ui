@@ -696,6 +696,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       return value;
     }
 
+    if (keyProperty && isObject(value)) {
+      return value;
+    }
+
     return find<ComposableItem>(items as ComposableItem[], item => getValueByKey(item, keyProperty) === value);
   };
 
