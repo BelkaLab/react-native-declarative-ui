@@ -3774,24 +3774,29 @@ react-devtools-core@^3.6.0:
     shell-quote "^1.6.1"
     ws "^3.3.1"
 
-react-is@^16.7.0, react-is@^16.8.1:
+react-is@^16.7.0:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
   integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
 
+react-is@^16.8.1:
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.9.0.tgz#21ca9561399aad0ff1a7701c01683e8ca981edcb"
+  integrity sha512-tJBzzzIgnnRfEm046qRcURvwQnZVXmuCbscxUO5RWrGTXpon2d4c8mI0D8WE6ydVIm29JiLB6+RslkIvym9Rjw==
+
 react-native-calendars@^1.22.0:
-  version "1.205.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.205.0.tgz#5918ab9666370bb00b7c2ec42d252c0c9386cf58"
-  integrity sha512-AjJiYtSDqQppJVrn3IxkqOeGoqVKN+/XFlJSZxZ4IT4vIaMvamM8AWsQI/F7oj3HXhQzGGKc+fTe5/Xv2BxJ3w==
+  version "1.209.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.209.0.tgz#d2b9e1c61933b4fd164675251b04be920c9cb31e"
+  integrity sha512-G1+ssaj6TAaP61+cx4IX0vBVD0aLGWfCU/vaJk0R7zb15P0p+vijWpnx8IuFdxclJnpweXgKHoo3tbKWWEnLgA==
   dependencies:
     lodash "^4.0.0"
     prop-types "^15.5.10"
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.2.0:
-  version "0.2.16"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.16.tgz#a88f879a8a6a1df969509ef49ea5cd4f2c3a6446"
-  integrity sha512-JkJ0FHxRzsUfe6lkspun/7mP0Etps4dKncnROZeUP2cHrTH5h1ImosKpCb7e3WN0TKBMUizVIrifF6R1nigQaw==
+  version "0.2.17"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.17.tgz#78ffbf8ee8fd40c05642d8b3af3414f865b8b372"
+  integrity sha512-UAfXEka2q37koKVb6U3RMJi2GQg0C+NxsnH46cb+xVmJWYEbcDpVduZg8T2RXnA8WFeVomn/cKKjl0p2nQUQ7A==
   dependencies:
     lodash "^4.17.13"
     lodash.delay "^4.1.1"
