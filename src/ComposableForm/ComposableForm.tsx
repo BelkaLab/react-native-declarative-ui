@@ -33,6 +33,9 @@ interface IComposableFormProps<T> {
   onSave?: () => void;
   onClear?: () => void;
   onFocus?: (inputField?: TextInput) => void;
+  loadingMapper?: {
+    [id: string]: boolean;
+  };
   pickerMapper?: {
     [id: string]: ComposableItem[] | string[];
   };
@@ -420,7 +423,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={model[field.id] as string | undefined}
-        editable={!field.disabled}
+        editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         multiline={field.multiline}
         keyboardType={field.keyboard || 'default'}
         isPassword={field.isPassword}
@@ -459,6 +462,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           />
         }
         rightContentVisibility={!!model[field.id]}
+        isLoading={this.props.loadingMapper && this.props.loadingMapper[field.id]}
         onFocusLabel={() => {
           if (this.props.onFocus) {
             this.props.onFocus(this.fieldRefs[field.id]);
@@ -499,13 +503,14 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
-        editable={!field.disabled}
+        editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         currency={field.currency}
         isPercentage={field.isPercentage}
         keyboardType="decimal-pad"
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
         selectionColor={Colors.PRIMARY_BLUE}
+        isLoading={this.props.loadingMapper && this.props.loadingMapper[field.id]}
         onSubmitEditing={() => {
           if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
             this.fieldRefs[field.nextField].focus();

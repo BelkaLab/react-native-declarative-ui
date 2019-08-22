@@ -14,6 +14,9 @@ declare module 'react-native-declarative-ui' {
     onClear?: () => void;
     onFocus?: (input: TextInput) => void;
     backgroundColor?: string;
+    loadingMapper?: {
+      [id: string]: boolean;
+    };
     pickerMapper?: {
       [id: string]: ComposableItem[] | string[];
     };
