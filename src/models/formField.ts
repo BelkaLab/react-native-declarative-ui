@@ -32,6 +32,8 @@ export type FormField = {
   checkboxTextPosition?: 'left' | 'right';
   urlLink?: string;
   checkBoxLabelUrl?: string;
+  // toggle props
+  disableSeparator?: boolean;
   // select props
   options?: ComposableItem[] | string[];
   keyProperty?: string;
