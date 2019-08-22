@@ -17,6 +17,7 @@ import { DatePickerField } from '../components/DatePickerField';
 import { MapPickerField } from '../components/MapPickerField';
 import { SelectPickerField } from '../components/SelectPickerField';
 import { TextField } from '../components/TextField';
+import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
@@ -333,6 +334,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             {this.renderCheckBoxField(field, model, errors, customStyle)}
           </View>
         );
+      case 'toggle':
+        return (
+          <View
+            key={index}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+          >
+            {this.renderToggleField(field, model, errors, customStyle)}
+          </View>
+        );
       case 'select':
         return (
           <View
@@ -594,6 +604,34 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, !model[field.id]);
         }}
         error={errors[field.id]}
+      />
+    );
+  };
+
+  private renderToggleField = (
+    field: FormField,
+    model: T,
+    errors: Dictionary<string>,
+    customStyle: StyleProp<ViewStyle> = {}
+  ) => {
+    return (
+      <ToggleField
+        containerStyle={[{ flex: 1 }, customStyle]}
+        value={model[field.id] as boolean}
+        disableSeparator={field.disableSeparator}
+        renderCustomLabel={this.getComposableFormCustomComponents().renderToggleLabelItem}
+        // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
+        label={field.label}
+        onValueChange={val => {
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              [field.id]: ''
+            }
+          });
+          this.props.onChange(field.id, val);
+        }}
+        disabled={field.disabled}
       />
     );
   };

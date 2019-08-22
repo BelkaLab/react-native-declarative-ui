@@ -57,6 +57,7 @@ declare module 'react-native-declarative-ui' {
   export type ComposableFormCustomComponents = {
     renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
     renderTopLabelItem?: (topLabel: string) => React.ReactElement<{}>;
+    renderToggleLabelItem?: (label: string) => React.ReactElement<{}>;
     renderHeaderTitle?: (header: string) => React.ReactElement<{}>;
   };
 
