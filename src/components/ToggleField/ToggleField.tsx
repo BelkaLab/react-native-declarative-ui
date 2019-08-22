@@ -21,7 +21,7 @@ export default class ToggleField extends Component<IToggleFieldProps, React.Comp
           <Switch
             {...rest}
             ref={input => input && this.props.onRef && this.props.onRef(input)}
-            onTintColor={Colors.PRIMARY_BLUE}
+            trackColor={{ true: Colors.PRIMARY_BLUE, false: '' }}
           />
         </View>
         {!disableSeparator && <View style={styles.separator} />}

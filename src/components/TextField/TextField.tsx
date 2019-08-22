@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, View, ViewStyle } from 'react-native';
 import { FloatingLabel } from '../../base/FloatingLabel';
+import { LoaderIcon } from '../../base/icons/LoaderIcon';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 
@@ -14,6 +15,7 @@ export interface ITextFieldProps extends TextInputProperties {
   placeholderStyle?: StyleProp<TextStyle>;
   rightContent?: JSX.Element;
   rightContentVisibility?: boolean;
+  isLoading?: boolean;
   error?: string;
   disableErrorMessage?: boolean;
   isPassword?: boolean;
@@ -43,6 +45,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
       rightContentVisibility,
       placeholderStyle,
       inputStyle,
+      isLoading,
       ...rest
     } = this.props;
 
@@ -79,7 +82,11 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
             currencyStyle={{
               color: !this.props.editable ? Colors.GRAY_500 : Colors.GRAY_600
             }}
-            inputStyle={[styles.inputStyle, { color: !this.props.editable ? Colors.GRAY_600 : Colors.BLACK }, inputStyle]}
+            inputStyle={[
+              styles.inputStyle,
+              { color: !this.props.editable ? Colors.GRAY_600 : Colors.BLACK },
+              inputStyle
+            ]}
             dirtyStyle={{
               fontSize: 15,
               top: Platform.select({ ios: -14, android: -16 })
@@ -111,7 +118,8 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
           >
             {this.props.label}
           </FloatingLabel>
-          {rightContentVisibility && rightContent}
+          {rightContentVisibility && rightContent && !isLoading}
+          {isLoading && <LoaderIcon />}
         </View>
         {!!error && this.renderError(error, !!this.props.disableErrorMessage)}
       </View>
