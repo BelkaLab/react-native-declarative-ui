@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Picker, Text } from 'react-native';
-import { SingleDayCalendar } from '../../base/calendar/SingleDayCalendar';
+import { Button, Picker, StyleSheet, Text, View } from 'react-native';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
@@ -15,27 +14,38 @@ export interface IDurationPickerOverlayProps {
 }
 
 interface IState {
-  selectedHour: number;
-  selectedMinute: number;
+  selectedHour?: number;
+  selectedMinute?: number;
 }
 
 class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNNBottomOverlayProps, IState> {
-  private calendar!: SingleDayCalendar;
-
   constructor(props: IDurationPickerOverlayProps & IRNNBottomOverlayProps) {
     super(props);
+    this.state = {
+      selectedHour: (props.pickedAmount || 0) / 60,
+      selectedMinute: (props.pickedAmount || 0) % 60
+    };
   }
 
   render() {
-    return <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>{this.renderPicker()}</View>;
+    return (
+      <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
+        {this.renderPicker()}
+        <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+          <Button title="Conferma" onPress={this.onConfirmPressed} />
+        </View>
+      </View>
+    );
   }
 
   private renderPicker = () => {
     const { selectedHour, selectedMinute } = this.state;
+    console.log(selectedHour, selectedMinute);
+
     return (
       <View style={styles.body}>
         <Picker
-          selectedValue={selectedHour}
+          selectedValue={`${selectedHour}`}
           style={styles.picker}
           // itemStyle={this.props.itemStyle}
           onValueChange={itemValue => this.onValueChange(itemValue, selectedMinute)}
@@ -44,7 +54,7 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
         </Picker>
         <Text style={styles.separator}>:</Text>
         <Picker
-          selectedValue={selectedMinute}
+          selectedValue={`${selectedMinute}`}
           style={styles.picker}
           // itemStyle={this.props.itemStyle}
           onValueChange={itemValue => this.onValueChange(selectedHour, itemValue)}
@@ -55,14 +65,14 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
     );
   };
 
-  onValueChange = (selectedHour: number, selectedMinute: number) => {
+  onValueChange = (selectedHour?: number, selectedMinute?: number) => {
     this.setState({ selectedHour, selectedMinute });
   };
 
   getHourItems = () => {
     const items = [];
     // const { maxHour, hourInterval, hourUnit } = this.props;
-    const maxHour = 23;
+    const maxHour = 9;
     const hourInterval = 1;
     const hourUnit = '';
     const interval = maxHour / hourInterval;
@@ -91,9 +101,10 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
   };
 
   private onConfirmPressed = () => {
-    if (this.props.onConfirm && this.state.selectedHour && this.state.selectedMinute) {
-      this.props.onConfirm(this.state.selectedHour * 60 + this.state.selectedMinute);
+    if (this.props.onConfirm) {
+      this.props.onConfirm(Number((this.state.selectedHour || 0) * 60) + Number(this.state.selectedMinute || 0));
     }
+    this.props.dismissOverlay();
   };
 }
 
@@ -112,7 +123,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
   body: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 32
   },
   picker: {
     flex: 1

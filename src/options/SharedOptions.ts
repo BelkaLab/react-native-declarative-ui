@@ -3,10 +3,11 @@ import Languages from 'numbro/dist/languages.min.js';
 import React from 'react';
 import { StyleProp, TextStyle } from 'react-native';
 import { CalendarTheme, LocaleConfig } from 'react-native-calendars';
+import { DurationPickerOverlay } from 'react-native-declarative-ui/src/overlays/DurationPickerOverlay';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 import { Navigation } from 'react-native-navigation';
 import { ComposableItem } from '../models/composableItem';
-import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, DURATION_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
 import { AutocompletePickerOverlay } from '../overlays/AutocompletePickerOverlay';
 import { CalendarPickerOverlay } from '../overlays/CalendarPickerOverlay';
 import { MapPickerOverlay } from '../overlays/MapPickerOverlay';
@@ -88,6 +89,7 @@ class SharedOptions {
     Navigation.registerComponent(SELECT_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(SelectPickerOverlay));
     Navigation.registerComponent(AUTOCOMPLETE_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(AutocompletePickerOverlay));
     Navigation.registerComponent(CALENDAR_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(CalendarPickerOverlay));
+    Navigation.registerComponent(DURATION_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(DurationPickerOverlay));
     Navigation.registerComponent(MAP_PICKER_OVERLAY_KEY, () => gestureHandlerRootHOC(MapPickerOverlay));
 
     return SharedOptions.instance;

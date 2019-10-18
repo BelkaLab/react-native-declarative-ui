@@ -950,7 +950,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     isInline: boolean = false,
     customStyle: StyleProp<ViewStyle> = {}
   ) => {
-    const date = model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('DD/MM/YYYY') : undefined;
+    const duration = this.retrieveDuration(model[field.id] as number | undefined);
 
     return (
       <DurationPickerField
@@ -960,7 +960,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
-        value={date}
+        value={duration}
         label={field.label}
         onPress={() => this.openDuration(field, model)}
         onRightIconClick={() => this.openDuration(field, model)}
@@ -968,6 +968,17 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         disableErrorMessage={isInline}
       />
     );
+  };
+
+  private retrieveDuration = (duration?: number) => {
+    if (!duration) {
+      return undefined;
+    }
+
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60 < 10 ? `0${duration % 60}` : duration % 60;
+
+    return `${hours}:${minutes}`;
   };
 
   private openDuration = (field: FormField, model: T) => {
