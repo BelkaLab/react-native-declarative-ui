@@ -3780,23 +3780,23 @@ react-is@^16.7.0:
   integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
 
 react-is@^16.8.1:
-  version "16.9.0"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.9.0.tgz#21ca9561399aad0ff1a7701c01683e8ca981edcb"
-  integrity sha512-tJBzzzIgnnRfEm046qRcURvwQnZVXmuCbscxUO5RWrGTXpon2d4c8mI0D8WE6ydVIm29JiLB6+RslkIvym9Rjw==
+  version "16.10.2"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.10.2.tgz#984120fd4d16800e9a738208ab1fba422d23b5ab"
+  integrity sha512-INBT1QEgtcCCgvccr5/86CfD71fw9EPmDxgiJX4I2Ddr6ZsV6iFXsuby+qWJPtmNuMY0zByTsG4468P7nHuNWA==
 
 react-native-calendars@^1.22.0:
-  version "1.210.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.210.0.tgz#eb9e9ff8018a8478f5ab9fc1fda9b01e087c49b7"
-  integrity sha512-Mk3Wgj7C/M+2SxUCn6YKnKZSZmcD4nMiE8lxddPR4CHUMBrN9/Tfvs0W71wW3oPA/5Wz8PEiCvcJQTd6tGUC6g==
+  version "1.212.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.212.0.tgz#6070ae37c7a446da5a6fb1c24b71feda5021aafd"
+  integrity sha512-FrWabRJlUeTjCF8qx8cYAId4SbCMmVmO5eE791ykQaTG2/jvQJz2O3MF5QRjJHyaS/QdeEilKf9w/Mk43bM42Q==
   dependencies:
     lodash "^4.0.0"
     prop-types "^15.5.10"
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.2.0:
-  version "0.2.19"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.19.tgz#fdebe9c274063feb90be00f4d9f0f9304f12f9e2"
-  integrity sha512-zQigmuLzhUEkN+pRwjoG9jU+ksNHakH05YefiXUDzsXSV4PRMptmomK1CelvafuwamjxSmybxprRrrpAnTF5Wg==
+  version "0.2.20"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.20.tgz#df349badd0075849426835ccb9d9f231d4a29117"
+  integrity sha512-c3aW4c46Rnh2xQfNTW+bvbZTkQH7DCSr/aVTeWp3wS4lyYrUVxcAQGoG48ywxsYPkUEVgwu+qKOsqiBrEI66Cw==
   dependencies:
     lodash "^4.17.13"
     lodash.delay "^4.1.1"
@@ -3972,9 +3972,9 @@ readable-stream@^2.0.1, readable-stream@^2.0.6, readable-stream@^2.2.2, readable
     util-deprecate "~1.0.1"
 
 reanimated-bottom-sheet@^1.0.0-alpha.13:
-  version "1.0.0-alpha.13"
-  resolved "https://registry.yarnpkg.com/reanimated-bottom-sheet/-/reanimated-bottom-sheet-1.0.0-alpha.13.tgz#15a585ced256dd9d3c8450016a5acb263e29dcb9"
-  integrity sha512-RuZ2riqZiWhSNDOpKmOD7JYtDS2ygTAPCDEQ9qVmBsQ/1RuJ1sh8WZRWuqdNFqExG8u2ZCj/dGg5hPAS1CtU5Q==
+  version "1.0.0-alpha.14"
+  resolved "https://registry.yarnpkg.com/reanimated-bottom-sheet/-/reanimated-bottom-sheet-1.0.0-alpha.14.tgz#2df541b1cfd589cd8e48abab71510a1403aef9a7"
+  integrity sha512-ytoh/N8kU1Dd+r+N7uapRR7GfqJnn4dV3Oi7gqz4lyGmgjB1QGGL6eFOVRGuaKx5xPfb3r9s6JXltvO9XxBj2Q==
 
 regenerate-unicode-properties@^7.0.0:
   version "7.0.0"
