@@ -14,6 +14,7 @@ import { RightFieldIcon } from '../base/icons/RightFieldIcon';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
 import { CheckBoxField } from '../components/CheckBoxField';
 import { DatePickerField } from '../components/DatePickerField';
+import { DurationPickerField } from '../components/DurationPickerField';
 import { MapPickerField } from '../components/MapPickerField';
 import { SelectPickerField } from '../components/SelectPickerField';
 import { TextField } from '../components/TextField';
@@ -21,7 +22,7 @@ import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import { showAutocompleteOverlay, showCalendarOverlay, showMapOverlay, showSelectOverlay } from '../navigation/integration';
+import { showAutocompleteOverlay, showCalendarOverlay, showDurationOverlay, showMapOverlay, showSelectOverlay } from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
@@ -371,6 +372,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderDateField(field, model, errors, isInline, customStyle)}
+          </View>
+        );
+      case 'duration':
+        return (
+          <View
+            key={index}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+          >
+            {this.renderDurationField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'map':
@@ -927,6 +937,55 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         });
 
         this.props.onChange(field.id, pickedPosition);
+      },
+      customFormOptions: this.getComposableFormOptions()
+    });
+  };
+
+  // This is a duration picker field renderer for fields of type date
+  private renderDurationField = (
+    field: FormField,
+    model: T,
+    errors: Dictionary<string>,
+    isInline: boolean = false,
+    customStyle: StyleProp<ViewStyle> = {}
+  ) => {
+    const date = model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('DD/MM/YYYY') : undefined;
+
+    return (
+      <DurationPickerField
+        onRef={input => {
+          this.fieldRefs[field.id] = input;
+        }}
+        containerStyle={[{ flex: 1 }, customStyle]}
+        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        value={date}
+        label={field.label}
+        onPress={() => this.openDuration(field, model)}
+        onRightIconClick={() => this.openDuration(field, model)}
+        error={errors[field.id]}
+        disableErrorMessage={isInline}
+      />
+    );
+  };
+
+  private openDuration = (field: FormField, model: T) => {
+    Keyboard.dismiss();
+
+    showDurationOverlay({
+      pickedAmount: model[field.id] as number,
+      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      onConfirm: (selectedItem: number) => {
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            [field.id]: ''
+          }
+        });
+
+        this.props.onChange(field.id, selectedItem);
       },
       customFormOptions: this.getComposableFormOptions()
     });

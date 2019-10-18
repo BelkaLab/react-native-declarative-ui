@@ -1,12 +1,14 @@
 import { Navigation } from 'react-native-navigation';
 import { IAutocompletePickerOverlayProps } from '../overlays/AutocompletePickerOverlay/AutocompletePickerOverlay';
 import { ICalendarPickerOverlayProps } from '../overlays/CalendarPickerOverlay/CalendarPickerOverlay';
+import { IDurationPickerOverlayProps } from '../overlays/DurationPickerOverlay/DurationPickerOverlay';
 import { IMapPickerOverlayProps } from '../overlays/MapPickerOverlay/MapPickerOverlay';
 import { ISelectPickerOverlayProps } from '../overlays/SelectPickerOverlay/SelectPickerOverlay';
 
 export const SELECT_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-select-picker-overlay';
 export const AUTOCOMPLETE_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-autocomplete-picker-overlay';
 export const CALENDAR_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-calendar-picker-overlay';
+export const DURATION_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-calendar-duration-overlay';
 export const MAP_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-map-picker-overlay';
 
 export function showSelectOverlay(passProps: ISelectPickerOverlayProps) {
@@ -64,6 +66,27 @@ export function showCalendarOverlay(passProps: ICalendarPickerOverlayProps) {
     Navigation.showOverlay({
       component: {
         name: CALENDAR_PICKER_OVERLAY_KEY,
+        passProps,
+        options: {
+          overlay: {
+            interceptTouchOutside: false
+          },
+          layout: {
+            backgroundColor: 'transparent'
+          }
+        }
+      }
+    });
+  } catch (err) {
+    console.log('Cannot use RNN showCalendarOverlay before installing dependency');
+  }
+}
+
+export function showDurationOverlay(passProps: IDurationPickerOverlayProps) {
+  try {
+    Navigation.showOverlay({
+      component: {
+        name: DURATION_PICKER_OVERLAY_KEY,
         passProps,
         options: {
           overlay: {
