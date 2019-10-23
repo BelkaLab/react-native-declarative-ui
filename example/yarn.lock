@@ -688,6 +688,11 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
+"@react-native-community/picker@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/picker/-/picker-1.1.1.tgz#f8a051b1345003cb43bca65e5de9ff33eddcf2fd"
+  integrity sha512-WCEosBhI0iBQDjk0fh5bYQ0ZC7ShtgDEk8zmR7xIimVFDj5NaCXPd4M2nFz2XeNEC2RbQwHZ6cF+ye3HO6bsdQ==
+
 "@types/lodash.filter@^4.6.5":
   version "4.6.5"
   resolved "https://registry.yarnpkg.com/@types/lodash.filter/-/lodash.filter-4.6.5.tgz#a9ddb92e7d30e6db2d18cf43d01d6b1a92d1a988"
@@ -3780,9 +3785,9 @@ react-is@^16.7.0:
   integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
 
 react-is@^16.8.1:
-  version "16.10.2"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.10.2.tgz#984120fd4d16800e9a738208ab1fba422d23b5ab"
-  integrity sha512-INBT1QEgtcCCgvccr5/86CfD71fw9EPmDxgiJX4I2Ddr6ZsV6iFXsuby+qWJPtmNuMY0zByTsG4468P7nHuNWA==
+  version "16.11.0"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.11.0.tgz#b85dfecd48ad1ce469ff558a882ca8e8313928fa"
+  integrity sha512-gbBVYR2p8mnriqAwWx9LbuUrShnAuSCNnuPGyc7GJrMVQtPDAh8iLpv7FRuMPFb56KkaVZIYSz1PrjI9q0QPCw==
 
 react-native-calendars@^1.22.0:
   version "1.212.0"
@@ -3794,10 +3799,11 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.2.0:
-  version "0.2.21"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.21.tgz#0b4e2e02e3524c0fb1839fc22ae1c5987c79c8af"
-  integrity sha512-AajmrsgeHHQaXCDARE+XDwmyg9H5vUm29IHPeig0mQ0PR30jDP6QAs/LPLTv+3m0TYhexsEzW8cGuXDB64mUMg==
+  version "0.2.22"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.22.tgz#2760e47302f1a5e3cd68f9121bb02eaa500b1d6e"
+  integrity sha512-rGQp1rRX68Cwpx3ydDW9CwQzJlCSD0B8sT6BY8HGtdZg+so+3FyNqo1stj2okbuiibPoFO0gBlOAn9hBUyY4Rw==
   dependencies:
+    "@react-native-community/picker" "^1.1.1"
     lodash "^4.17.13"
     lodash.delay "^4.1.1"
     lodash.every "^4.6.0"
