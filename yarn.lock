@@ -689,6 +689,11 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
+"@react-native-community/picker@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/picker/-/picker-1.1.1.tgz#f8a051b1345003cb43bca65e5de9ff33eddcf2fd"
+  integrity sha512-WCEosBhI0iBQDjk0fh5bYQ0ZC7ShtgDEk8zmR7xIimVFDj5NaCXPd4M2nFz2XeNEC2RbQwHZ6cF+ye3HO6bsdQ==
+
 "@types/lodash.delay@^4.1.6":
   version "4.1.6"
   resolved "https://registry.yarnpkg.com/@types/lodash.delay/-/lodash.delay-4.1.6.tgz#1c31fdeae86fc78984bcf88639f9722e958a98aa"

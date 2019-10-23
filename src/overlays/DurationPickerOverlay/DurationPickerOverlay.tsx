@@ -1,5 +1,6 @@
+import Picker from '@react-native-community/picker';
 import React, { Component } from 'react';
-import { Button, Picker, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
@@ -40,7 +41,6 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
 
   private renderPicker = () => {
     const { selectedHour, selectedMinute } = this.state;
-    console.log(selectedHour, selectedMinute);
 
     return (
       <View style={styles.body}>
@@ -72,7 +72,7 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
   getHourItems = () => {
     const items = [];
     // const { maxHour, hourInterval, hourUnit } = this.props;
-    const maxHour = 9;
+    const maxHour = 8;
     const hourInterval = 1;
     const hourUnit = '';
     const interval = maxHour / hourInterval;

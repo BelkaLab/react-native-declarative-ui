@@ -43,6 +43,7 @@
     "react-native-reanimated": "*"
   },
   "dependencies": {
+    "@react-native-community/picker": "^1.1.1",
     "lodash": "^4.17.13",
     "lodash.delay": "^4.1.1",
     "lodash.every": "^4.6.0",
