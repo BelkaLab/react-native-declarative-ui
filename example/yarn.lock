@@ -688,11 +688,6 @@
     xcode "^2.0.0"
     xmldoc "^0.4.0"
 
-"@react-native-community/picker@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@react-native-community/picker/-/picker-1.1.1.tgz#f8a051b1345003cb43bca65e5de9ff33eddcf2fd"
-  integrity sha512-WCEosBhI0iBQDjk0fh5bYQ0ZC7ShtgDEk8zmR7xIimVFDj5NaCXPd4M2nFz2XeNEC2RbQwHZ6cF+ye3HO6bsdQ==
-
 "@types/lodash.filter@^4.6.5":
   version "4.6.5"
   resolved "https://registry.yarnpkg.com/@types/lodash.filter/-/lodash.filter-4.6.5.tgz#a9ddb92e7d30e6db2d18cf43d01d6b1a92d1a988"
@@ -3799,11 +3794,10 @@ react-native-calendars@^1.22.0:
     xdate "^0.8.0"
 
 react-native-declarative-ui@^0.2.0:
-  version "0.2.22"
-  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.22.tgz#2760e47302f1a5e3cd68f9121bb02eaa500b1d6e"
-  integrity sha512-rGQp1rRX68Cwpx3ydDW9CwQzJlCSD0B8sT6BY8HGtdZg+so+3FyNqo1stj2okbuiibPoFO0gBlOAn9hBUyY4Rw==
+  version "0.2.24"
+  resolved "https://registry.yarnpkg.com/react-native-declarative-ui/-/react-native-declarative-ui-0.2.24.tgz#be55673fad9bb77675737c6189a52029820e61a9"
+  integrity sha512-3nVwf4fGGtIGsFzboRk7XEbqJgkw2p4DMpL7y6c38d7v5FB1pR9NTZa/H1h6PAFXgEfOOcPQVet6LGThTSpOYg==
   dependencies:
-    "@react-native-community/picker" "^1.1.1"
     lodash "^4.17.13"
     lodash.delay "^4.1.1"
     lodash.every "^4.6.0"
@@ -3978,9 +3972,9 @@ readable-stream@^2.0.1, readable-stream@^2.0.6, readable-stream@^2.2.2, readable
     util-deprecate "~1.0.1"
 
 reanimated-bottom-sheet@^1.0.0-alpha.13:
-  version "1.0.0-alpha.14"
-  resolved "https://registry.yarnpkg.com/reanimated-bottom-sheet/-/reanimated-bottom-sheet-1.0.0-alpha.14.tgz#2df541b1cfd589cd8e48abab71510a1403aef9a7"
-  integrity sha512-ytoh/N8kU1Dd+r+N7uapRR7GfqJnn4dV3Oi7gqz4lyGmgjB1QGGL6eFOVRGuaKx5xPfb3r9s6JXltvO9XxBj2Q==
+  version "1.0.0-alpha.15"
+  resolved "https://registry.yarnpkg.com/reanimated-bottom-sheet/-/reanimated-bottom-sheet-1.0.0-alpha.15.tgz#448d596354e6ea0955953ab4f4b2dea1805ad4a9"
+  integrity sha512-QLNkf3joZa3SGfYmKYCqmFfEBNet+304NRX3KhxkCKYWfqkWeqGZZuRsPz6OXWIVuMmF413O7Qf4E/28Vv2jTw==
 
 regenerate-unicode-properties@^7.0.0:
   version "7.0.0"
