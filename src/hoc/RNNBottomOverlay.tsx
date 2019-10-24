@@ -13,6 +13,7 @@ export interface IRNNBottomOverlayProps {
   canExtendFullScreen?: boolean;
   hasTextInput?: boolean;
   isBackDropMode?: boolean;
+  disabledInteraction?: boolean;
   minHeight?: number;
   headerBackgroundColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
@@ -132,7 +133,7 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
                 // when animationState is equal to 1, sheet is to bottom (out of viewport)
                 // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
                 // if (animationStateValue >= 0.97) {
-                if (animationStateValue >= 0.99 && animationStateValue < 1 && !this.state.isFirstOpening) {
+                if (animationStateValue >= 0.99 && animationStateValue < 1.1 && !this.state.isFirstOpening) {
                   try {
                     await Navigation.dismissOverlay(this.props.componentId);
 
@@ -177,9 +178,11 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
               ref={this.bottomSheet}
               callbackNode={this.animationState}
               snapPoints={snaps}
-              enabledGestureInteraction={this.props.isBackDropMode}
+              enabledGestureInteraction={!this.props.disabledInteraction && this.props.isBackDropMode}
               enabledInnerScrolling={
-                this.props.isBackDropMode && this.state.height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT
+                !this.props.disabledInteraction &&
+                this.props.isBackDropMode &&
+                this.state.height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT
               }
               renderHeader={() => this.renderHeader()}
               renderContent={() => this.renderContent()}

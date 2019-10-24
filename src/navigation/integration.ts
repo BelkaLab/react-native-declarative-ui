@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { Navigation } from 'react-native-navigation';
 import { IAutocompletePickerOverlayProps } from '../overlays/AutocompletePickerOverlay/AutocompletePickerOverlay';
 import { ICalendarPickerOverlayProps } from '../overlays/CalendarPickerOverlay/CalendarPickerOverlay';
@@ -87,7 +88,10 @@ export function showDurationOverlay(passProps: IDurationPickerOverlayProps) {
     Navigation.showOverlay({
       component: {
         name: DURATION_PICKER_OVERLAY_KEY,
-        passProps,
+        passProps: {
+          ...passProps,
+          disabledInteraction: Platform.OS === 'android'
+        },
         options: {
           overlay: {
             interceptTouchOutside: false

@@ -1,6 +1,6 @@
+import { Picker } from '@react-native-community/picker';
 import React, { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
-import { TimePicker, WheelPicker } from 'react-native-wheel-picker-android';
 import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
@@ -23,7 +23,7 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
   constructor(props: IDurationPickerOverlayProps & IRNNBottomOverlayProps) {
     super(props);
     this.state = {
-      selectedHour: (props.pickedAmount || 0) / 60,
+      selectedHour: Math.floor((props.pickedAmount || 0) / 60),
       selectedMinute: (props.pickedAmount || 0) % 60
     };
   }
@@ -32,7 +32,7 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
     return (
       <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
         {this.renderPicker()}
-        <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+        <View style={{ paddingHorizontal: 16, marginBottom: 34 }}>
           <Button title="Conferma" onPress={this.onConfirmPressed} />
         </View>
       </View>
@@ -43,30 +43,30 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
     const { selectedHour, selectedMinute } = this.state;
 
     return (
-      <View style={styles.body}>
-        {/* <Picker
-          selectedValue={`${selectedHour}`}
-          style={styles.picker}
-          // itemStyle={this.props.itemStyle}
-          onValueChange={itemValue => this.onValueChange(itemValue, selectedMinute)}
-        >
-          {this.getHourItems()}
-        </Picker> */}
-        <TimePicker onTimeSelected={itemValue => this.onValueChange(itemValue, selectedMinute)} />
-        <Text style={styles.separator}>:</Text>
-        {/* <Picker
-          selectedValue={`${selectedMinute}`}
-          style={styles.picker}
-          // itemStyle={this.props.itemStyle}
-          onValueChange={itemValue => this.onValueChange(selectedHour, itemValue)}
-        >
-          {this.getMinuteItems()}
-        </Picker> */}
-        <WheelPicker
-          selectedItem={`${selectedHour}`}
-          data={['0', '1', '2', '3', '4', '5', '6', '7', '8']}
-          onItemSelected={itemValue => this.onValueChange(selectedHour, itemValue)}
-        />
+      <View>
+        <View style={{ flexDirection: 'row', paddingHorizontal: 16, paddingTop: 16, marginStart: 4 }}>
+          <Text style={{ fontSize: 16, flex: 1 }}>Ore</Text>
+          <Text style={{ fontSize: 16, flex: 1 }}>Minuti</Text>
+        </View>
+        <View style={styles.body}>
+          <Picker
+            selectedValue={`${selectedHour}`}
+            style={styles.picker}
+            // itemStyle={this.props.itemStyle}
+            onValueChange={itemValue => this.onValueChange(Number(itemValue), selectedMinute)}
+          >
+            {this.getHourItems()}
+          </Picker>
+          <Text style={styles.separator}>:</Text>
+          <Picker
+            selectedValue={selectedMinute && selectedMinute < 10 ? `0${selectedMinute}` : `${selectedMinute}`}
+            style={styles.picker}
+            // itemStyle={this.props.itemStyle}
+            onValueChange={itemValue => this.onValueChange(selectedHour, Number(itemValue))}
+          >
+            {this.getMinuteItems()}
+          </Picker>
+        </View>
       </View>
     );
   };
@@ -75,36 +75,36 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNN
     this.setState({ selectedHour, selectedMinute });
   };
 
-  // getHourItems = () => {
-  //   const items = [];
-  //   // const { maxHour, hourInterval, hourUnit } = this.props;
-  //   const maxHour = 8;
-  //   const hourInterval = 1;
-  //   const hourUnit = '';
-  //   const interval = maxHour / hourInterval;
-  //   for (let i = 0; i <= interval; i++) {
-  //     const value = `${i * hourInterval}`;
-  //     const item = <Picker.Item key={value} value={value} label={value + hourUnit} />;
-  //     items.push(item);
-  //   }
-  //   return items;
-  // };
+  getHourItems = () => {
+    const items = [];
+    // const { maxHour, hourInterval, hourUnit } = this.props;
+    const maxHour = 8;
+    const hourInterval = 1;
+    const hourUnit = '';
+    const interval = maxHour / hourInterval;
+    for (let i = 0; i <= interval; i++) {
+      const value = `${i * hourInterval}`;
+      const item = <Picker.Item key={value} value={value} label={value + hourUnit} />;
+      items.push(item);
+    }
+    return items;
+  };
 
-  // getMinuteItems = () => {
-  //   const items = [];
-  //   // const { maxMinute, minuteInterval, minuteUnit } = this.props;
-  //   const maxMinute = 59;
-  //   const minuteInterval = 1;
-  //   const minuteUnit = '';
-  //   const interval = maxMinute / minuteInterval;
-  //   for (let i = 0; i <= interval; i++) {
-  //     const value = i * minuteInterval;
-  //     const newValue = value < 10 ? `0${value}` : `${value}`;
-  //     const item = <Picker.Item key={value} value={newValue} label={newValue + minuteUnit} />;
-  //     items.push(item);
-  //   }
-  //   return items;
-  // };
+  getMinuteItems = () => {
+    const items = [];
+    // const { maxMinute, minuteInterval, minuteUnit } = this.props;
+    const maxMinute = 59;
+    const minuteInterval = 1;
+    const minuteUnit = '';
+    const interval = maxMinute / minuteInterval;
+    for (let i = 0; i <= interval; i++) {
+      const value = i * minuteInterval;
+      const newValue = value < 10 ? `0${value}` : `${value}`;
+      const item = <Picker.Item key={value} value={newValue} label={newValue + minuteUnit} />;
+      items.push(item);
+    }
+    return items;
+  };
 
   private onConfirmPressed = () => {
     if (this.props.onConfirm) {
@@ -130,8 +130,8 @@ const styles = StyleSheet.create({
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
   body: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 32
+    padding: 16,
+    paddingTop: 8
   },
   picker: {
     flex: 1
