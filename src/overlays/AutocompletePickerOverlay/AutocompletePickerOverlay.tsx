@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SearchBar } from '../../base/autocomplete/SearchBar';
-import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 
 export interface IAutocompletePickerOverlayProps {
   pickedItem: ComposableItem | string;
@@ -27,8 +28,8 @@ interface IState {
   isFirstLoad: boolean;
 }
 
-class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProps & IRNNBottomOverlayProps, IState> {
-  constructor(props: IAutocompletePickerOverlayProps & IRNNBottomOverlayProps) {
+class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProps & IBottomOverlayProps, IState> {
+  constructor(props: IAutocompletePickerOverlayProps & IBottomOverlayProps) {
     super(props);
     this.state = {
       items: props.items,
@@ -217,4 +218,4 @@ const styles = StyleSheet.create({
   helperPickerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
 });
 
-export default withRNNBottomOverlay(AutocompletePickerOverlay);
+export default withMappedNavigationParams()(withBottomOverlay(AutocompletePickerOverlay));

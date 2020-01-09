@@ -23,10 +23,12 @@
     "cpx": "^1.5.0",
     "react": "16.8.3",
     "react-native": "0.59.10",
-    "react-native-gesture-handler": "*",
-    "react-native-navigation": "^2.1.0",
-    "react-native-reanimated": "^1.1.0",
+    "react-native-gesture-handler": "^1.5.2",
+    "react-native-reanimated": "^1.4.0",
     "react-native-typescript-transformer": "^1.1.4",
+    "react-navigation": "^4.0.10",
+    "react-navigation-props-mapper": "^1.0.2",
+    "react-navigation-stack": "^2.0.13",
     "tslib": "^1.9.3",
     "tslint": "^5.8.0",
     "tslint-config-prettier": "^1.6.0",
@@ -38,9 +40,10 @@
     "build": "cpx \"src/**/*.{ts,tsx}\" \"example/node_modules/react-native-declarative-ui/src\" --watch"
   },
   "peerDependencies": {
-    "react-native-gesture-handler": "*",
-    "react-native-navigation": "^2.1.0",
-    "react-native-reanimated": "*"
+    "react-native-gesture-handler": "^1.5.2",
+    "react-native-reanimated": "^1.4.0",
+    "react-navigation": "^4.0.0",
+    "react-navigation-props-mapper": "^1.0.2"
   },
   "dependencies": {
     "@react-native-community/picker": "^1.1.1",

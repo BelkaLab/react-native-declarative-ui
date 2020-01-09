@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -20,8 +21,8 @@ interface IState {
   pickedPosition?: GooglePlaceDetail;
 }
 
-class MapPickerOverlay extends Component<IMapPickerOverlayProps & IRNNBottomOverlayProps, IState> {
-  constructor(props: IMapPickerOverlayProps & IRNNBottomOverlayProps) {
+class MapPickerOverlay extends Component<IMapPickerOverlayProps & IBottomOverlayProps, IState> {
+  constructor(props: IMapPickerOverlayProps & IBottomOverlayProps) {
     super(props);
   }
 
@@ -121,4 +122,4 @@ const styles = StyleSheet.create({
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' }
 });
 
-export default withRNNBottomOverlay(MapPickerOverlay);
+export default withMappedNavigationParams()(withBottomOverlay(MapPickerOverlay));

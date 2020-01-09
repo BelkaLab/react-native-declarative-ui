@@ -1,10 +1,11 @@
 import { Picker } from '@react-native-community/picker';
 import React, { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
-import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 
 export interface IDurationPickerOverlayProps {
   pickedAmount: number;
@@ -19,8 +20,8 @@ interface IState {
   selectedMinute?: number;
 }
 
-class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IRNNBottomOverlayProps, IState> {
-  constructor(props: IDurationPickerOverlayProps & IRNNBottomOverlayProps) {
+class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBottomOverlayProps, IState> {
+  constructor(props: IDurationPickerOverlayProps & IBottomOverlayProps) {
     super(props);
     this.state = {
       selectedHour: Math.floor((props.pickedAmount || 0) / 60),
@@ -142,4 +143,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default withRNNBottomOverlay(DurationPickerOverlay);
+export default withMappedNavigationParams()(withBottomOverlay(DurationPickerOverlay));

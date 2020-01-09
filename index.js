@@ -2,8 +2,9 @@ import { LocaleConfig } from 'react-native-calendars';
 import { ComposableForm } from './src/ComposableForm';
 import { KeyboardAvoidingScrollView } from './src/KeyboardAvoidingScrollView';
 import SharedOptions from './src/options/SharedOptions';
+import { ComposableFormModals } from './src/navigation/integration';
 
-export { ComposableForm, KeyboardAvoidingScrollView, SharedOptions };
+export { ComposableForm, KeyboardAvoidingScrollView, SharedOptions, ComposableFormModals };
 
 LocaleConfig.locales['it-IT'] = {
   monthNames: [

@@ -1,14 +1,24 @@
 import delay from 'lodash.delay';
 import React, { Component, ComponentType } from 'react';
-import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  BackHandler,
+  Dimensions,
+  EmitterSubscription,
+  Image,
+  Keyboard,
+  LayoutChangeEvent,
+  NativeEventSubscription,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Navigation } from 'react-native-navigation';
+import { NavigationStackScreenProps, NavigationStackOptions } from 'react-navigation-stack';
 import Animated from 'react-native-reanimated';
 import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
 
-export interface IRNNBottomOverlayProps {
-  componentId: string;
+export interface IBottomOverlayProps extends NavigationStackScreenProps {
   dismissOverlay: (onDismissedCallback?: () => void) => void;
   canExtendFullScreen?: boolean;
   hasTextInput?: boolean;
@@ -32,16 +42,15 @@ type OverlayContent = {
   onListLayout?: (event: LayoutChangeEvent) => void;
 };
 
-export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverlayProps>(
-  ChildComponent: ComponentType<P>
-) =>
-  class WithRNNBottomOverlay extends Component<P & IRNNBottomOverlayProps, IState> {
+export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps>(ChildComponent: ComponentType<P>) =>
+  class WithBottomOverlay extends Component<P & IBottomOverlayProps, IState> {
     private backButtonSubscription?: NativeEventSubscription;
     private subscriptions!: EmitterSubscription[];
     private bottomSheet = React.createRef<BottomSheetBehavior>();
     private animationState: Animated.Value<number> = new Animated.Value(1);
     private timerId?: number;
-    constructor(props: P & IRNNBottomOverlayProps) {
+
+    constructor(props: P & IBottomOverlayProps) {
       super(props);
 
       this.state = {
@@ -53,11 +62,15 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
       };
     }
 
-    private calcuateSnaps = (props: P & IRNNBottomOverlayProps, currentHeight: number) => {
-      // if (props.minHeight && currentHeight <= props.minHeight) {
-      //   currentHeight = props.minHeight;
-      // }
+    static navigationOptions = (): NavigationStackOptions => {
+      return {
+        gestureEnabled: false,
+        animationEnabled: false,
+        cardStyle: { backgroundColor: 'transparent' }
+      };
+    };
 
+    private calcuateSnaps = (props: P & IBottomOverlayProps, currentHeight: number) => {
       if (props.hasTextInput) {
         return this.props.isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
       }
@@ -115,9 +128,11 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
         onDismissedCallback
       });
 
-      if (this.bottomSheet.current) {
-        this.bottomSheet.current.snapTo(this.props.isBackDropMode ? 2 : 1);
-      }
+      delay(() => {
+        if (this.bottomSheet.current) {
+          this.bottomSheet.current!.snapTo(this.props.isBackDropMode ? 2 : 1);
+        }
+      }, 10);
     };
 
     render() {
@@ -128,20 +143,13 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
           <Animated.Code
             exec={Animated.block([
               Animated.call([this.animationState], async ([animationStateValue]) => {
-                // console.log(this.state.isFirstOpening, animationStateValue);
+                // console.log(this.state.isFirstOpening, this.state.height, animationStateValue);
 
-                // when animationState is equal to 1, sheet is to bottom (out of viewport)
-                // we go for 0.97, because it's enough to trigger dismissOverlay and have a better interaction
-                // if (animationStateValue >= 0.97) {
-                if (animationStateValue >= 0.99 && animationStateValue < 1.1 && !this.state.isFirstOpening) {
-                  try {
-                    await Navigation.dismissOverlay(this.props.componentId);
+                if (animationStateValue >= 0.99 && animationStateValue < 1 && !this.state.isFirstOpening) {
+                  this.props.navigation.goBack();
 
-                    if (this.state.onDismissedCallback) {
-                      this.state.onDismissedCallback();
-                    }
-                  } catch (err) {
-                    // Overlay already dismissed
+                  if (this.state.onDismissedCallback) {
+                    this.state.onDismissedCallback();
                   }
                 } else if (animationStateValue < 0.99 && this.state.isFirstOpening) {
                   this.setState({
@@ -151,7 +159,6 @@ export const withRNNBottomOverlay = <P extends OverlayContent & IRNNBottomOverla
               })
             ])}
           />
-
           <TouchableWithoutFeedback
             style={styles.backgroundContainer}
             onPress={() =>

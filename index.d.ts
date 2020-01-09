@@ -88,4 +88,8 @@ declare module 'react-native-declarative-ui' {
   }
 
   export class KeyboardAvoidingScrollView extends React.Component<IKeyboardAvoidingScrollViewProps, any> { }
+
+  const ComposableFormModals: object
+
+  export { ComposableFormModals }
 }

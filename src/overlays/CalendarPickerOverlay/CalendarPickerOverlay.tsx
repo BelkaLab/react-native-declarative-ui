@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { SingleDayCalendar } from '../../base/calendar/SingleDayCalendar';
-import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 
 export interface ICalendarPickerOverlayProps {
   mode: 'single-day';
@@ -18,10 +19,10 @@ export interface ICalendarPickerOverlayProps {
 
 interface IState {}
 
-class CalendarPickerOverlay extends Component<ICalendarPickerOverlayProps & IRNNBottomOverlayProps, IState> {
+class CalendarPickerOverlay extends Component<ICalendarPickerOverlayProps & IBottomOverlayProps, IState> {
   private calendar!: SingleDayCalendar;
 
-  constructor(props: ICalendarPickerOverlayProps & IRNNBottomOverlayProps) {
+  constructor(props: ICalendarPickerOverlayProps & IBottomOverlayProps) {
     super(props);
   }
 
@@ -73,4 +74,4 @@ const styles = StyleSheet.create({
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' }
 });
 
-export default withRNNBottomOverlay(CalendarPickerOverlay);
+export default withMappedNavigationParams()(withBottomOverlay(CalendarPickerOverlay));

@@ -7,7 +7,20 @@ import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
+import {
+  EmitterSubscription,
+  findNodeHandle,
+  Keyboard,
+  Linking,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View,
+  ViewStyle
+} from 'react-native';
 import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
@@ -22,12 +35,25 @@ import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import { showAutocompleteOverlay, showCalendarOverlay, showDurationOverlay, showMapOverlay, showSelectOverlay } from '../navigation/integration';
+import {
+  SELECT_PICKER_OVERLAY_KEY,
+  showAutocompleteOverlay,
+  showCalendarOverlay,
+  showDurationOverlay,
+  showMapOverlay,
+  AUTOCOMPLETE_PICKER_OVERLAY_KEY,
+  CALENDAR_PICKER_OVERLAY_KEY,
+  DURATION_PICKER_OVERLAY_KEY,
+  MAP_PICKER_OVERLAY_KEY
+} from '../navigation/integration';
 import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
+import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+import { NavigationRoute } from 'react-navigation';
 
 interface IComposableFormProps<T> {
+  navigation: StackNavigationProp<NavigationRoute, {}>;
   model: T;
   structure: ComposableStructure;
   onChange: (id: string, value?: unknown) => void;
@@ -685,7 +711,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
     const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
-    showSelectOverlay({
+    this.props.navigation.navigate(SELECT_PICKER_OVERLAY_KEY, {
       pickedItem: this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
       items,
       displayProperty: field.displayProperty,
@@ -736,7 +762,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
       },
       renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
-      renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem
+      renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem,
+      isBackDropMode: true
     });
   };
 
@@ -792,7 +819,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
     const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
 
-    showAutocompleteOverlay({
+    this.props.navigation.navigate(AUTOCOMPLETE_PICKER_OVERLAY_KEY, {
       pickedItem: model[field.id] as ComposableItem | string,
       items,
       displayProperty: field.displayProperty,
@@ -800,7 +827,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-      onFilterItems: text => this.props.searchMapper![field.id](text),
+      onFilterItems: (text: string) => this.props.searchMapper![field.id](text),
       onPick: (selectedItem: ComposableItem | string) => {
         this.setState({
           errors: {
@@ -831,7 +858,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             }
           });
         }
-      }
+      },
+      canExtendFullScreen: true,
+      hasTextInput: true,
+      minHeight: 350
     });
   };
 
@@ -868,7 +898,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openCalendar = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    showCalendarOverlay({
+    this.props.navigation.navigate(CALENDAR_PICKER_OVERLAY_KEY, {
       pickedDate: model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date(),
       isAlreadyPicked: Boolean(model[field.id]),
       mode: 'single-day',
@@ -922,7 +952,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openMapPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    showMapOverlay({
+    this.props.navigation.navigate(MAP_PICKER_OVERLAY_KEY, {
       apiKey: this.props.googleApiKey!,
       pickedPosition: model[field.id] as GooglePlaceDetail,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
@@ -938,7 +968,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
         this.props.onChange(field.id, pickedPosition);
       },
-      customFormOptions: this.getComposableFormOptions()
+      customFormOptions: this.getComposableFormOptions(),
+      canExtendFullScreen: true,
+      hasTextInput: true,
+      minHeight: 350
     });
   };
 
@@ -984,7 +1017,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   private openDuration = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    showDurationOverlay({
+    this.props.navigation.navigate(DURATION_PICKER_OVERLAY_KEY, {
       pickedAmount: model[field.id] as number,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
@@ -998,7 +1031,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
         this.props.onChange(field.id, selectedItem);
       },
-      customFormOptions: this.getComposableFormOptions()
+      customFormOptions: this.getComposableFormOptions(),
+      disabledInteraction: Platform.OS === 'android'
     });
   };
 

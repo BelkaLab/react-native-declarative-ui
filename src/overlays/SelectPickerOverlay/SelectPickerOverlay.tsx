@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Dimensions, Image, LayoutChangeEvent, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { Dimensions, Image, LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import { FlatList, TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { isIphoneX } from 'react-native-iphone-x-helper';
-import { IRNNBottomOverlayProps, withRNNBottomOverlay } from '../../hoc/RNNBottomOverlay';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
@@ -30,8 +31,8 @@ interface IState {
   isFirstLoad: boolean;
 }
 
-class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IRNNBottomOverlayProps, IState> {
-  constructor(props: ISelectPickerOverlayProps & IRNNBottomOverlayProps) {
+class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomOverlayProps, IState> {
+  constructor(props: ISelectPickerOverlayProps & IBottomOverlayProps) {
     super(props);
     this.state = {
       items: props.items,
@@ -199,4 +200,4 @@ const styles = StyleSheet.create({
   createNewItemText: { fontSize: 17, color: Colors.PRIMARY_BLUE }
 });
 
-export default withRNNBottomOverlay(SelectPickerOverlay);
+export default withMappedNavigationParams()(withBottomOverlay(SelectPickerOverlay));
