@@ -1,6 +1,15 @@
 import React, { Component } from 'react';
-import { Dimensions, Image, LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
-import { FlatList, TouchableOpacity, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import {
+  Dimensions,
+  Image,
+  LayoutChangeEvent,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View
+} from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
