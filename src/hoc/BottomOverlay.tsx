@@ -290,9 +290,11 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
                 height: nativeEvent.layout.height,
                 snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
               });
-              if (this.bottomSheet.current) {
-                this.bottomSheet.current.snapTo(0);
-              }
+              delay(() => {
+                if (this.bottomSheet.current) {
+                  this.bottomSheet.current.snapTo(0);
+                }
+              }, 10);
             }
           }}
         >
