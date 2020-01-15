@@ -3,7 +3,7 @@
   "version": "0.3.3",
   "main": "index.js",
   "repository": "https://github.com/BelkaLab/react-native-declarative-ui",
-  "author": "Belka <fabrizio@belka.us> (http://belka.us)",
+  "author": "Belka <fabrizio@belkadigital.com> (https://www.belkadigital.com)",
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "*",

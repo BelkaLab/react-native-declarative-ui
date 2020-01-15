@@ -13,8 +13,9 @@ import {
   View
 } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { NavigationStackScreenProps, NavigationStackOptions } from 'react-navigation-stack';
 import Animated from 'react-native-reanimated';
+import { StackActions } from 'react-navigation';
+import { NavigationStackOptions, NavigationStackScreenProps } from 'react-navigation-stack';
 import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
 
@@ -69,6 +70,20 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
         cardStyle: { backgroundColor: 'transparent' }
       };
     };
+
+    completeTransition() {
+      const { navigation } = this.props;
+      const parent = navigation.dangerouslyGetParent();
+
+      if (parent) {
+        navigation.dispatch(
+          StackActions.completeTransition({
+            key: parent.state.key,
+            toChildKey: parent.state.routes[parent.state.index].key
+          })
+        );
+      }
+    }
 
     private calcuateSnaps = (props: P & IBottomOverlayProps, currentHeight: number) => {
       if (props.hasTextInput) {
@@ -147,6 +162,8 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
 
                 if (animationStateValue >= 0.99 && animationStateValue < 1 && !this.state.isFirstOpening) {
                   this.props.navigation.goBack();
+
+                  this.completeTransition();
 
                   if (this.state.onDismissedCallback) {
                     this.state.onDismissedCallback();
