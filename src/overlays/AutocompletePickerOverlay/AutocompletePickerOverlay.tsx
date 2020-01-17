@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity as IosTouchableOpacity, View } from 'react-native';
+import { FlatList, TouchableOpacity as AndroidTouchableOpacity } from 'react-native-gesture-handler';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { SearchBar } from '../../base/autocomplete/SearchBar';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import { withMappedNavigationParams } from 'react-navigation-props-mapper';
+
+const TouchableOpacity = Platform.select({
+  ios: IosTouchableOpacity,
+  android: AndroidTouchableOpacity
+});
 
 export interface IAutocompletePickerOverlayProps {
   pickedItem: ComposableItem | string;

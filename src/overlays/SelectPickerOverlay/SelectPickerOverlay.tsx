@@ -1,21 +1,21 @@
 import React, { Component } from 'react';
-import {
-  Dimensions,
-  Image,
-  LayoutChangeEvent,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View
-} from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { Dimensions, Image, LayoutChangeEvent, Platform, StyleSheet, Text, TouchableOpacity as IosTouchableOpacity, TouchableWithoutFeedback as IosTouchableWithoutFeedback, View } from 'react-native';
+import { FlatList, TouchableOpacity as AndroidTouchableOpacity, TouchableWithoutFeedback as AndroidTouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+
+const TouchableOpacity = Platform.select({
+  ios: IosTouchableOpacity,
+  android: AndroidTouchableOpacity
+});
+const TouchableWithoutFeedback = Platform.select({
+  ios: IosTouchableWithoutFeedback,
+  android: AndroidTouchableWithoutFeedback
+});
 
 export interface ISelectPickerOverlayProps {
   items: ComposableItem[] | string[];
