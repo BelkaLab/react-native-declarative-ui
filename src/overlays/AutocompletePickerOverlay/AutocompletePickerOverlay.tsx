@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity as IosTouchableOpacity, View } from 'react-native';
+import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import { FlatList, TouchableOpacity as AndroidTouchableOpacity } from 'react-native-gesture-handler';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { SearchBar } from '../../base/autocomplete/SearchBar';
@@ -46,6 +47,16 @@ class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProp
       isLoading: false,
       isFirstLoad: true
     };
+
+    if (Platform.OS === 'android') {
+      AndroidKeyboardAdjust.setAdjustPan();
+    }
+  }
+
+  componentWillUnmount() {
+    if (Platform.OS === 'android') {
+      AndroidKeyboardAdjust.setAdjustResize();
+    }
   }
 
   render() {

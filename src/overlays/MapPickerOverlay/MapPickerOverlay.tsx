@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, Platform, StyleSheet, View } from 'react-native';
+import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
@@ -24,6 +25,16 @@ interface IState {
 class MapPickerOverlay extends Component<IMapPickerOverlayProps & IBottomOverlayProps, IState> {
   constructor(props: IMapPickerOverlayProps & IBottomOverlayProps) {
     super(props);
+
+    if (Platform.OS === 'android') {
+      AndroidKeyboardAdjust.setAdjustPan();
+    }
+  }
+
+  componentWillUnmount() {
+    if (Platform.OS === 'android') {
+      AndroidKeyboardAdjust.setAdjustResize();
+    }
   }
 
   render() {
