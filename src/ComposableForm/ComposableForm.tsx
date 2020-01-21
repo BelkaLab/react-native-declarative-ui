@@ -461,6 +461,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         value={model[field.id] as string | undefined}
         editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         multiline={field.multiline}
+        scrollEnabled={false} // fix for trigger scroll on iOS when keyboard opens
         keyboardType={field.keyboard || 'default'}
         isPassword={field.isPassword}
         autoCapitalize={

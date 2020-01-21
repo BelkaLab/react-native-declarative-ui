@@ -1,6 +1,9 @@
+
 declare module 'react-native-declarative-ui' {
   import { ScrollViewProperties } from 'react-native';
   import { CalendarTheme } from 'react-native-calendars';
+  import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+  import { NavigationRoute, NavigationParams } from 'react-navigation';
 
   export type ComposableItem = {
     [key: string]: unknown;
@@ -13,6 +16,7 @@ declare module 'react-native-declarative-ui' {
     onSave?: () => void;
     onClear?: () => void;
     onFocus?: (input: TextInput) => void;
+    navigation: StackNavigationProp<NavigationRoute<NavigationParams>, NavigationParams>;
     backgroundColor?: string;
     loadingMapper?: {
       [id: string]: boolean;
