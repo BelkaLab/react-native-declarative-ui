@@ -1,17 +1,6 @@
 import delay from 'lodash.delay';
 import React, { Component, ComponentType } from 'react';
-import {
-  BackHandler,
-  Dimensions,
-  EmitterSubscription,
-  Image,
-  Keyboard,
-  LayoutChangeEvent,
-  NativeEventSubscription,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View
-} from 'react-native';
+import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { StackActions } from 'react-navigation';
@@ -243,7 +232,9 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
               backgroundColor: headerBackgroundColor || Colors.WHITE
             }
           ]}
-        />
+        >
+          <View style={styles.knob} />
+        </View>
       );
     };
 
@@ -321,7 +312,7 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
     };
   };
 
-const HEADER_HEIGHT = 40;
+const HEADER_HEIGHT = 28;
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: 'transparent' },
@@ -329,8 +320,7 @@ const styles = StyleSheet.create({
   listHeaderContainer: {
     height: HEADER_HEIGHT,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'center',
     borderTopRightRadius: 12,
     borderTopLeftRadius: 12,
     backgroundColor: Colors.WHITE,
@@ -360,5 +350,5 @@ const styles = StyleSheet.create({
     marginRight: 8,
     marginTop: 8
   },
-  knob: { width: 32, height: 4, borderRadius: 4, backgroundColor: Colors.WHITE, marginTop: 8 }
+  knob: { width: 32, height: 4, borderRadius: 4, backgroundColor: Colors.GRAY_400, marginTop: 8 }
 });
