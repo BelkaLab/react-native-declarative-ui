@@ -63,7 +63,7 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
           <FlatList<string | ComposableItem>
             keyboardShouldPersistTaps="handled"
             data={this.state.items}
-            scrollEnabled={false}
+            scrollEnabled={true}
             style={{ maxHeight: Dimensions.get('window').height * 0.94 - 40 }}
             contentContainerStyle={isIphoneX() && { paddingBottom: 34 }}
             renderItem={({ item }) => this.renderItem(item)}
