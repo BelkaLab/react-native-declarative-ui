@@ -3974,10 +3974,10 @@ react-native-android-keyboard-adjust@^1.2.0:
   resolved "https://registry.yarnpkg.com/react-native-android-keyboard-adjust/-/react-native-android-keyboard-adjust-1.2.0.tgz#7988b1258482c08548ce972401b2ae03a674fcb4"
   integrity sha512-Q280bmf0zXnzLbHU9DcVoKZSKihd0s3hltz2kIUCJ5Q9EhLVR/pjgZ3Bwd1VgrHxQPnduHXdCp0432msklRMow==
 
-react-native-calendars@^1.22.0:
-  version "1.203.0"
-  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.203.0.tgz#6d71cdb15fed4cadc593c735a7f1ceaaf758ea19"
-  integrity sha512-Sq2X2LxILmrLRuYNk3il+vm9RKv0UqWQfoxSjnTSc1iLn0qZaNRoN1OuiCzIssKK1skuNvoywuAe4ZG/l5SGiw==
+react-native-calendars@1.224.0:
+  version "1.224.0"
+  resolved "https://registry.yarnpkg.com/react-native-calendars/-/react-native-calendars-1.224.0.tgz#2935df86678731a518e9cdc18baaf536b2baf4ad"
+  integrity sha512-rnfuFaEuQCBq36ImfTjdtT7z7uVPcSZbCHkqGd00zoEycX02aS+8+NGNJyLbfCIILYRqH5qBsOHvOUAif67Y8Q==
   dependencies:
     lodash "^4.0.0"
     prop-types "^15.5.10"
