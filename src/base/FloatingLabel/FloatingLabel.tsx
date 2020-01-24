@@ -1,4 +1,3 @@
-import delay from 'lodash.delay';
 import React, { PureComponent } from 'react';
 import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
@@ -97,18 +96,18 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   }
 
   componentDidUpdate() {
-    if (Platform.OS === 'android' && this.props.isSelectField && this.input) {
-      delay(() => {
-        if (this.input) {
-          this.input.setNativeProps({
-            selection: {
-              start: 0,
-              end: 0
-            }
-          });
-        }
-      }, 10);
-    }
+    // if (Platform.OS === 'android' && this.props.isSelectField && this.input) {
+    //   delay(() => {
+    //     if (this.input) {
+    //       this.input.setNativeProps({
+    //         selection: {
+    //           start: 0,
+    //           end: 0
+    //         }
+    //       });
+    //     }
+    //   }, 10);
+    // }
   }
 
   render() {
@@ -274,14 +273,14 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       this.animate(false);
     }
 
-    if (Platform.OS === 'android' && this.input) {
-      this.input.setNativeProps({
-        selection: {
-          start: 0,
-          end: 0
-        }
-      });
-    }
+    // if (Platform.OS === 'android' && this.input) {
+    //   this.input.setNativeProps({
+    //     selection: {
+    //       start: 0,
+    //       end: 0
+    //     }
+    //   });
+    // }
 
     this.setState({ isFocused: false }, () => {
       if (this.props.onBlurLabel) {
