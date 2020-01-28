@@ -10,21 +10,7 @@ import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import {
-  EmitterSubscription,
-  findNodeHandle,
-  Keyboard,
-  Linking,
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableHighlight,
-  View,
-  ViewStyle
-} from 'react-native';
-import { globalStyles } from '../styles/globalStyles';
+import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { NavigationRoute } from 'react-navigation';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
@@ -41,19 +27,10 @@ import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import {
-  AUTOCOMPLETE_PICKER_OVERLAY_KEY,
-  CALENDAR_PICKER_OVERLAY_KEY,
-  DURATION_PICKER_OVERLAY_KEY,
-  MAP_PICKER_OVERLAY_KEY,
-  SELECT_PICKER_OVERLAY_KEY
-} from '../navigation/integration';
-import SharedOptions, {
-  ComposableFormOptions,
-  DefinedComposableFormOptions,
-  ComposableFormCustomComponents
-} from '../options/SharedOptions';
+import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, DURATION_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
+import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
 
 interface IComposableFormProps<T> {
@@ -83,6 +60,7 @@ interface IComposableFormProps<T> {
   customStyle?: ComposableFormOptions;
   customComponents?: ComposableFormCustomComponents;
   googleApiKey?: string;
+  dynamicValidations?: string[] | string[][];
 }
 
 interface IState {
@@ -309,8 +287,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   };
 
   private validateForm = async (fields: FormField[], model: T): Promise<boolean> => {
-    // const { dynamicValidations } = this.props;
+    const { dynamicValidations } = this.props;
 
+    console.log(dynamicValidations);
+    
     this.setState({
       errors: {}
     });
@@ -378,14 +358,20 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     //   }
     // });
 
-    // if (dynamicValidations) {
-    //   forEach(Object.keys(dynamicValidations), key => {
-    //     newErrors = {
-    //       ...newErrors,
-    //       [key]: validate(key, model[key] as string | number | boolean | Date, dynamicValidations)
-    //     };
-    //   });
-    // }
+    if (dynamicValidations) {
+      const schema: Schema<Dictionary<string>> = transformAll(dynamicValidations);
+
+      for (const key in schema) {
+        const [error] = await to<unknown, ValidationError>(schema[key].validate(model[key]));
+  
+        if (error) {
+          newErrors = {
+            ...newErrors,
+            [key]: first(error.errors)
+          } as Dictionary<string>;
+        }
+      }
+    }
 
     this.setState({
       errors: newErrors
