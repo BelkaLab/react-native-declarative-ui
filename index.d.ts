@@ -37,6 +37,7 @@ declare module 'react-native-declarative-ui' {
     customStyle?: ComposableFormOptions;
     customComponents?: ComposableFormCustomComponents;
     googleApiKey?: string;
+    dynamicValidations?: string[] | string[][];
   }
 
   export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> { }
