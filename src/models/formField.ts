@@ -50,4 +50,7 @@ export type FormField = {
   // inline props
   flex?: number;
   childs?: FormField[];
+  // validation props
+  validation?: string[] | string[][];
+  skipValidation?: boolean;
 };

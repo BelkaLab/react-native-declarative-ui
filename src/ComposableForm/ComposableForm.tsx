@@ -1,6 +1,9 @@
+import { transformAll } from '@overgear/yup-ast';
+import to from 'await-to-js';
 import every from 'lodash.every';
 import find from 'lodash.find';
 import first from 'lodash.first';
+import has from 'lodash.has';
 import isEqual from 'lodash.isequal';
 import merge from 'lodash.merge';
 import some from 'lodash.some';
@@ -21,8 +24,11 @@ import {
   View,
   ViewStyle
 } from 'react-native';
-import { ComposableFormCustomComponents } from 'react-native-declarative-ui';
+import { globalStyles } from '../styles/globalStyles';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
+import { NavigationRoute } from 'react-navigation';
+import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
+import { Schema, ValidationError } from 'yup';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
 import { CheckBoxField } from '../components/CheckBoxField';
@@ -36,21 +42,19 @@ import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
 import {
-  SELECT_PICKER_OVERLAY_KEY,
-  showAutocompleteOverlay,
-  showCalendarOverlay,
-  showDurationOverlay,
-  showMapOverlay,
   AUTOCOMPLETE_PICKER_OVERLAY_KEY,
   CALENDAR_PICKER_OVERLAY_KEY,
   DURATION_PICKER_OVERLAY_KEY,
-  MAP_PICKER_OVERLAY_KEY
+  MAP_PICKER_OVERLAY_KEY,
+  SELECT_PICKER_OVERLAY_KEY
 } from '../navigation/integration';
-import SharedOptions, { ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
+import SharedOptions, {
+  ComposableFormOptions,
+  DefinedComposableFormOptions,
+  ComposableFormCustomComponents
+} from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { getValueByKey, isObject } from '../utils/helper';
-import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
-import { NavigationRoute } from 'react-navigation';
 
 interface IComposableFormProps<T> {
   navigation: StackNavigationProp<NavigationRoute, {}>;
@@ -226,9 +230,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
       if (isVisibilityFieldExternal && !externalModel) {
         throw new Error(
-          `Field ${
-            field.id
-          } has isVisibilityFieldExternal setted as true, but you forgot to pass dependencyModel to ComposableForm as props`
+          `Field ${field.id} has isVisibilityFieldExternal setted as true, but you forgot to pass dependencyModel to ComposableForm as props`
         );
       }
 
@@ -297,6 +299,140 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       // });
       // this.props.onFormStatus(isFilled);
     }
+  };
+
+  isValid = async (): Promise<boolean> => {
+    const { structure } = this.state;
+    const { model } = this.props;
+
+    return await this.validateForm(structure!.fields, model);
+  };
+
+  private validateForm = async (fields: FormField[], model: T): Promise<boolean> => {
+    // const { dynamicValidations } = this.props;
+
+    this.setState({
+      errors: {}
+    });
+    let newErrors: Dictionary<string> = {};
+
+    for (const field of fields) {
+      if ((field.type === 'inline' || field.type === 'group') && field.childs) {
+        for (const child of field.childs) {
+          if ((child.type === 'inline' || child.type === 'group') && child.childs) {
+            for (const innerChild of child.childs) {
+              newErrors = await this.validateField(innerChild, model, newErrors);
+            }
+          } else {
+            newErrors = await this.validateField(child, model, newErrors);
+          }
+        }
+      }
+      // } else if (field.validateWithNextField) {
+      // const validation = validateCouple(
+      //   { [field.id]: model[field.id] as string, [fields[index + 1].id]: model[fields[index + 1].id] as string },
+      //   {
+      //     ...field.validation,
+      //     ...fields[index + 1].validation
+      //   }
+      // );
+      // newErrors = {
+      //   ...newErrors,
+      //   [field.id]: validation && validation[field.id] ? validation[field.id][0] : undefined,
+      //   [fields[index + 1].id]:
+      //     validation && validation[fields[index + 1].id] ? validation[fields[index + 1].id][0] : undefined
+      // };
+      // }
+      else if (!field.skipValidation) {
+        newErrors = await this.validateField(field, model, newErrors);
+      }
+    }
+    // forEach(fields, async (field, index) => {
+    //   if (field.type === 'inline' || field.type === 'group') {
+    //     forEach(field.childs, async f => {
+    //       if (f.type === 'inline' || f.type === 'group') {
+    //         forEach(f.childs, async item => {
+    //           newErrors = await this.validateField(item, model, newErrors);
+    //         });
+    //       } else {
+    //         debugger;
+    //         newErrors = await this.validateField(f, model, newErrors);
+    //       }
+    //     });
+    //   } else if (field.validateWithNextField) {
+    //     // const validation = validateCouple(
+    //     //   { [field.id]: model[field.id] as string, [fields[index + 1].id]: model[fields[index + 1].id] as string },
+    //     //   {
+    //     //     ...field.validation,
+    //     //     ...fields[index + 1].validation
+    //     //   }
+    //     // );
+    //     // newErrors = {
+    //     //   ...newErrors,
+    //     //   [field.id]: validation && validation[field.id] ? validation[field.id][0] : undefined,
+    //     //   [fields[index + 1].id]:
+    //     //     validation && validation[fields[index + 1].id] ? validation[fields[index + 1].id][0] : undefined
+    //     // };
+    //   } else if (!field.skipValidation) {
+    //     newErrors = await this.validateField(field, model, newErrors);
+    //   }
+    // });
+
+    // if (dynamicValidations) {
+    //   forEach(Object.keys(dynamicValidations), key => {
+    //     newErrors = {
+    //       ...newErrors,
+    //       [key]: validate(key, model[key] as string | number | boolean | Date, dynamicValidations)
+    //     };
+    //   });
+    // }
+
+    this.setState({
+      errors: newErrors
+    });
+
+    return !some(newErrors, (error: string) => error !== undefined);
+  };
+
+  private validateField = async (
+    field: FormField,
+    model: T,
+    errors: Dictionary<string>
+  ): Promise<Dictionary<string>> => {
+    if (field.validation) {
+      const schema: Schema<unknown> = transformAll(field.validation);
+
+      const [error] = await to<unknown, ValidationError>(schema.validate(model[field.id]));
+
+      if (error) {
+        const newErrors = {
+          ...errors,
+          [field.id]: first(error.errors)
+        } as Dictionary<string>;
+        
+        return Promise.resolve(newErrors);
+      }
+
+      // return {
+      //   ...errors,
+      //   [field.id]:
+      //     field.id === 'iban'
+      //       ? IBAN.isValid(model[field.id] as string) || !model[field.id]
+      //         ? undefined
+      //         : field.validation.message
+      //       : validate(field.id, model[field.id] as string | number | boolean | Date, field.validation)
+      // };
+    }
+    return Promise.resolve(errors);
+  };
+
+  private hasErrorsInline = (fields: FormField[]): boolean => {
+    return some(fields, f => has(this.state.errors, f.id) && this.state.errors[f.id]);
+  };
+
+  private retrieveErrorMessageInline = (fields: FormField[]): string => {
+    const found = find(fields, f => this.state.errors[f.id] !== undefined);
+    return found ? this.state.errors[found.id] : '';
   };
 
   private renderFields = (
@@ -434,6 +570,9 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
                 )
               )}
             </View>
+            {this.hasErrorsInline(field.childs!) && (
+              <Text style={globalStyles.errorMessage}>{this.retrieveErrorMessageInline(field.childs!)}</Text>
+            )}
           </View>
         );
       default:
@@ -737,9 +876,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         if (field.shouldReturnKey) {
           if (!isObject(selectedItem)) {
             throw new Error(
-              `Field ${
-                field.id
-              } is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
+              `Field ${field.id} is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
             );
           }
           if (!field.keyProperty) {

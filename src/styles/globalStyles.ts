@@ -28,4 +28,9 @@ export const globalStyles = StyleSheet.create({
     height: 34,
     backgroundColor: Colors.GRAY_200
   },
+  errorMessage: {
+    color: Colors.RED,
+    fontSize: 12,
+    marginTop: 8
+  }
 });

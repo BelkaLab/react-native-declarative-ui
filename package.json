@@ -13,6 +13,7 @@
     "@types/lodash.find": "^4.6.4",
     "@types/lodash.first": "^3.0.6",
     "@types/lodash.foreach": "^4.5.6",
+    "@types/lodash.has": "^4.5.6",
     "@types/lodash.isequal": "^4.5.3",
     "@types/lodash.map": "^4.6.13",
     "@types/lodash.merge": "^4.6.5",
@@ -20,6 +21,7 @@
     "@types/react": "^16.0.23",
     "@types/react-native": "0.57",
     "@types/react-native-vector-icons": "^4.6.4",
+    "@types/yup": "^0.26.28",
     "cpx": "^1.5.0",
     "react": "16.8.3",
     "react-native": "0.59.10",
@@ -41,14 +43,16 @@
     "build": "cpx \"src/**/*.{ts,tsx}\" \"example/node_modules/react-native-declarative-ui/src\" --watch"
   },
   "peerDependencies": {
+    "react-native-android-keyboard-adjust": "^1.2.0",
     "react-native-gesture-handler": "^1.5.2",
     "react-native-reanimated": "^1.4.0",
-    "react-native-android-keyboard-adjust": "^1.2.0",
     "react-navigation": "^4.0.0",
     "react-navigation-props-mapper": "^1.0.2"
   },
   "dependencies": {
+    "@overgear/yup-ast": "^1.0.3",
     "@react-native-community/picker": "^1.1.1",
+    "await-to-js": "^2.1.1",
     "lodash": "^4.17.13",
     "lodash.delay": "^4.1.1",
     "lodash.every": "^4.6.0",
@@ -56,6 +60,7 @@
     "lodash.find": "^4.6.0",
     "lodash.first": "^3.0.0",
     "lodash.foreach": "^4.5.0",
+    "lodash.has": "^4.5.2",
     "lodash.isequal": "^4.5.0",
     "lodash.map": "^4.6.0",
     "lodash.merge": "^4.6.1",
@@ -65,7 +70,8 @@
     "react-native-calendars": "1.224.0",
     "react-native-google-places-autocomplete": "1.3.9",
     "react-native-iphone-x-helper": "^1.2.1",
-    "reanimated-bottom-sheet": "^1.0.0-alpha.13"
+    "reanimated-bottom-sheet": "^1.0.0-alpha.13",
+    "yup": "^0.28.0"
   },
   "resolutions": {
     "mem": "^4.0.0",
