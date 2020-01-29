@@ -1,5 +1,21 @@
 import React, { PureComponent } from 'react';
-import { Animated, Easing, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import {
+  Animated,
+  Easing,
+  NativeSyntheticEvent,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputEndEditingEventData,
+  TextInputFocusEventData,
+  TextInputProperties,
+  TextStyle,
+  TouchableWithoutFeedback,
+  View,
+  ViewStyle
+} from 'react-native';
 import { Colors } from '../../styles/colors';
 
 const INPUT_HEIGHT = 35;
@@ -42,6 +58,7 @@ interface IFloatingLabelProps extends TextInputProperties {
   style?: StyleProp<ViewStyle>;
   onFocusLabel?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
   onBlurLabel?: (e: NativeSyntheticEvent<TextInputFocusEventData>) => void;
+  isMandatory?: boolean;
 }
 
 interface IState {
@@ -216,6 +233,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
         style={[styles.label, this.props.labelStyle, { fontSize: this.state.fontSize, top: this.state.top }]}
       >
         {this.props.children}
+        {this.props.isMandatory && <View style={{ width: 4 }} />}
+        {this.props.isMandatory && <Text style={{ color: Colors.RED }}>*</Text>}
       </Animated.Text>
     );
   }

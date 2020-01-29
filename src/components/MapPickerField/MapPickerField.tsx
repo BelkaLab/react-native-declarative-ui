@@ -18,6 +18,7 @@ export interface IMapPickerFieldProps extends TextInputProperties {
   error?: string;
   disableErrorMessage?: boolean;
   positionValue?: GooglePlaceDetail;
+  isMandatory?: boolean;
 
   // options?: ComposableItem[] | string[];
   // displayProperty?: string;

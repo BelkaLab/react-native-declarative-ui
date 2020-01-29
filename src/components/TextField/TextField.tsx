@@ -21,6 +21,7 @@ export interface ITextFieldProps extends TextInputProperties {
   isPassword?: boolean;
   isPercentage?: boolean;
   currency?: string;
+  isMandatory?: boolean;
 }
 
 type State = {

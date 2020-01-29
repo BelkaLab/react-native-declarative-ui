@@ -26,6 +26,7 @@ export interface IAutocompletePickerOverlayProps {
   renderOverlayItem?: (item: ComposableItem | string, displayProperty?: string) => React.ReactElement<{}>;
   headerBackgroundColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
+  isMandatory?: boolean;
 }
 
 interface IState {

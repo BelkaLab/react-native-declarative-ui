@@ -23,7 +23,7 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   keyProperty?: string;
   itemValue?: ComposableItem | string;
   isPercentage?: boolean;
-  //   reduxProp?: string;
+  isMandatory?: boolean;
 }
 
 type State = {

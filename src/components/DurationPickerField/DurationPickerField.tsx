@@ -18,6 +18,7 @@ export interface IDurationPickerFieldProps extends TextInputProperties {
   disableErrorMessage?: boolean;
   onRightIconClick?: () => void;
   rightContent?: JSX.Element;
+  isMandatory?: boolean;
 }
 
 type State = {
