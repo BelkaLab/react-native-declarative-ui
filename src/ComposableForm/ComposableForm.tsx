@@ -296,7 +296,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         schema.validateSync(model[field.id]);
         return false;
       } catch (err) {
-        return err.type === 'required';
+        return err.type === 'required' || (err.type === 'oneOf' && err.params.values === "true");
       }
     } else if ((field.type === 'inline' || field.type === 'group') && field.childs) {
       let isInnerFilled = false;
