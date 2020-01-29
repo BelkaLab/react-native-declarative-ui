@@ -1,6 +1,7 @@
 import { transformAll } from '@overgear/yup-ast';
 import to from 'await-to-js';
 import every from 'lodash.every';
+import filter from 'lodash.filter';
 import find from 'lodash.find';
 import first from 'lodash.first';
 import has from 'lodash.has';
@@ -10,7 +11,20 @@ import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
+import {
+  EmitterSubscription,
+  findNodeHandle,
+  Keyboard,
+  Linking,
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableHighlight,
+  View,
+  ViewStyle
+} from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { NavigationRoute } from 'react-navigation';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
@@ -27,8 +41,18 @@ import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, DURATION_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
-import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
+import {
+  AUTOCOMPLETE_PICKER_OVERLAY_KEY,
+  CALENDAR_PICKER_OVERLAY_KEY,
+  DURATION_PICKER_OVERLAY_KEY,
+  MAP_PICKER_OVERLAY_KEY,
+  SELECT_PICKER_OVERLAY_KEY
+} from '../navigation/integration';
+import SharedOptions, {
+  ComposableFormCustomComponents,
+  ComposableFormOptions,
+  DefinedComposableFormOptions
+} from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
@@ -38,6 +62,7 @@ interface IComposableFormProps<T> {
   model: T;
   structure: ComposableStructure;
   onChange: (id: string, value?: unknown) => void;
+  onFormFilled: (isFilled: boolean) => void;
   onSave?: () => void;
   onClear?: () => void;
   onFocus?: (inputField?: TextInput) => void;
@@ -150,7 +175,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
   async UNSAFE_componentWillReceiveProps(nextProps: IComposableFormProps<T>) {
     if (!isEqual(nextProps.model, this.props.model)) {
-      // this.checkIfFormIsFilled(nextProps.model);
+      this.checkIfFormIsFilled(nextProps.model);
 
       if (this.state.structure) {
         this.state.structure.fields.map(field => {
@@ -265,20 +290,6 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return isVisibilityConditionInverted ? !isVisible : isVisible;
   };
 
-  private checkIfFormIsFilled = (model: T) => {
-    if (this.state.structure) {
-      // add check if we have errors on non mandatory fields
-      // const isFilled = !some(
-      //   filter(this.state.structure.fields, (field: FormField) => this.isFieldMandatory(field)), // Mandatory fields
-      //   (field: FormField) => model[field.id] === undefined || model[field.id] === '' || model[field.id] === false
-      // );
-      // this.setState({
-      //   isFormFilled: isFilled
-      // });
-      // this.props.onFormStatus(isFilled);
-    }
-  };
-
   isValid = async (): Promise<boolean> => {
     const { structure } = this.state;
     const { model } = this.props;
@@ -286,11 +297,38 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return await this.validateForm(structure!.fields, model);
   };
 
+  private checkIfFormIsFilled = (model: T) => {
+    if (this.state.structure) {
+      // add check if we have errors on non mandatory fields
+      const isFilled = !some(
+        filter(this.state.structure.fields, (field: FormField) => this.isFieldMandatory(field, model)), // Mandatory fields
+        (field: FormField) => model[field.id] === undefined || model[field.id] === '' || model[field.id] === false
+      );
+      this.setState({
+        isFormFilled: isFilled
+      });
+      this.props.onFormFilled(isFilled);
+    }
+  };
+
+  private isFieldMandatory = (field: FormField, model: T): boolean => {
+    if (field.validation) {
+      const schema: Schema<unknown> = transformAll(field.validation);
+
+      try {
+        schema.validateSync(model[field.id]);
+        return false;
+      } catch (err) {
+        return err.type === 'required';
+      }
+    }
+
+    return false;
+  };
+
   private validateForm = async (fields: FormField[], model: T): Promise<boolean> => {
     const { dynamicValidations } = this.props;
 
-    console.log(dynamicValidations);
-    
     this.setState({
       errors: {}
     });
@@ -327,43 +365,13 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         newErrors = await this.validateField(field, model, newErrors);
       }
     }
-    // forEach(fields, async (field, index) => {
-    //   if (field.type === 'inline' || field.type === 'group') {
-    //     forEach(field.childs, async f => {
-    //       if (f.type === 'inline' || f.type === 'group') {
-    //         forEach(f.childs, async item => {
-    //           newErrors = await this.validateField(item, model, newErrors);
-    //         });
-    //       } else {
-    //         debugger;
-    //         newErrors = await this.validateField(f, model, newErrors);
-    //       }
-    //     });
-    //   } else if (field.validateWithNextField) {
-    //     // const validation = validateCouple(
-    //     //   { [field.id]: model[field.id] as string, [fields[index + 1].id]: model[fields[index + 1].id] as string },
-    //     //   {
-    //     //     ...field.validation,
-    //     //     ...fields[index + 1].validation
-    //     //   }
-    //     // );
-    //     // newErrors = {
-    //     //   ...newErrors,
-    //     //   [field.id]: validation && validation[field.id] ? validation[field.id][0] : undefined,
-    //     //   [fields[index + 1].id]:
-    //     //     validation && validation[fields[index + 1].id] ? validation[fields[index + 1].id][0] : undefined
-    //     // };
-    //   } else if (!field.skipValidation) {
-    //     newErrors = await this.validateField(field, model, newErrors);
-    //   }
-    // });
 
     if (dynamicValidations) {
       const schema: Schema<Dictionary<string>> = transformAll(dynamicValidations);
 
       for (const key in schema) {
         const [error] = await to<unknown, ValidationError>(schema[key].validate(model[key]));
-  
+
         if (error) {
           newErrors = {
             ...newErrors,
@@ -395,7 +403,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           ...errors,
           [field.id]: first(error.errors)
         } as Dictionary<string>;
-        
+
         return Promise.resolve(newErrors);
       }
 
