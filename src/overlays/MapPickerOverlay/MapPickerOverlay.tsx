@@ -39,7 +39,7 @@ class MapPickerOverlay extends Component<IMapPickerOverlayProps & IBottomOverlay
 
   render() {
     return (
-      <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
+      <View style={[globalStyles.pickerContainer, { height: '100%' }]}>
         <GooglePlacesAutocomplete
           placeholder="Cerca"
           minLength={3}

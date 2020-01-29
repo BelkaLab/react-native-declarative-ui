@@ -233,7 +233,7 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
         style={[styles.label, this.props.labelStyle, { fontSize: this.state.fontSize, top: this.state.top }]}
       >
         {this.props.children}
-        {this.props.isMandatory && <View style={{ width: 4 }} />}
+        {this.props.isMandatory && <View style={{ width: 4, height: 4 }} />}
         {this.props.isMandatory && <Text style={{ color: Colors.RED }}>*</Text>}
       </Animated.Text>
     );
