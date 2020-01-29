@@ -31,6 +31,7 @@ export const globalStyles = StyleSheet.create({
   errorMessage: {
     color: Colors.RED,
     fontSize: 12,
-    marginTop: 8
+    marginTop: 8,
+    marginStart: 4
   }
 });
