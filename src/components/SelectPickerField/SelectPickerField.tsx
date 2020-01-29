@@ -185,6 +185,8 @@ const styles = StyleSheet.create({
   },
   errorMessage: {
     color: Colors.RED,
-    fontSize: 12
+    fontSize: 12,
+    marginTop: 8,
+    marginStart: 4
   }
 });

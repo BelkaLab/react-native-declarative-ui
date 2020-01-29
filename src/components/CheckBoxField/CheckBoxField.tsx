@@ -29,6 +29,9 @@ export default class CheckBoxField extends React.Component<ICheckBoxFieldProps, 
 const styles = StyleSheet.create({
   containerStyle: {},
   errorMessage: {
-    color: 'red'
+    color: 'red',
+    fontSize: 12,
+    marginTop: 8,
+    marginStart: 4
   }
 });
