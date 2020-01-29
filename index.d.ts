@@ -16,6 +16,7 @@ declare module 'react-native-declarative-ui' {
     onSave?: () => void;
     onClear?: () => void;
     onFocus?: (input: TextInput) => void;
+    onFormFilled: (isFilled: boolean) => void;
     navigation: StackNavigationProp<NavigationRoute<NavigationParams>, NavigationParams>;
     backgroundColor?: string;
     loadingMapper?: {
