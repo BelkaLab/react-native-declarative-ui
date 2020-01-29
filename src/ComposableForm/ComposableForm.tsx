@@ -11,20 +11,7 @@ import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import {
-  EmitterSubscription,
-  findNodeHandle,
-  Keyboard,
-  Linking,
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableHighlight,
-  View,
-  ViewStyle
-} from 'react-native';
+import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { NavigationRoute } from 'react-navigation';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
@@ -41,18 +28,8 @@ import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import {
-  AUTOCOMPLETE_PICKER_OVERLAY_KEY,
-  CALENDAR_PICKER_OVERLAY_KEY,
-  DURATION_PICKER_OVERLAY_KEY,
-  MAP_PICKER_OVERLAY_KEY,
-  SELECT_PICKER_OVERLAY_KEY
-} from '../navigation/integration';
-import SharedOptions, {
-  ComposableFormCustomComponents,
-  ComposableFormOptions,
-  DefinedComposableFormOptions
-} from '../options/SharedOptions';
+import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, DURATION_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
@@ -301,7 +278,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     if (this.state.structure) {
       // add check if we have errors on non mandatory fields
       const isFilled = !some(
-        filter(this.state.structure.fields, (field: FormField) => this.isFieldMandatory(field, model)), // Mandatory fields
+        filter(this.state.structure.fields, (field: FormField) => this.isFieldFilled(field, model)), // Mandatory fields
         (field: FormField) => model[field.id] === undefined || model[field.id] === '' || model[field.id] === false
       );
       this.setState({
@@ -311,16 +288,23 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
   };
 
-  private isFieldMandatory = (field: FormField, model: T): boolean => {
-    if (field.validation) {
+  private isFieldFilled = (field: FormField, model: T): boolean => {
+    if (field.validation) {     
       const schema: Schema<unknown> = transformAll(field.validation);
 
-      try {
+      try {        
         schema.validateSync(model[field.id]);
         return false;
       } catch (err) {
         return err.type === 'required';
       }
+    } else if ((field.type === 'inline' || field.type === 'group') && field.childs) {
+      let isInnerFilled = false;
+      for (const child of field.childs) {
+        isInnerFilled = isInnerFilled || this.isFieldFilled(child, model);
+      }
+
+      return isInnerFilled;
     }
 
     return false;
@@ -650,6 +634,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           }
         }}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
       />
     );
@@ -704,6 +689,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, this.restoreNumberWithLocale(model[field.id] as string | number | undefined));
         }}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
       />
     );
@@ -779,6 +765,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, !model[field.id]);
         }}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
       />
     );
   };
@@ -807,6 +794,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           this.props.onChange(field.id, val);
         }}
         disabled={field.disabled}
+        isMandatory={field.isMandatory}
       />
     );
   };
@@ -835,6 +823,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         keyProperty={field.keyProperty}
         error={errors[field.id]}
         disableErrorMessage={isInline}
+        isMandatory={field.isMandatory}
         options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
       />
     );
@@ -940,6 +929,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         displayProperty={field.displayProperty}
         keyProperty={field.keyProperty}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
         options={items}
       />
@@ -1022,6 +1012,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         onPress={() => this.openCalendar(field, model)}
         onRightIconClick={() => this.openCalendar(field, model)}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
       />
     );
@@ -1075,6 +1066,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         // displayProperty={field.displayProperty}
         // keyProperty={field.keyProperty}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
         // options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
       />
@@ -1130,6 +1122,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         onPress={() => this.openDuration(field, model)}
         onRightIconClick={() => this.openDuration(field, model)}
         error={errors[field.id]}
+        isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
       />
     );

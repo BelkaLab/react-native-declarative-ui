@@ -53,4 +53,5 @@ export type FormField = {
   // validation props
   validation?: string[] | string[][];
   skipValidation?: boolean;
+  isMandatory?: boolean;
 };
