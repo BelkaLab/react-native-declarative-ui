@@ -278,7 +278,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     if (this.state.structure) {
       // add check if we have errors on non mandatory fields
       const isFilled = !some(
-        filter(this.state.structure.fields, (field: FormField) => this.isFieldFilled(field, model)), // Mandatory fields
+        filter(this.state.structure.fields, (field: FormField) => this.isFieldMandatoryAndNotFilled(field, model)), // Mandatory fields
         (field: FormField) => model[field.id] === undefined || model[field.id] === '' || model[field.id] === false
       );
       this.setState({
@@ -288,7 +288,11 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
   };
 
-  private isFieldFilled = (field: FormField, model: T): boolean => {
+  private isFieldMandatoryAndNotFilled = (field: FormField, model: T): boolean => {
+    if (this.isFieldNotVisible(field, model)) {
+      return false;
+    };
+
     if (field.validation) {     
       const schema: Schema<unknown> = transformAll(field.validation);
 
@@ -301,7 +305,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     } else if ((field.type === 'inline' || field.type === 'group') && field.childs) {
       let isInnerFilled = false;
       for (const child of field.childs) {
-        isInnerFilled = isInnerFilled || this.isFieldFilled(child, model);
+        isInnerFilled = isInnerFilled || this.isFieldMandatoryAndNotFilled(child, model);
       }
 
       return isInnerFilled;
@@ -377,6 +381,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     model: T,
     errors: Dictionary<string>
   ): Promise<Dictionary<string>> => {
+    if (this.isFieldNotVisible(field, model)) {
+      return errors;
+    };
+    
     if (field.validation) {
       const schema: Schema<unknown> = transformAll(field.validation);
 
