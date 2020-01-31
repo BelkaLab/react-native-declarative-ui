@@ -1165,7 +1165,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         this.props.onChange(field.id, selectedItem);
       },
       customFormOptions: this.getComposableFormOptions(),
-      disabledInteraction: Platform.OS === 'android'
+      disabledInteraction: true
     });
   };
 
