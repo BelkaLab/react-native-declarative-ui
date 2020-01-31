@@ -1,5 +1,6 @@
+import Geolocation from '@react-native-community/geolocation';
 import React, { Component } from 'react';
-import { Dimensions, Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
@@ -29,6 +30,15 @@ class MapPickerOverlay extends Component<IMapPickerOverlayProps & IBottomOverlay
     if (Platform.OS === 'android') {
       AndroidKeyboardAdjust.setAdjustPan();
     }
+  }
+
+  componentDidMount() {
+    Geolocation.setRNConfiguration({
+      skipPermissionRequests: false,
+      authorizationLevel: 'whenInUse'
+    });
+
+    Geolocation.requestAuthorization();
   }
 
   componentWillUnmount() {
