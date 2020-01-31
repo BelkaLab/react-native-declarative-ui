@@ -1,11 +1,11 @@
 import { Picker } from '@react-native-community/picker';
 import React, { Component } from 'react';
 import { Button, StyleSheet, Text, View } from 'react-native';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 
 export interface IDurationPickerOverlayProps {
   pickedAmount: number;
@@ -31,9 +31,9 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
 
   render() {
     return (
-      <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
+      <View style={[globalStyles.pickerContainer, {height: '100%', marginBottom: 8}]}>
         {this.renderPicker()}
-        <View style={{ paddingHorizontal: 16, marginBottom: 34 }}>
+        <View style={{ paddingHorizontal: 16 }}>
           <Button title="Conferma" onPress={this.onConfirmPressed} />
         </View>
       </View>
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   body: {
     flexDirection: 'row',
     padding: 16,
-    paddingTop: 8
+    paddingTop: 4
   },
   picker: {
     flex: 1
