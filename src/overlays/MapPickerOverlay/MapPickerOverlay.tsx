@@ -38,7 +38,9 @@ class MapPickerOverlay extends Component<IMapPickerOverlayProps & IBottomOverlay
       authorizationLevel: 'whenInUse'
     });
 
-    Geolocation.requestAuthorization();
+    if (Platform.OS === 'ios') {
+      Geolocation.requestAuthorization();
+    }
   }
 
   componentWillUnmount() {
