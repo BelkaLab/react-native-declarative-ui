@@ -23,7 +23,13 @@ export type ComposableFormOptions = {
     headerBackgroundColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
     renderCustomCancelButton?: () => React.ReactElement<{}>;
-  }
+  };
+  segments?: {
+    activeItemColor?: string;
+    segmentActiveTextStyle?: StyleProp<TextStyle>;
+    segmentInactiveTextStyle?: StyleProp<TextStyle>;
+    backgroundColor?: string;
+  };
 };
 
 export type DefinedComposableFormOptions = {
@@ -43,7 +49,13 @@ export type DefinedComposableFormOptions = {
     headerBackgroundColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
     renderCustomCancelButton?: () => React.ReactElement<{}>;
-  }
+  };
+  segments: {
+    activeItemColor?: string;
+    segmentActiveTextStyle?: StyleProp<TextStyle>;
+    segmentInactiveTextStyle?: StyleProp<TextStyle>;
+    backgroundColor?: string;
+  };
 };
 
 export type ComposableFormCustomComponents = {
@@ -64,7 +76,17 @@ class SharedOptions {
     },
     labels: {},
     calendars: {},
-    pickers: {}
+    pickers: {},
+    segments: {
+      activeItemColor: Colors.PRIMARY_BLUE,
+      backgroundColor: Colors.WHITE,
+      segmentActiveTextStyle: {
+        color: Colors.WHITE
+      },
+      segmentInactiveTextStyle: {
+        color: Colors.BLACK
+      }
+    }
   };
   private _customComponents: ComposableFormCustomComponents = {};
 
