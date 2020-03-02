@@ -1,6 +1,6 @@
 import { map } from 'lodash';
 import React, { useState } from 'react';
-import { StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle, Platform, TouchableNativeFeedback } from 'react-native';
+import { Platform, StyleProp, StyleSheet, Text, TextStyle, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
 
 export interface ISegmentProps {
@@ -42,19 +42,25 @@ const Segment = (props: ISegmentProps) => {
     <View style={[styles.container, { borderColor, backgroundColor }, containerStyle]}>
       {map(data, (item, index) => {
         const isActive = index === activeIndex;
+        const isLastItem = index === (data.length - 1);
         // Android Buttons should have the ripple effect
         if (Platform.OS === 'android') {
           return (
             <TouchableNativeFeedback
               onPress={() => itemPressed(index)}
-              style={[
-                styles.segmentItem,
-                { backgroundColor: isActive ? activeItemColor : backgroundColor }
-              ]}
               disabled={isActive}>
-              <Text style={isActive ? activeTextStyle : inactiveTextStyle}>
-                {item}
-              </Text>
+              <View
+                style={[
+                  styles.segmentItem,
+                  {
+                    backgroundColor: isActive ? activeItemColor : backgroundColor,
+                    marginRight: !isLastItem ? 1 : 0
+                  }
+                ]}>
+                <Text style={isActive ? activeTextStyle : inactiveTextStyle}>
+                  {item}
+                </Text>
+              </View>
             </TouchableNativeFeedback>
           );
         }
@@ -63,7 +69,10 @@ const Segment = (props: ISegmentProps) => {
             onPress={() => itemPressed(index)}
             style={[
               styles.segmentItem,
-              { backgroundColor: isActive ? activeItemColor : backgroundColor }
+              {
+                backgroundColor: isActive ? activeItemColor : backgroundColor,
+                marginRight: !isLastItem ? 1 : 0
+              }
             ]}
             disabled={isActive}>
             <Text style={isActive ? activeTextStyle : inactiveTextStyle}>
@@ -95,6 +104,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 3,
     minHeight: 28
+  },
+  fullWidth: {
+    flex: 1,
+    flexDirection: 'row',
+    alignSelf: 'stretch'
   }
 });
 
