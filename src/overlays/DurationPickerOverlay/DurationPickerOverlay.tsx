@@ -1,6 +1,8 @@
-import { Picker } from '@react-native-community/picker';
 import React, { Component } from 'react';
-import { Button, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Picker } from '../../components/Picker';
+import { PickerItem } from '../../components/Picker/Picker';
+import { TextButton } from '../../components/TextButton';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
@@ -13,6 +15,7 @@ export interface IDurationPickerOverlayProps {
   customFormOptions: ComposableFormOptions;
   headerBackgroundColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
+  headerButtonColor?: string;
 }
 
 interface IState {
@@ -30,44 +33,53 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
   }
 
   render() {
+    const {
+      headerButtonColor = Colors.WHITE,
+      headerBackgroundColor = Colors.PRIMARY_BLUE
+    } = this.props;
+
     return (
-      <View style={[globalStyles.pickerContainer, {height: '100%', marginBottom: 8}]}>
-        {this.renderPicker()}
-        <View style={{ paddingHorizontal: 16 }}>
-          <Button title="Conferma" onPress={this.onConfirmPressed} />
+      <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
+        <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
+          <TextButton
+            title="Annulla"
+            color={headerButtonColor}
+            fontWeight="400"
+            onPress={() => this.props.dismissOverlay()}
+          />
+          <TextButton
+            title="Conferma"
+            color={headerButtonColor}
+            fontWeight="600"
+            onPress={this.onConfirmPressed}
+          />
         </View>
+        {this.renderPicker()}
       </View>
     );
   }
 
   private renderPicker = () => {
     const { selectedHour, selectedMinute } = this.state;
+    const paddingHorizontal = Platform.OS === "android" ? 16 : 0;
 
     return (
-      <View>
-        <View style={{ flexDirection: 'row', paddingHorizontal: 16, paddingTop: 16, marginStart: 4 }}>
-          <Text style={{ fontSize: 16, flex: 1 }}>Ore</Text>
-          <Text style={{ fontSize: 16, flex: 1 }}>Minuti</Text>
-        </View>
-        <View style={styles.body}>
-          <Picker
-            selectedValue={`${selectedHour}`}
-            style={styles.picker}
-            // itemStyle={this.props.itemStyle}
-            onValueChange={itemValue => this.onValueChange(Number(itemValue), selectedMinute)}
-          >
-            {this.getHourItems()}
-          </Picker>
-          <Text style={styles.separator}>:</Text>
-          <Picker
-            selectedValue={selectedMinute && selectedMinute < 10 ? `0${selectedMinute}` : `${selectedMinute}`}
-            style={styles.picker}
-            // itemStyle={this.props.itemStyle}
-            onValueChange={itemValue => this.onValueChange(selectedHour, Number(itemValue))}
-          >
-            {this.getMinuteItems()}
-          </Picker>
-        </View>
+      <View style={[styles.body, { paddingHorizontal, paddingBottom: 34 }]}>
+        <View style={styles.emptySpace} />
+        <Picker
+          data={this.getHourItems()}
+          containerStyle={styles.picker}
+          onValueChange={itemValue => this.onValueChange(Number(itemValue), selectedMinute)}
+        />
+        <Text style={styles.pickerLabel}>ore</Text>
+        <View style={styles.emptySpace} />
+        <Picker
+          data={this.getMinuteItems()}
+          containerStyle={styles.picker}
+          onValueChange={itemValue => this.onValueChange(selectedHour, Number(itemValue))}
+        />
+        <Text style={styles.pickerLabel}>minuti</Text>
+        <View style={styles.emptySpace} />
       </View>
     );
   };
@@ -85,7 +97,11 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
     const interval = maxHour / hourInterval;
     for (let i = 0; i <= interval; i++) {
       const value = `${i * hourInterval}`;
-      const item = <Picker.Item key={value} value={value} label={value + hourUnit} />;
+      //const item = <Picker.Item key={value} value={value} label={value + hourUnit} />;
+      const item: PickerItem = {
+        value: value,
+        label: value + hourUnit
+      }
       items.push(item);
     }
     return items;
@@ -94,14 +110,18 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
   getMinuteItems = () => {
     const items = [];
     // const { maxMinute, minuteInterval, minuteUnit } = this.props;
-    const maxMinute = 59;
-    const minuteInterval = 1;
+    const maxMinute = 55;
+    const minuteInterval = 5;
     const minuteUnit = '';
     const interval = maxMinute / minuteInterval;
     for (let i = 0; i <= interval; i++) {
       const value = i * minuteInterval;
       const newValue = value < 10 ? `0${value}` : `${value}`;
-      const item = <Picker.Item key={value} value={newValue} label={newValue + minuteUnit} />;
+      //const item = <Picker.Item key={value} value={newValue} label={newValue + minuteUnit} />;
+      const item: PickerItem = {
+        value: newValue,
+        label: newValue + minuteUnit
+      }
       items.push(item);
     }
     return items;
@@ -128,18 +148,28 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.GRAY_200,
     paddingHorizontal: 16
   },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 14
+  },
+  buttonText: { fontSize: 17 },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
   body: {
-    flexDirection: 'row',
-    padding: 16,
-    paddingTop: 4
+    flexDirection: 'row'
   },
   picker: {
-    flex: 1
+    flex: 1,
+    paddingTop: 2
   },
-  separator: {
-    alignSelf: 'center',
-    fontSize: 16
+  pickerLabel: {
+    fontSize: 17,
+    color: Colors.BLACK,
+    alignSelf: 'center'
+  },
+  emptySpace: {
+    flex: 1
   }
 });
 

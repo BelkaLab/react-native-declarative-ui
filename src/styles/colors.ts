@@ -1,4 +1,6 @@
 export enum Colors {
+  TRANSPARENT = '#FFFFFF00',
+
   /* White */
 
   WHITE = '#FFFFFF',
