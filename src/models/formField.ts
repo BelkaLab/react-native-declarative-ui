@@ -44,10 +44,12 @@ export type FormField = {
   shouldReturnKey?: boolean;
   updateFieldId?: string;
   updateFieldKeyProperty?: string;
+  // visibility props
   visibilityFieldId?: string;
   visibilityFieldValue?: ComposableItem | ComposableItem[] | string | string[];
   isVisibilityFieldExternal?: boolean;
   isVisibilityConditionInverted?: boolean;
+  persistentValue?: boolean;
   // segment props
   segmentItems: string[];
   // inline props

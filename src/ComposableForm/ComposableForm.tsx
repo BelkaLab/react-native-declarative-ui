@@ -157,7 +157,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
       if (this.state.structure) {
         this.state.structure.fields.map(field => {
-          if (this.isFieldNotVisible(field, nextProps.model) && !!nextProps.model[field.id]) {
+          if (!field.persistentValue && this.isFieldNotVisible(field, nextProps.model) && !!nextProps.model[field.id]) {
             this.props.onChange(field.id, undefined);
           }
         });
