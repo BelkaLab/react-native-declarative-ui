@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { Picker } from '../../components/Picker';
 import { ITEM_HEIGHT, PickerItem } from '../../components/Picker/Picker';
@@ -61,10 +61,11 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
 
   private renderPicker = () => {
     const { selectedHour, selectedMinute } = this.state;
+    const isIOS = Platform.OS === "ios";
 
     return (
       <>
-        <View style={[styles.container, {zIndex: -1}]}>
+        <View style={[styles.container, {zIndex: -1, top: isIOS ? 30 : 34}]}>
           <View style={styles.selectedItemIndicator} />
         </View>
         <View style={styles.body}>
@@ -188,11 +189,6 @@ const styles = StyleSheet.create({
   picker: {
     flex: 1,
     paddingTop: 2
-  },
-  pickerLabel: {
-    fontSize: 17,
-    color: Colors.BLACK,
-    alignSelf: 'center'
   },
   spaceBetweenPickers: { width: 20 }
 });
