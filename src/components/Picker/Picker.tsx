@@ -1,13 +1,22 @@
+import { delay, findIndex } from 'lodash';
 import React from 'react';
 import { FlatList, ListRenderItemInfo, StyleProp, StyleSheet, Text, View, ViewStyle, ViewToken } from 'react-native';
 import { Colors } from '../../styles/colors';
 
 const PICKER_HEIGHT = 216;
-const ITEM_HEIGHT = 43;
+export const ITEM_HEIGHT = 42;
+const ITEM_LAYOUT = (index: number) => ({
+  length: ITEM_HEIGHT,
+  offset: ITEM_HEIGHT * index,
+  index
+});
 
 export interface IPickerProps {
   data: PickerItem[];
+  label?: string;
+  selectedValue?: any;
   containerStyle?: StyleProp<ViewStyle>;
+  itemContainerStyle?: StyleProp<ViewStyle>;
   onValueChange?(value: any): void;
   activeColor?: string;
   inactiveColor?: string;
@@ -38,8 +47,16 @@ class Picker extends React.Component<IPickerProps, IState> {
     }
   }
 
+  componentDidMount() {
+    const { data, selectedValue } = this.props;
+    if (selectedValue) {
+      const index = findIndex(data, (item) => Number(item.value) === selectedValue);
+      delay(() => this.flatListRef?.scrollToIndex({ animated: false, index }), 100);
+    }
+  }
+
   render() {
-    const { data, containerStyle } = this.props;
+    const { data, label, containerStyle, itemContainerStyle } = this.props;
     const { middleIndex } = this.state;
     const emptyPickerItem: PickerItem = {
       value: 0,
@@ -49,6 +66,11 @@ class Picker extends React.Component<IPickerProps, IState> {
 
     return (
       <View style={[styles.container, containerStyle]}>
+        <View style={[styles.labelContainer, itemContainerStyle]}>
+          <Text style={styles.label}>
+            {label}
+          </Text>
+        </View>
         <FlatList<PickerItem>
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
@@ -59,13 +81,14 @@ class Picker extends React.Component<IPickerProps, IState> {
           viewabilityConfig={this.viewabilityConfig}
           decelerationRate="fast"
           snapToOffsets={data.map((val, index: number) => index * ITEM_HEIGHT)}
+          getItemLayout={(_, index) => ITEM_LAYOUT(index)}
         />
       </View>
     );
   }
 
   private renderItem = ({ item, index }: ListRenderItemInfo<PickerItem>, middleIndex: number | null) => {
-    const { data, activeColor, inactiveColor } = this.props;
+    const { data, label, activeColor, inactiveColor, itemContainerStyle } = this.props;
 
     const isFirstItem = index === 0;
     const isLastItem = index === data.length + 1;
@@ -77,20 +100,21 @@ class Picker extends React.Component<IPickerProps, IState> {
     const color = isMiddleItem ? (activeColor || Colors.BLACK) : (inactiveColor || Colors.GRAY_500)
 
     return (
-      <View style={styles.itemContainer}>
+      <View style={[styles.itemContainer, itemContainerStyle]}>
         <Text style={[styles.itemText, { color }]}>
           {item.label}
+        </Text>
+        <Text style={[styles.itemText, { color: Colors.TRANSPARENT }]}>
+          {label}
         </Text>
       </View>
     );
   };
 
   private viewableItemsChanged = ({ viewableItems }: { viewableItems: ViewToken[]; changed: ViewToken[]; }) => {
-    const { data, onValueChange } = this.props;
-    const scrolledToEnd = viewableItems[0]?.item === data[data.length - 3];
-    const middleItem = viewableItems.length > 4 || scrolledToEnd
-      ? viewableItems[2]
-      : viewableItems[1];
+    const { onValueChange } = this.props;
+    const isAtStart = viewableItems.length === 4 && viewableItems[0]?.index === 0;
+    const middleItem = isAtStart ? viewableItems[0] : viewableItems[1];
     if (middleItem) {
       this.setState((prevState) => ({ middleIndex: middleItem.index }));
       if (onValueChange)
@@ -104,16 +128,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     height: PICKER_HEIGHT
   },
+  labelContainer: {
+    //zIndex: -1,
+    position: 'absolute',
+    top: 0,
+    left: 50,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center'
+  },
   itemContainer: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     height: ITEM_HEIGHT
   },
   itemText: {
-    fontSize: 17
+    fontSize: 17,
+    textAlign: 'center'
   },
   firstLastSpacing: {
     height: ITEM_HEIGHT * 2
+  },
+  label: {
+    flex: 1,
+    fontSize: 17,
+    color: Colors.BLACK,
+    textAlign: 'center'
   }
 });
 

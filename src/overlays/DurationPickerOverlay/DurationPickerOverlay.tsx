@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
-import { Picker } from '../../components/Picker';
-import { PickerItem } from '../../components/Picker/Picker';
-import { TextButton } from '../../components/TextButton';
+import { StyleSheet, View } from 'react-native';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
+import { Picker } from '../../components/Picker';
+import { ITEM_HEIGHT, PickerItem } from '../../components/Picker/Picker';
+import { TextButton } from '../../components/TextButton';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
@@ -39,7 +39,7 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
     } = this.props;
 
     return (
-      <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
+      <View style={[globalStyles.pickerContainer, { height: "100%" }]}>
         <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
           <TextButton
             title="Annulla"
@@ -61,26 +61,31 @@ class DurationPickerOverlay extends Component<IDurationPickerOverlayProps & IBot
 
   private renderPicker = () => {
     const { selectedHour, selectedMinute } = this.state;
-    const paddingHorizontal = Platform.OS === "android" ? 16 : 0;
 
     return (
-      <View style={[styles.body, { paddingHorizontal, paddingBottom: 34 }]}>
-        <View style={styles.emptySpace} />
-        <Picker
-          data={this.getHourItems()}
-          containerStyle={styles.picker}
-          onValueChange={itemValue => this.onValueChange(Number(itemValue), selectedMinute)}
-        />
-        <Text style={styles.pickerLabel}>ore</Text>
-        <View style={styles.emptySpace} />
-        <Picker
-          data={this.getMinuteItems()}
-          containerStyle={styles.picker}
-          onValueChange={itemValue => this.onValueChange(selectedHour, Number(itemValue))}
-        />
-        <Text style={styles.pickerLabel}>minuti</Text>
-        <View style={styles.emptySpace} />
-      </View>
+      <>
+        <View style={[styles.container, {zIndex: -1}]}>
+          <View style={styles.selectedItemIndicator} />
+        </View>
+        <View style={styles.body}>
+          <Picker
+            data={this.getHourItems()}
+            label="ore"
+            selectedValue={selectedHour}
+            containerStyle={styles.picker}
+            itemContainerStyle={{paddingStart: 80}}
+            onValueChange={itemValue => this.onValueChange(Number(itemValue), selectedMinute)}
+          />
+          <Picker
+            data={this.getMinuteItems()}
+            label="minuti"
+            selectedValue={selectedMinute}
+            containerStyle={styles.picker}
+            itemContainerStyle={{paddingEnd: 80}}
+            onValueChange={itemValue => this.onValueChange(selectedHour, Number(itemValue))}
+          />
+        </View>
+      </>
     );
   };
 
@@ -156,8 +161,29 @@ const styles = StyleSheet.create({
   },
   buttonText: { fontSize: 17 },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
+  container: {
+    flex: 1,
+    position: 'absolute',
+    top: 30,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  selectedItemIndicator: {
+    height: ITEM_HEIGHT,
+    width: "100%",
+    alignSelf: 'center',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: Colors.GRAY_200
+  },
   body: {
-    flexDirection: 'row'
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    // paddingHorizontal: 80
   },
   picker: {
     flex: 1,
@@ -168,9 +194,7 @@ const styles = StyleSheet.create({
     color: Colors.BLACK,
     alignSelf: 'center'
   },
-  emptySpace: {
-    flex: 1
-  }
+  spaceBetweenPickers: { width: 20 }
 });
 
 export default withMappedNavigationParams()(withBottomOverlay(DurationPickerOverlay));
