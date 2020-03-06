@@ -60,7 +60,13 @@ declare module 'react-native-declarative-ui' {
       headerBackgroundColor?: string;
       renderCustomBackground?: () => React.ReactElement<{}>;
       renderCustomCancelButton?: () => React.ReactElement<{}>;
-    }
+    };
+    segments?: {
+      activeItemColor?: string;
+      segmentActiveTextStyle?: StyleProp<TextStyle>;
+      segmentInactiveTextStyle?: StyleProp<TextStyle>;
+      backgroundColor?: string;
+    };
   };
 
   export type ComposableFormCustomComponents = {

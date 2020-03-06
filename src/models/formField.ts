@@ -17,7 +17,8 @@ export type FormField = {
   | 'inline'
   | 'header'
   | 'title'
-  | 'separator';
+  | 'separator'
+  | 'segment';
   // text props
   nextField?: string;
   autoFocus?: boolean;
@@ -43,10 +44,12 @@ export type FormField = {
   shouldReturnKey?: boolean;
   updateFieldId?: string;
   updateFieldKeyProperty?: string;
+  // visibility props
   visibilityFieldId?: string;
   visibilityFieldValue?: ComposableItem | ComposableItem[] | string | string[];
   isVisibilityFieldExternal?: boolean;
   isVisibilityConditionInverted?: boolean;
+  persistentValue?: boolean;
   // inline props
   flex?: number;
   childs?: FormField[];

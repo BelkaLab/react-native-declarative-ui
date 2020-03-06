@@ -33,6 +33,7 @@ import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, D
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
+import { Segment } from '../components/Segment';
 
 interface IComposableFormProps<T> {
   navigation: StackNavigationProp<NavigationRoute, {}>;
@@ -156,7 +157,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
 
       if (this.state.structure) {
         this.state.structure.fields.map(field => {
-          if (this.isFieldNotVisible(field, nextProps.model) && !!nextProps.model[field.id]) {
+          if (!field.persistentValue && this.isFieldNotVisible(field, nextProps.model) && !!nextProps.model[field.id]) {
             this.props.onChange(field.id, undefined);
           }
         });
@@ -217,23 +218,23 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       if (Array.isArray(visibilityFieldValue)) {
         const shouldFieldBeHidden = isVisibilityConditionInverted
           ? some(visibilityFieldValue, (value: ComposableItem | string) =>
-              this.shouldFieldBeHidden(
-                !isVisibilityFieldExternal ? model! : externalModel!,
-                visibilityFieldId,
-                value,
-                isVisibilityConditionInverted,
-                keyProperty
-              )
+            this.shouldFieldBeHidden(
+              !isVisibilityFieldExternal ? model! : externalModel!,
+              visibilityFieldId,
+              value,
+              isVisibilityConditionInverted,
+              keyProperty
             )
+          )
           : every(visibilityFieldValue, (value: ComposableItem | string) =>
-              this.shouldFieldBeHidden(
-                !isVisibilityFieldExternal ? model! : externalModel!,
-                visibilityFieldId,
-                value,
-                isVisibilityConditionInverted,
-                keyProperty
-              )
-            );
+            this.shouldFieldBeHidden(
+              !isVisibilityFieldExternal ? model! : externalModel!,
+              visibilityFieldId,
+              value,
+              isVisibilityConditionInverted,
+              keyProperty
+            )
+          );
 
         return shouldFieldBeHidden;
       } else {
@@ -261,7 +262,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       !model[visibilityFieldId] ||
       (keyProperty
         ? (visibilityFieldValue as ComposableItem)[keyProperty] !==
-          (model[visibilityFieldId] as ComposableItem)[keyProperty]
+        (model[visibilityFieldId] as ComposableItem)[keyProperty]
         : !isEqual(visibilityFieldValue, model[visibilityFieldId]));
 
     return isVisibilityConditionInverted ? !isVisible : isVisible;
@@ -293,10 +294,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       return false;
     };
 
-    if (field.validation) {     
+    if (field.validation) {
       const schema: Schema<unknown> = transformAll(field.validation);
 
-      try {        
+      try {
         schema.validateSync(model[field.id]);
         return false;
       } catch (err) {
@@ -384,7 +385,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     if (this.isFieldNotVisible(field, model)) {
       return errors;
     };
-    
+
     if (field.validation) {
       const schema: Schema<unknown> = transformAll(field.validation);
 
@@ -448,15 +449,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             {!!this.getComposableFormCustomComponents().renderHeaderTitle ? (
               this.getComposableFormCustomComponents().renderHeaderTitle!(field.label)
             ) : (
-              <Text
-                style={{
-                  fontSize: 16,
-                  color: Colors.BLACK
-                }}
-              >
-                {field.label}
-              </Text>
-            )}
+                <Text
+                  style={{
+                    fontSize: 16,
+                    color: Colors.BLACK
+                  }}
+                >
+                  {field.label}
+                </Text>
+              )}
           </View>
         );
       case 'text':
@@ -538,6 +539,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
           >
             {this.renderMapField(field, model, errors, isInline, customStyle)}
+          </View>
+        );
+      case 'segment':
+        return (
+          <View
+            key={index}
+            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+          >
+            {this.renderSegment(field, model, customStyle)}
           </View>
         );
       case 'inline':
@@ -763,8 +773,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
               </TouchableHighlight>
             </View>
           ) : (
-            undefined
-          )
+              undefined
+            )
         }
         rightText={field.checkboxTextPosition === 'right' ? field.label : undefined}
         leftText={!field.checkboxTextPosition || field.checkboxTextPosition === 'left' ? field.label : undefined}
@@ -1076,7 +1086,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         error={errors[field.id]}
         isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
-        // options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
+      // options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
       />
     );
   };
@@ -1105,6 +1115,26 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       hasTextInput: true,
       minHeight: 350
     });
+  };
+
+  // This is a component to pick between several items
+  private renderSegment = (
+    field: FormField,
+    model: T,
+    customStyle: StyleProp<ViewStyle> = {}
+  ) => {
+    return (
+      <Segment
+        data={field.options as string[]}
+        containerStyle={[{ flex: 1 }, customStyle]}
+        activeItemIndex={model[field.id] as number}
+        onChange={(index) => this.props.onChange(field.id, index)}
+        backgroundColor={this.getComposableFormOptions().segments.backgroundColor}
+        activeTextStyle={this.getComposableFormOptions().segments.segmentActiveTextStyle}
+        inactiveTextStyle={this.getComposableFormOptions().segments.segmentInactiveTextStyle}
+        activeItemColor={this.getComposableFormOptions().segments.activeItemColor}
+      />
+    );
   };
 
   // This is a duration picker field renderer for fields of type date
@@ -1195,5 +1225,7 @@ const styles = StyleSheet.create({
     alignItems: 'stretch'
   },
   checkboxUrlContainer: { flexDirection: 'row', paddingHorizontal: 8, width: '100%' },
-  overlayContainer: { justifyContent: 'flex-end', margin: 0 }
+  overlayContainer: { justifyContent: 'flex-end', margin: 0 },
+  segmentActiveText: { color: Colors.WHITE },
+  segmentInactiveText: { color: Colors.BLACK }
 });
