@@ -2,12 +2,14 @@
 declare module 'react-native-declarative-ui' {
   import { ScrollViewProperties } from 'react-native';
   import { CalendarTheme } from 'react-native-calendars';
+  import { NavigationParams, NavigationRoute } from 'react-navigation';
   import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
-  import { NavigationRoute, NavigationParams } from 'react-navigation';
 
   export type ComposableItem = {
     [key: string]: unknown;
   };
+
+  type Validation = string | string[] | { [key: string]: string[][] };
 
   interface ComposableFormProps<T> {
     model: T;
@@ -38,7 +40,7 @@ declare module 'react-native-declarative-ui' {
     customStyle?: ComposableFormOptions;
     customComponents?: ComposableFormCustomComponents;
     googleApiKey?: string;
-    dynamicValidations?: string[] | string[][];
+    dynamicValidations?: unknown;
   }
 
   export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> { }
@@ -63,10 +65,14 @@ declare module 'react-native-declarative-ui' {
     };
     segments?: {
       activeItemColor?: string;
-      segmentActiveTextStyle?: StyleProp<TextStyle>;
-      segmentInactiveTextStyle?: StyleProp<TextStyle>;
       backgroundColor?: string;
-    };
+      segmentActiveTextStyle?: {
+        color: string;
+      },
+      segmentInactiveTextStyle?: {
+        color: string;
+      }
+    }
   };
 
   export type ComposableFormCustomComponents = {
@@ -92,6 +98,7 @@ declare module 'react-native-declarative-ui' {
   const SharedOptions: SharedOptionsManager;
 
   export { SharedOptions };
+  export { ComposableFormModals };
 
   interface IKeyboardAvoidingScrollViewProps extends ScrollViewProperties {
     focusedField?: TextInput;
@@ -103,5 +110,4 @@ declare module 'react-native-declarative-ui' {
 
   const ComposableFormModals: object
 
-  export { ComposableFormModals }
 }
