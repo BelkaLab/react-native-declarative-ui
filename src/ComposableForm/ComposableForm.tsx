@@ -1125,7 +1125,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   ) => {
     return (
       <Segment
-        data={field.segmentItems}
+        data={field.options as string[]}
         containerStyle={[{ flex: 1 }, customStyle]}
         activeItemIndex={model[field.id] as number}
         onChange={(index) => this.props.onChange(field.id, index)}
