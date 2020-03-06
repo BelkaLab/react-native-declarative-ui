@@ -50,8 +50,6 @@ export type FormField = {
   isVisibilityFieldExternal?: boolean;
   isVisibilityConditionInverted?: boolean;
   persistentValue?: boolean;
-  // segment props
-  segmentItems: string[];
   // inline props
   flex?: number;
   childs?: FormField[];
