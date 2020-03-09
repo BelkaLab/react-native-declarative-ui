@@ -22,6 +22,7 @@ import { CheckBoxField } from '../components/CheckBoxField';
 import { DatePickerField } from '../components/DatePickerField';
 import { DurationPickerField } from '../components/DurationPickerField';
 import { MapPickerField } from '../components/MapPickerField';
+import { Segment } from '../components/Segment';
 import { SelectPickerField } from '../components/SelectPickerField';
 import { TextField } from '../components/TextField';
 import { ToggleField } from '../components/ToggleField';
@@ -33,7 +34,6 @@ import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, D
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
-import { Segment } from '../components/Segment';
 
 interface IComposableFormProps<T> {
   navigation: StackNavigationProp<NavigationRoute, {}>;
@@ -1183,6 +1183,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     this.props.navigation.navigate(DURATION_PICKER_OVERLAY_KEY, {
       pickedAmount: model[field.id] as number,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
+      headerHeight: 13,
+      knobColor: Colors.WHITE_OPACITY_BACKGROUND,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
       onConfirm: (selectedItem: number) => {
         this.setState({
