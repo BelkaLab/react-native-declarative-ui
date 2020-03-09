@@ -20,6 +20,7 @@ export type ComposableFormOptions = {
     singleDayTheme?: CalendarTheme;
   };
   pickers?: {
+    knobColor?: string;
     headerBackgroundColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
     renderCustomCancelButton?: () => React.ReactElement<{}>;
@@ -46,6 +47,7 @@ export type DefinedComposableFormOptions = {
     singleDayTheme?: CalendarTheme;
   };
   pickers: {
+    knobColor?: string;
     headerBackgroundColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
     renderCustomCancelButton?: () => React.ReactElement<{}>;

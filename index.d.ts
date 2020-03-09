@@ -59,6 +59,7 @@ declare module 'react-native-declarative-ui' {
       singleDayTheme?: CalendarTheme;
     };
     pickers?: {
+      knobColor?: string;
       headerBackgroundColor?: string;
       renderCustomBackground?: () => React.ReactElement<{}>;
       renderCustomCancelButton?: () => React.ReactElement<{}>;
