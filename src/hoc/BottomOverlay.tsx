@@ -16,6 +16,8 @@ export interface IBottomOverlayProps extends NavigationStackScreenProps {
   disabledInteraction?: boolean;
   minHeight?: number;
   headerBackgroundColor?: string;
+  headerHeight?: number;
+  knobColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
@@ -207,14 +209,19 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
     }
 
     private renderHeader = () => {
-      const { headerBackgroundColor, renderCustomBackground } = this.props;
+      const {
+        headerBackgroundColor = Colors.WHITE,
+        headerHeight = HEADER_HEIGHT,
+        knobColor = Colors.GRAY_400,
+        renderCustomBackground
+      } = this.props;
 
       if (renderCustomBackground) {
         return (
           <View style={styles.listHeaderCustomContainer}>
             <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
             <View style={{ width: 24, height: 24 }} />
-            <View style={styles.knob} />
+            <View style={[styles.knob, { backgroundColor: knobColor }]} />
             <TouchableOpacity onPress={() => this.dismissOverlay()} style={styles.knobContainer}>
               <Image
                 source={require('../assets/android_clear_input.png')}
@@ -229,11 +236,12 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
           style={[
             styles.listHeaderContainer,
             {
-              backgroundColor: headerBackgroundColor || Colors.WHITE
+              height: headerHeight,
+              backgroundColor: headerBackgroundColor
             }
           ]}
         >
-          <View style={styles.knob} />
+          <View style={[styles.knob, { backgroundColor: knobColor }]} />
         </View>
       );
     };
@@ -291,24 +299,24 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
           />
         </View>
       ) : (
-        <View
-          onLayout={({ nativeEvent }) => {
-            if (this.state.height === 0) {
-              this.setState({
-                height: nativeEvent.layout.height,
-                snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
-              });
-              delay(() => {
-                if (this.bottomSheet.current) {
-                  this.bottomSheet.current.snapTo(0);
-                }
-              }, 10);
-            }
-          }}
-        >
-          <ChildComponent {...this.props as P} dismissOverlay={this.dismissOverlay} />
-        </View>
-      );
+          <View
+            onLayout={({ nativeEvent }) => {
+              if (this.state.height === 0) {
+                this.setState({
+                  height: nativeEvent.layout.height,
+                  snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
+                });
+                delay(() => {
+                  if (this.bottomSheet.current) {
+                    this.bottomSheet.current.snapTo(0);
+                  }
+                }, 10);
+              }
+            }}
+          >
+            <ChildComponent {...this.props as P} dismissOverlay={this.dismissOverlay} />
+          </View>
+        );
     };
   };
 

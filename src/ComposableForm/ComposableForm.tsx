@@ -22,6 +22,7 @@ import { CheckBoxField } from '../components/CheckBoxField';
 import { DatePickerField } from '../components/DatePickerField';
 import { DurationPickerField } from '../components/DurationPickerField';
 import { MapPickerField } from '../components/MapPickerField';
+import { Segment } from '../components/Segment';
 import { SelectPickerField } from '../components/SelectPickerField';
 import { TextField } from '../components/TextField';
 import { ToggleField } from '../components/ToggleField';
@@ -33,7 +34,6 @@ import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, D
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
-import { Segment } from '../components/Segment';
 
 interface IComposableFormProps<T> {
   navigation: StackNavigationProp<NavigationRoute, {}>;
@@ -860,6 +860,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       topLabel: field.pickerLabel,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: this.getComposableFormOptions().pickers.knobColor,
       onCreateNewItemPressed: () => {
         if (this.props.createNewItemMapper) {
           this.props.createNewItemMapper[field.id].callback();
@@ -967,6 +968,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: this.getComposableFormOptions().pickers.knobColor,
       onFilterItems: (text: string) => this.props.searchMapper![field.id](text),
       onPick: (selectedItem: ComposableItem | string) => {
         this.setState({
@@ -1045,6 +1047,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       mode: 'single-day',
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: this.getComposableFormOptions().pickers.knobColor,
       onConfirm: (selectedItem: string) => {
         this.setState({
           errors: {
@@ -1099,6 +1102,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       pickedPosition: model[field.id] as GooglePlaceDetail,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: this.getComposableFormOptions().pickers.knobColor,
       renderCustomCancelButton: this.getComposableFormOptions().pickers.renderCustomCancelButton,
       onConfirm: (pickedPosition: GooglePlaceDetail) => {
         this.setState({
@@ -1184,6 +1188,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       pickedAmount: model[field.id] as number,
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: this.getComposableFormOptions().pickers.knobColor,
+      headerHeight: 14,
       onConfirm: (selectedItem: number) => {
         this.setState({
           errors: {
