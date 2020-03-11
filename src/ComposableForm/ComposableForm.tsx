@@ -1189,7 +1189,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
       knobColor: this.getComposableFormOptions().pickers.knobColor,
-      headerHeight: 13,
+      headerHeight: 14,
       onConfirm: (selectedItem: number) => {
         this.setState({
           errors: {
