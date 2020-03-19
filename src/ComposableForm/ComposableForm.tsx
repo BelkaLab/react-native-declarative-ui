@@ -596,6 +596,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         value={model[field.id] as string | undefined}
         editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         multiline={field.multiline}
+        maxLength={field.maxLength}
         scrollEnabled={false} // fix for trigger scroll on iOS when keyboard opens
         keyboardType={field.keyboard || 'default'}
         isPassword={field.isPassword}
@@ -678,6 +679,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
         editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         currency={field.currency}
+        maxLength={field.maxLength}
         isPercentage={field.isPercentage}
         keyboardType="decimal-pad"
         returnKeyType={field.nextField ? 'next' : 'done'}

@@ -25,6 +25,7 @@ export type FormField = {
   disabled?: boolean;
   multiline?: boolean;
   isPassword?: boolean;
+  maxLength?: number;
   keyboard?: 'email-address' | 'default';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   // number props
