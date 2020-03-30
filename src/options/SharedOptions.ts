@@ -12,6 +12,14 @@ export type ComposableFormOptions = {
     inlinePadding?: number;
     backgroundColor?: string;
   };
+  textFields: {
+    focusedBorderColor?: string;
+    selectionColor?: string;
+  },
+  checkBoxes?: {
+    color?: string;
+    urlColor?: string;
+  },
   labels?: {
     placeholderStyle?: StyleProp<TextStyle>;
     inputStyle?: StyleProp<TextStyle>;
@@ -39,6 +47,14 @@ export type DefinedComposableFormOptions = {
     inlinePadding?: number;
     backgroundColor?: string;
   };
+  textFields: {
+    focusedBorderColor?: string;
+    selectionColor?: string;
+  },
+  checkBoxes?: {
+    color?: string;
+    urlColor?: string;
+  },
   labels: {
     placeholderStyle?: StyleProp<TextStyle>;
     inputStyle?: StyleProp<TextStyle>;
@@ -76,6 +92,8 @@ class SharedOptions {
       inlinePadding: 16,
       backgroundColor: Colors.WHITE
     },
+    textFields: {},
+    checkBoxes: {},
     labels: {},
     calendars: {},
     pickers: {},

@@ -591,6 +591,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         containerStyle={[{ flex: 1 }, customStyle]}
+        focusedBorderColor={this.getComposableFormOptions().textFields.focusedBorderColor}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={model[field.id] as string | undefined}
@@ -605,7 +606,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
-        selectionColor={Colors.PRIMARY_BLUE}
+        selectionColor={this.getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
         onSubmitEditing={event => {
           if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
             this.fieldRefs[field.nextField].focus();
@@ -674,6 +675,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         containerStyle={[{ flex: 1 }, customStyle]}
+        focusedBorderColor={this.getComposableFormOptions().textFields.focusedBorderColor}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
         value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
@@ -764,6 +766,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   ) => {
     return (
       <CheckBoxField
+        color={this.getComposableFormOptions().checkBoxes?.color}
         containerStyle={[{ flex: 1 }, customStyle]}
         isChecked={model[field.id] as boolean}
         rightTextView={
@@ -771,7 +774,14 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             <View style={styles.checkboxUrlContainer}>
               <Text>{field.label}</Text>
               <TouchableHighlight onPress={() => Linking.openURL(field.urlLink!)}>
-                <Text style={{ color: Colors.PRIMARY_BLUE, fontWeight: '600' }}>{field.checkBoxLabelUrl}</Text>
+                <Text
+                  style={{
+                    color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
+                    fontWeight: '600'
+                  }}
+                >
+                  {field.checkBoxLabelUrl}
+                </Text>
               </TouchableHighlight>
             </View>
           ) : (

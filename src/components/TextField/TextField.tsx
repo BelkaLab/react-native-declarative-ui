@@ -22,6 +22,7 @@ export interface ITextFieldProps extends TextInputProperties {
   isPercentage?: boolean;
   currency?: string;
   isMandatory?: boolean;
+  focusedBorderColor?: string;
 }
 
 type State = {
@@ -69,9 +70,9 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
               globalStyles.input,
               this.retrieveBorderColor(),
               rightContent &&
-                rightContentVisibility && {
-                  paddingRight: !!rest.value && (!!rest.currency || !!rest.isPercentage) ? 46 : 28
-                }
+              rightContentVisibility && {
+                paddingRight: !!rest.value && (!!rest.currency || !!rest.isPercentage) ? 46 : 28
+              }
             ]}
             labelStyle={[
               {
@@ -136,12 +137,17 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
   };
 
   private retrieveBorderColor = () => {
-    const { error, editable, value } = this.props;
+    const {
+      error,
+      editable,
+      value,
+      focusedBorderColor = Colors.PRIMARY_BLUE
+    } = this.props;
     const { isFocused } = this.state;
 
     if (isFocused) {
       return {
-        borderColor: Colors.PRIMARY_BLUE
+        borderColor: focusedBorderColor
       };
     }
 
