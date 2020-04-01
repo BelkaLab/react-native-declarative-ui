@@ -52,6 +52,14 @@ declare module 'react-native-declarative-ui' {
       backgroundColor?: string;
     };
     textFields?: {
+      backgroundColor?: string;
+      disabledBackgroundColor?: string;
+      floatingLabelColor?: string;
+      disabledFloatingLabelColor?: string;
+      color?: string;
+      disabledColor?: string;
+      borderColor?: string;
+      disabledBorderColor?: string;
       focusedBorderColor?: string;
       selectionColor?: string;
     },
