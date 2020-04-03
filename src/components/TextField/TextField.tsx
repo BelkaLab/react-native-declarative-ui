@@ -82,6 +82,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
                 onRef(input);
               }
             }}
+            editable={editable}
             style={[
               globalStyles.input,
               this.retrieveBorderColor(),
