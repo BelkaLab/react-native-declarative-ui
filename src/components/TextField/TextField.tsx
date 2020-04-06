@@ -15,6 +15,7 @@ export interface ITextFieldProps extends TextInputProperties {
   placeholderStyle?: StyleProp<TextStyle>;
   rightContent?: JSX.Element;
   rightContentVisibility?: boolean;
+  editable?: boolean;
   isLoading?: boolean;
   error?: string;
   disableErrorMessage?: boolean;
@@ -38,6 +39,8 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
 
   render() {
     const {
+      editable = true,
+      isPassword = false,
       onFocusLabel,
       onBlurLabel,
       onRef,
@@ -65,6 +68,8 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
                 onRef(input);
               }
             }}
+            editable={editable}
+            isPassword={isPassword}
             style={[
               globalStyles.input,
               this.retrieveBorderColor(),
@@ -119,7 +124,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
           >
             {this.props.label}
           </FloatingLabel>
-          {rightContentVisibility && rightContent && !isLoading}
+          {rightContentVisibility && editable && !isLoading && !isPassword && rightContent}
           {isLoading && <LoaderIcon />}
         </View>
         {!!error && this.renderError(error, !!this.props.disableErrorMessage)}

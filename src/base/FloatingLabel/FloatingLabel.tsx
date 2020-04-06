@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   label: floatingLabelStyle,
   passwordToggle: {
     position: 'absolute',
-    right: 10,
+    right: 6,
     top: 0,
     bottom: 0,
     backgroundColor: 'transparent',

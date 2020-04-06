@@ -634,7 +634,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             }}
           />
         }
-        rightContentVisibility={!!model[field.id]}
+        rightContentVisibility={field.isPassword || !!model[field.id]}
         isLoading={this.props.loadingMapper && this.props.loadingMapper[field.id]}
         onFocusLabel={() => {
           if (this.props.onFocus) {
