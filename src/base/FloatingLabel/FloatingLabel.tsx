@@ -137,7 +137,7 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
               ? (
                 <View style={styles.passwordToggle}>
                   <TouchableOpacity onPress={this.onTogglePasswordVisibilityPressed}>
-                    <Image source={require('../../assets/eye-slash.png')} />
+                    <Image source={require('../../assets/eye.png')} />
                   </TouchableOpacity>
                 </View>
               ) : (
