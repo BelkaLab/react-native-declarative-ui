@@ -54,7 +54,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
       disabledFloatingLabelColor = Colors.GRAY_500,
       color = Colors.BLACK,
       disabledColor = Colors.GRAY_600,
-      editable = false,
+      editable = true,
       onFocusLabel,
       onBlurLabel,
       onRef,
