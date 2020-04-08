@@ -1,41 +1,8 @@
 import React, { PureComponent } from 'react';
-import {
-  Animated,
-  Easing,
-  NativeSyntheticEvent,
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputEndEditingEventData,
-  TextInputFocusEventData,
-  TextInputProperties,
-  TextStyle,
-  TouchableWithoutFeedback,
-  View,
-  ViewStyle
-} from 'react-native';
+import { Animated, Easing, Image, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableOpacity, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
 
 const INPUT_HEIGHT = 35;
-
-const defaultCleanStyle = {
-  fontSize: 17,
-  top: 7
-};
-
-const defaultDirtyStyle = {
-  fontSize: 12,
-  top: -17
-};
-
-const floatingLabelStyle: StyleProp<TextStyle> = {
-  marginTop: 22,
-  left: 10,
-  color: Colors.WHITE,
-  position: 'absolute'
-};
 
 interface IFloatingLabelProps extends TextInputProperties {
   onRef?: (ref: TextInput | null) => void;
@@ -76,8 +43,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
     super(props);
 
     const isDirty = Boolean(this.props.value || this.props.placeholder);
-    const cleanStyle = this.props.cleanStyle || defaultCleanStyle;
-    const dirtyStyle = this.props.dirtyStyle || defaultDirtyStyle;
+    const cleanStyle = this.props.cleanStyle || styles.defaultCleanStyle;
+    const dirtyStyle = this.props.dirtyStyle || styles.defaultDirtyStyle;
 
     this.state = {
       text: props.value,
@@ -141,8 +108,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
         {isSelectField ? (
           <View pointerEvents="none">{this.renderTextField(hasSymbol)}</View>
         ) : (
-          this.renderTextField(hasSymbol)
-        )}
+            this.renderTextField(hasSymbol)
+          )}
       </View>
     );
   }
@@ -256,8 +223,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   };
 
   private animate = (isDirty: boolean) => {
-    const cleanStyle = this.props.cleanStyle || defaultCleanStyle;
-    const dirtyStyle = this.props.dirtyStyle || defaultDirtyStyle;
+    const cleanStyle = this.props.cleanStyle || styles.defaultCleanStyle;
+    const dirtyStyle = this.props.dirtyStyle || styles.defaultDirtyStyle;
 
     const nextStyle = isDirty ? dirtyStyle : cleanStyle;
 
@@ -328,6 +295,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 4
   },
-  symbol: { fontSize: 17, paddingLeft: 10, paddingRight: 8, marginTop: Platform.select({ android: 29, ios: 30 }) },
-  label: floatingLabelStyle
+  symbol: {
+    fontSize: 17,
+    paddingLeft: 10,
+    paddingRight: 8,
+    marginTop: Platform.select({ android: 29, ios: 30 })
+  },
+  label: {
+    marginTop: 22,
+    left: 10,
+    color: Colors.WHITE,
+    position: 'absolute'
+  },
+  defaultCleanStyle: {
+    fontSize: 17,
+    top: 7
+  },
+  defaultDirtyStyle: {
+    fontSize: 12,
+    top: -17
+  }
 });

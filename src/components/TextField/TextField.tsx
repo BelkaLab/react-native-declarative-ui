@@ -28,10 +28,14 @@ export interface ITextFieldProps extends TextInputProperties {
   backgroundColor?: string;
   disabledBackgroundColor?: string;
   floatingLabelColor?: string;
+  focusedFloatingLabelColor?: string;
+  errorFloatingLabelColor?: string;
   disabledFloatingLabelColor?: string;
   borderColor?: string;
-  disabledBorderColor?: string;
   focusedBorderColor?: string;
+  errorBorderColor?: string;
+  disabledBorderColor?: string;
+  errorMessageColor?: string;
 }
 
 type State = {
@@ -50,8 +54,6 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
     const {
       backgroundColor = 'transparent',
       disabledBackgroundColor = 'transparent',
-      floatingLabelColor = Colors.GRAY_600,
-      disabledFloatingLabelColor = Colors.GRAY_500,
       color = Colors.BLACK,
       disabledColor = Colors.GRAY_600,
       editable = true,
@@ -97,7 +99,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
             labelStyle={[
               {
                 backgroundColor: 'transparent',
-                color: editable ? floatingLabelColor : disabledFloatingLabelColor
+                color: this.retrieveFloatingLabelColor()
               },
               placeholderStyle
             ]}
@@ -149,11 +151,41 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
   }
 
   private renderError = (error: string, disableErrorMessage: boolean) => {
+    const {
+      errorMessageColor = Colors.RED
+    } = this.props;
+
     if (disableErrorMessage) {
       return null;
     }
 
-    return <Text style={styles.errorMessage}>{error}</Text>;
+    return <Text style={[styles.errorMessage, { color: errorMessageColor }]}>{error}</Text>;
+  };
+
+  private retrieveFloatingLabelColor = () => {
+    const {
+      error,
+      editable,
+      floatingLabelColor = Colors.GRAY_600,
+      focusedFloatingLabelColor = Colors.GRAY_600,
+      errorFloatingLabelColor = Colors.RED,
+      disabledFloatingLabelColor = Colors.GRAY_500,
+    } = this.props;
+    const { isFocused } = this.state;
+
+    if (!editable) {
+      return disabledFloatingLabelColor;
+    }
+
+    if (isFocused) {
+      return focusedFloatingLabelColor;
+    }
+
+    if (error) {
+      return errorFloatingLabelColor;
+    }
+
+    return floatingLabelColor;
   };
 
   private retrieveBorderColor = () => {
@@ -161,8 +193,9 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
       error,
       editable,
       value,
-      focusedBorderColor = Colors.PRIMARY_BLUE,
       borderColor = Colors.GRAY_400,
+      focusedBorderColor = Colors.PRIMARY_BLUE,
+      errorBorderColor = Colors.RED,
       disabledBorderColor = Colors.GRAY_200,
     } = this.props;
     const { isFocused } = this.state;
@@ -175,7 +208,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
 
     if (error) {
       return {
-        borderColor: Colors.RED
+        borderColor: errorBorderColor
       };
     }
 

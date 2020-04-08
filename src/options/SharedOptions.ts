@@ -16,13 +16,17 @@ export type ComposableFormOptions = {
     backgroundColor?: string;
     disabledBackgroundColor?: string;
     floatingLabelColor?: string;
+    focusedFloatingLabelColor?: string;
+    errorFloatingLabelColor?: string;
     disabledFloatingLabelColor?: string;
     color?: string;
     disabledColor?: string;
     borderColor?: string;
-    disabledBorderColor?: string;
     focusedBorderColor?: string;
+    errorBorderColor?: string;
+    disabledBorderColor?: string;
     selectionColor?: string;
+    errorMessageColor?: string;
   },
   checkBoxes?: {
     color?: string;
@@ -59,13 +63,17 @@ export type DefinedComposableFormOptions = {
     backgroundColor?: string;
     disabledBackgroundColor?: string;
     floatingLabelColor?: string;
+    focusedFloatingLabelColor?: string;
+    errorFloatingLabelColor?: string;
     disabledFloatingLabelColor?: string;
     color?: string;
     disabledColor?: string;
     borderColor?: string;
-    disabledBorderColor?: string;
     focusedBorderColor?: string;
+    errorBorderColor?: string;
+    disabledBorderColor?: string;
     selectionColor?: string;
+    errorMessageColor?: string;
   },
   checkBoxes?: {
     color?: string;
