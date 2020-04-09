@@ -593,6 +593,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        color={this.getComposableFormOptions().textFields.color}
+        disabledColor={this.getComposableFormOptions().textFields.disabledColor}
+        backgroundColor={this.getComposableFormOptions().textFields.backgroundColor}
+        disabledBackgroundColor={this.getComposableFormOptions().textFields.disabledBackgroundColor}
+        floatingLabelColor={this.getComposableFormOptions().textFields.floatingLabelColor}
+        focusedFloatingLabelColor={this.getComposableFormOptions().textFields.focusedFloatingLabelColor}
+        errorFloatingLabelColor={this.getComposableFormOptions().textFields.errorFloatingLabelColor}
+        disabledFloatingLabelColor={this.getComposableFormOptions().textFields.disabledFloatingLabelColor}
+        borderColor={this.getComposableFormOptions().textFields.borderColor}
+        errorBorderColor={this.getComposableFormOptions().textFields.errorBorderColor}
+        focusedBorderColor={this.getComposableFormOptions().textFields.focusedBorderColor}
+        disabledBorderColor={this.getComposableFormOptions().textFields.disabledBorderColor}
+        errorMessageColor={this.getComposableFormOptions().textFields.errorMessageColor}
         value={model[field.id] as string | undefined}
         editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         multiline={field.multiline}
@@ -605,7 +618,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
-        selectionColor={Colors.PRIMARY_BLUE}
+        selectionColor={this.getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
         onSubmitEditing={event => {
           if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
             this.fieldRefs[field.nextField].focus();
@@ -676,6 +689,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        color={this.getComposableFormOptions().textFields.color}
+        disabledColor={this.getComposableFormOptions().textFields.disabledColor}
+        backgroundColor={this.getComposableFormOptions().textFields.backgroundColor}
+        disabledBackgroundColor={this.getComposableFormOptions().textFields.disabledBackgroundColor}
+        floatingLabelColor={this.getComposableFormOptions().textFields.floatingLabelColor}
+        focusedFloatingLabelColor={this.getComposableFormOptions().textFields.focusedFloatingLabelColor}
+        errorFloatingLabelColor={this.getComposableFormOptions().textFields.errorFloatingLabelColor}
+        disabledFloatingLabelColor={this.getComposableFormOptions().textFields.disabledFloatingLabelColor}
+        borderColor={this.getComposableFormOptions().textFields.borderColor}
+        errorBorderColor={this.getComposableFormOptions().textFields.errorBorderColor}
+        focusedBorderColor={this.getComposableFormOptions().textFields.focusedBorderColor}
+        disabledBorderColor={this.getComposableFormOptions().textFields.disabledBorderColor}
+        errorMessageColor={this.getComposableFormOptions().textFields.errorMessageColor}
         value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
         editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
         currency={field.currency}
@@ -764,6 +790,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   ) => {
     return (
       <CheckBoxField
+        color={this.getComposableFormOptions().checkBoxes?.color}
         containerStyle={[{ flex: 1 }, customStyle]}
         isChecked={model[field.id] as boolean}
         rightTextView={
@@ -771,7 +798,14 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
             <View style={styles.checkboxUrlContainer}>
               <Text>{field.label}</Text>
               <TouchableHighlight onPress={() => Linking.openURL(field.urlLink!)}>
-                <Text style={{ color: Colors.PRIMARY_BLUE, fontWeight: '600' }}>{field.checkBoxLabelUrl}</Text>
+                <Text
+                  style={{
+                    color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
+                    fontWeight: '600'
+                  }}
+                >
+                  {field.checkBoxLabelUrl}
+                </Text>
               </TouchableHighlight>
             </View>
           ) : (

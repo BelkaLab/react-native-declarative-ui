@@ -51,6 +51,26 @@ declare module 'react-native-declarative-ui' {
       inlinePadding?: number;
       backgroundColor?: string;
     };
+    textFields?: {
+      backgroundColor?: string;
+      disabledBackgroundColor?: string;
+      floatingLabelColor?: string;
+      focusedFloatingLabelColor?: string;
+      errorFloatingLabelColor?: string;
+      disabledFloatingLabelColor?: string;
+      color?: string;
+      disabledColor?: string;
+      borderColor?: string;
+      focusedBorderColor?: string;
+      errorBorderColor?: string;
+      disabledBorderColor?: string;
+      selectionColor?: string;
+      errorMessageColor?: string;
+    },
+    checkBoxes?: {
+      color?: string;
+      urlColor?: string;
+    },
     labels?: {
       placeholderStyle?: StyleProp<TextStyle>;
       inputStyle?: StyleProp<TextStyle>;

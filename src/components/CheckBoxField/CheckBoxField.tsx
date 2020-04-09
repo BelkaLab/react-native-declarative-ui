@@ -11,15 +11,23 @@ export interface ICheckBoxFieldProps extends ICheckBoxProps {
   containerStyle?: StyleProp<ViewStyle>;
   error?: string | undefined;
   disableErrorMessage?: boolean;
+  color?: string;
 }
 
 export default class CheckBoxField extends React.Component<ICheckBoxFieldProps, React.ComponentState> {
   render() {
-    const { containerStyle, onRef, error, disableErrorMessage, ...rest } = this.props;
+    const {
+      containerStyle,
+      onRef,
+      error,
+      disableErrorMessage,
+      color = Colors.SECONDARY_BLUE,
+      ...rest
+    } = this.props;
 
     return (
       <View style={[containerStyle, styles.containerStyle]}>
-        <CheckBox {...rest} checkBoxColor={Colors.SECONDARY_BLUE} ref={input => onRef && onRef(input)} />
+        <CheckBox {...rest} checkBoxColor={color} ref={input => onRef && onRef(input)} />
         {Boolean(error) && !disableErrorMessage && <Text style={styles.errorMessage}>{error}</Text>}
       </View>
     );
