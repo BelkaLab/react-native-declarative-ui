@@ -12,6 +12,26 @@ export type ComposableFormOptions = {
     inlinePadding?: number;
     backgroundColor?: string;
   };
+  textFields: {
+    backgroundColor?: string;
+    disabledBackgroundColor?: string;
+    floatingLabelColor?: string;
+    focusedFloatingLabelColor?: string;
+    errorFloatingLabelColor?: string;
+    disabledFloatingLabelColor?: string;
+    color?: string;
+    disabledColor?: string;
+    borderColor?: string;
+    focusedBorderColor?: string;
+    errorBorderColor?: string;
+    disabledBorderColor?: string;
+    selectionColor?: string;
+    errorMessageColor?: string;
+  },
+  checkBoxes?: {
+    color?: string;
+    urlColor?: string;
+  },
   labels?: {
     placeholderStyle?: StyleProp<TextStyle>;
     inputStyle?: StyleProp<TextStyle>;
@@ -39,6 +59,26 @@ export type DefinedComposableFormOptions = {
     inlinePadding?: number;
     backgroundColor?: string;
   };
+  textFields: {
+    backgroundColor?: string;
+    disabledBackgroundColor?: string;
+    floatingLabelColor?: string;
+    focusedFloatingLabelColor?: string;
+    errorFloatingLabelColor?: string;
+    disabledFloatingLabelColor?: string;
+    color?: string;
+    disabledColor?: string;
+    borderColor?: string;
+    focusedBorderColor?: string;
+    errorBorderColor?: string;
+    disabledBorderColor?: string;
+    selectionColor?: string;
+    errorMessageColor?: string;
+  },
+  checkBoxes?: {
+    color?: string;
+    urlColor?: string;
+  },
   labels: {
     placeholderStyle?: StyleProp<TextStyle>;
     inputStyle?: StyleProp<TextStyle>;
@@ -76,6 +116,8 @@ class SharedOptions {
       inlinePadding: 16,
       backgroundColor: Colors.WHITE
     },
+    textFields: {},
+    checkBoxes: {},
     labels: {},
     calendars: {},
     pickers: {},
