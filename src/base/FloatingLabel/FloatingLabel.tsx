@@ -34,6 +34,7 @@ interface IState {
   isFocused: boolean;
   fontSize: Animated.Value;
   top: Animated.Value;
+  passwordToggle: boolean;
 }
 
 export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IState> {
@@ -51,7 +52,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       isFocused: this.props.autoFocus || false,
       height: 0,
       fontSize: new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize),
-      top: new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top)
+      top: new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top),
+      passwordToggle: !!props.isPassword
     };
   }
 
@@ -95,7 +97,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
   }
 
   render() {
-    const { style, isSelectField, isPercentage, currency, value } = this.props;
+    const { style, isSelectField, isPercentage, currency, value, isPassword } = this.props;
+    const { passwordToggle } = this.state;
 
     const hasSymbol = (this.state.isFocused || !!value) && (!!currency || !!isPercentage);
 
@@ -110,6 +113,25 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
         ) : (
             this.renderTextField(hasSymbol)
           )}
+        {
+          isPassword
+          && (
+            passwordToggle
+              ? (
+                <View style={styles.passwordToggle}>
+                  <TouchableOpacity onPress={this.onTogglePasswordVisibilityPressed}>
+                    <Image source={require('../../assets/eye.png')} />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <View style={styles.passwordToggle}>
+                  <TouchableOpacity onPress={this.onTogglePasswordVisibilityPressed}>
+                    <Image source={require('../../assets/eye-slash.png')} />
+                  </TouchableOpacity>
+                </View>
+              )
+          )
+        }
       </View>
     );
   }
@@ -123,11 +145,11 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       onFocusLabel,
       onBlurLabel,
       onEndEditing,
-      isPassword,
       inputStyle,
       value,
       ...rest
     } = this.props;
+    const { passwordToggle } = this.state;
 
     return (
       <View style={styles.inputContainer}>
@@ -167,7 +189,7 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
               paddingLeft: 0
             }
           ]}
-          secureTextEntry={isPassword}
+          secureTextEntry={passwordToggle}
           onContentSizeChange={event => {
             if (this.props.multiline) {
               const height = event.nativeEvent.contentSize.height;
@@ -204,6 +226,10 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
         {this.props.isMandatory && <Text style={{ color: Colors.RED }}>*</Text>}
       </Animated.Text>
     );
+  }
+
+  onTogglePasswordVisibilityPressed = () => {
+    this.setState(state => ({ passwordToggle: !state.passwordToggle }));
   }
 
   onChangeText = (text: string) => {
@@ -279,7 +305,8 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
 const styles = StyleSheet.create({
   element: {
     position: 'relative',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    backgroundColor: 'transparent'
   },
   input: {
     height: INPUT_HEIGHT + 5,
@@ -300,6 +327,14 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     paddingRight: 8,
     marginTop: Platform.select({ android: 29, ios: 30 })
+  },
+  passwordToggle: {
+    position: 'absolute',
+    right: 6,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
+    justifyContent: 'center'
   },
   label: {
     marginTop: 22,
