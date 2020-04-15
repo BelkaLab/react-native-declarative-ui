@@ -20,6 +20,7 @@ export type ComposableFormOptions = {
     errorFloatingLabelColor?: string;
     disabledFloatingLabelColor?: string;
     color?: string;
+    descriptionColor?: string;
     disabledColor?: string;
     borderColor?: string;
     focusedBorderColor?: string;
@@ -67,6 +68,7 @@ export type DefinedComposableFormOptions = {
     errorFloatingLabelColor?: string;
     disabledFloatingLabelColor?: string;
     color?: string;
+    descriptionColor?: string;
     disabledColor?: string;
     borderColor?: string;
     focusedBorderColor?: string;

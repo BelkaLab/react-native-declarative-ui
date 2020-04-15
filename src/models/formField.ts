@@ -20,6 +20,7 @@ export type FormField = {
   | 'separator'
   | 'segment';
   // text props
+  description?: string;
   nextField?: string;
   autoFocus?: boolean;
   disabled?: boolean;

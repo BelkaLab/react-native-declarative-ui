@@ -590,10 +590,12 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
+        description={field.description}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
         color={this.getComposableFormOptions().textFields.color}
+        descriptionColor={this.getComposableFormOptions().textFields.descriptionColor}
         disabledColor={this.getComposableFormOptions().textFields.disabledColor}
         backgroundColor={this.getComposableFormOptions().textFields.backgroundColor}
         disabledBackgroundColor={this.getComposableFormOptions().textFields.disabledBackgroundColor}
@@ -686,10 +688,12 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
+        description={field.description}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
         inputStyle={this.getComposableFormOptions().labels.inputStyle}
         color={this.getComposableFormOptions().textFields.color}
+        descriptionColor={this.getComposableFormOptions().textFields.descriptionColor}
         disabledColor={this.getComposableFormOptions().textFields.disabledColor}
         backgroundColor={this.getComposableFormOptions().textFields.backgroundColor}
         disabledBackgroundColor={this.getComposableFormOptions().textFields.disabledBackgroundColor}

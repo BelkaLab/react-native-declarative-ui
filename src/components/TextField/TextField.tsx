@@ -18,13 +18,14 @@ export interface ITextFieldProps extends TextInputProperties {
   editable?: boolean;
   isLoading?: boolean;
   error?: string;
-  editable?: boolean;
+  description?: string;
   disableErrorMessage?: boolean;
   isPassword?: boolean;
   isPercentage?: boolean;
   currency?: string;
   isMandatory?: boolean;
   color?: string;
+  descriptionColor?: string;
   disabledColor?: string;
   backgroundColor?: string;
   disabledBackgroundColor?: string;
@@ -63,6 +64,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
       onBlurLabel,
       onRef,
       error,
+      description,
       rightContent,
       rightContentVisibility,
       placeholderStyle,
@@ -149,6 +151,7 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
           {isLoading && <LoaderIcon />}
         </View>
         {!!error && this.renderError(error, !!this.props.disableErrorMessage)}
+        {!error && !!description && this.renderDescription(description)}
       </View>
     );
   }
@@ -162,7 +165,15 @@ export default class TextField extends React.Component<ITextFieldProps, State> {
       return null;
     }
 
-    return <Text style={[styles.errorMessage, { color: errorMessageColor }]}>{error}</Text>;
+    return <Text style={[styles.messageBelow, { color: errorMessageColor }]}>{error}</Text>;
+  };
+
+  private renderDescription = (description: string) => {
+    const {
+      descriptionColor = Colors.GRAY_600
+    } = this.props;
+
+    return <Text style={[styles.messageBelow, { color: descriptionColor }]}>{description}</Text>;
   };
 
   private retrieveFloatingLabelColor = () => {
@@ -245,8 +256,7 @@ const styles = StyleSheet.create({
     padding: 0,
     fontSize: 17
   },
-  errorMessage: {
-    color: Colors.RED,
+  messageBelow: {
     fontSize: 12,
     marginTop: 8,
     marginStart: 4
