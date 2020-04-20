@@ -11,7 +11,7 @@ import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle } from 'react-native';
+import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { NavigationRoute } from 'react-navigation';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
@@ -798,23 +798,9 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         isChecked={model[field.id] as boolean}
         rightTextView={
-          field.urlLink ? (
-            <View style={styles.checkboxUrlContainer}>
-              <Text>{field.label}</Text>
-              <TouchableHighlight onPress={() => Linking.openURL(field.urlLink!)}>
-                <Text
-                  style={{
-                    color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
-                    fontWeight: '600'
-                  }}
-                >
-                  {field.checkBoxLabelUrl}
-                </Text>
-              </TouchableHighlight>
-            </View>
-          ) : (
-              undefined
-            )
+          field.urlLink
+            ? this.renderCheckBoxLink(field)
+            : undefined
         }
         rightText={field.checkboxTextPosition === 'right' ? field.label : undefined}
         leftText={!field.checkboxTextPosition || field.checkboxTextPosition === 'left' ? field.label : undefined}
@@ -827,6 +813,42 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       />
     );
   };
+
+  private renderCheckBoxLink = (field: FormField) => {
+    if (Platform.OS === 'android') {
+      return (
+        <View style={styles.checkboxUrlContainer}>
+          <Text>{field.label}</Text>
+          <TouchableNativeFeedback onPress={() => Linking.openURL(field.urlLink!)}>
+            <Text
+              style={{
+                color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
+                fontWeight: '600'
+              }}
+            >
+              {field.checkBoxLabelUrl}
+            </Text>
+          </TouchableNativeFeedback>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.checkboxUrlContainer}>
+        <Text>{field.label}</Text>
+        <TouchableOpacity onPress={() => Linking.openURL(field.urlLink!)}>
+          <Text
+            style={{
+              color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
+              fontWeight: '600'
+            }}
+          >
+            {field.checkBoxLabelUrl}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   private renderToggleField = (
     field: FormField,
