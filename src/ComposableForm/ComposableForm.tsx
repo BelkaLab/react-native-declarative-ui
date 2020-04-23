@@ -11,9 +11,9 @@ import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
 import React, { Component } from 'react';
-import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableHighlight, View, ViewStyle, TouchableNativeFeedback, TouchableOpacity } from 'react-native';
+import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
-import { NavigationRoute } from 'react-navigation';
+import { NavigationEventSubscription, NavigationRoute } from 'react-navigation';
 import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { Schema, ValidationError } from 'yup';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
@@ -74,12 +74,14 @@ interface IState {
   isModalVisible: boolean;
   isAutoFocused: boolean;
   isFocusingMultiline?: boolean;
+  isScreenVisible: boolean;
 }
 
 export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
   private fieldRefs: Dictionary<TextInput> = {};
   private errors: Dictionary<string> = {};
   private subscriptions!: EmitterSubscription[];
+  private navigationSubs!: NavigationEventSubscription[];
 
   constructor(props: IComposableFormProps<T>) {
     super(props);
@@ -92,7 +94,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       isFormFilled: false,
       isKeyboardOpened: false,
       isModalVisible: false,
-      isAutoFocused: false
+      isAutoFocused: false,
+      isScreenVisible: false
     };
   }
 
@@ -115,8 +118,29 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     ];
   }
 
+  componentDidMount() {
+    this.navigationSubs = [
+      this.props.navigation.addListener('didFocus', () => {
+        this.setState({
+          isScreenVisible: true
+        })
+      }),
+      this.props.navigation.addListener('didBlur', () => {
+        this.setState({
+          isScreenVisible: false
+        })
+      })
+    ];
+  }
+
   componentWillUnmount() {
-    this.subscriptions.forEach(sub => sub.remove());
+    if (this.subscriptions) {
+      this.subscriptions.forEach(sub => sub.remove());
+    } 
+
+    if (this.navigationSubs) {
+      this.navigationSubs.forEach(sub => sub.remove());
+    }
   }
 
   keyboardDidShow = () => {
@@ -136,7 +160,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   };
 
   componentDidUpdate() {
-    if (!this.state.isAutoFocused) {
+    if (!this.state.isAutoFocused && this.state.isScreenVisible) {
       const focusField = find(this.state.structure.fields, f => f.autoFocus && this.fieldRefs[f.id]) as
         | FormField
         | undefined;
