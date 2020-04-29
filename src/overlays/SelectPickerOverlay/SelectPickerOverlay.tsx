@@ -32,6 +32,10 @@ export interface ISelectPickerOverlayProps {
   onListLayout?: (event: LayoutChangeEvent) => void;
   headerBackgroundColor?: string;
   renderCustomBackground?: () => React.ReactElement<{}>;
+  selectedItemTextColor?: string;
+  selectedItemIconColor?: string;
+  createNewItemTextColor?: string;
+  createNewItemIconColor?: string;
 }
 
 interface IState {
@@ -60,27 +64,27 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
         {isLoading ? (
           <View>Loader</View>
         ) : (
-          <FlatList<string | ComposableItem>
-            keyboardShouldPersistTaps="handled"
-            data={this.state.items}
-            scrollEnabled={true}
-            style={{ maxHeight: Dimensions.get('window').height * 0.94 - 40 }}
-            contentContainerStyle={isIphoneX() && { paddingBottom: 34 }}
-            renderItem={({ item }) => this.renderItem(item)}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  height: 1,
-                  width: '100%',
-                  backgroundColor: Colors.GRAY_200,
-                  marginLeft: 16
-                }}
-              />
-            )}
-            extraData={this.state}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        )}
+            <FlatList<string | ComposableItem>
+              keyboardShouldPersistTaps="handled"
+              data={this.state.items}
+              scrollEnabled={true}
+              style={{ maxHeight: Dimensions.get('window').height * 0.94 - 40 }}
+              contentContainerStyle={isIphoneX() && { paddingBottom: 34 }}
+              renderItem={({ item }) => this.renderItem(item)}
+              ItemSeparatorComponent={() => (
+                <View
+                  style={{
+                    height: 1,
+                    width: '100%',
+                    backgroundColor: Colors.GRAY_200,
+                    marginLeft: 16
+                  }}
+                />
+              )}
+              extraData={this.state}
+              keyExtractor={(item, index) => index.toString()}
+            />
+          )}
       </View>
     );
   }
@@ -102,17 +106,21 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
   };
 
   private renderDefaultItem = (item: ComposableItem | string, keyProperty?: string, displayProperty?: string) => {
-    const { pickedItem } = this.props;
+    const {
+      pickedItem,
+      selectedItemTextColor = Colors.PRIMARY_BLUE,
+      selectedItemIconColor = Colors.PRIMARY_BLUE
+    } = this.props;
     if (typeof item === 'object' && typeof pickedItem === 'object' && keyProperty && displayProperty) {
       const isSelected = item[keyProperty] === pickedItem[keyProperty];
 
       return (
         <View style={styles.createNewItemContainer}>
-          <Text style={{ color: isSelected ? Colors.PRIMARY_BLUE : Colors.BLACK }}>
+          <Text style={{ color: isSelected ? selectedItemTextColor : Colors.BLACK }}>
             {String(item[displayProperty])}
           </Text>
           {isSelected && (
-            <Image source={require('../../assets/ic_check.png')} style={{ tintColor: Colors.PRIMARY_BLUE }} />
+            <Image source={require('../../assets/ic_check.png')} style={{ tintColor: selectedItemIconColor }} />
           )}
         </View>
       );
@@ -123,13 +131,18 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
         {typeof item === 'object' && displayProperty ? (
           <Text>{String(item[displayProperty])}</Text>
         ) : (
-          <Text>{item}</Text>
-        )}
+            <Text>{item}</Text>
+          )}
       </View>
     );
   };
 
   private renderCreateNewItem = () => {
+    const {
+      createNewItemTextColor = Colors.PRIMARY_BLUE,
+      createNewItemIconColor = Colors.PRIMARY_BLUE
+    } = this.props;
+
     return (
       <TouchableWithoutFeedback
         onPress={() => {
@@ -139,9 +152,18 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
         <View style={styles.createNewItemButton}>
           <Image
             source={require('../../assets/ic_plus.png')}
-            style={{ tintColor: Colors.PRIMARY_BLUE, marginEnd: 8 }}
+            style={{ tintColor: createNewItemIconColor, marginEnd: 8 }}
           />
-          <Text style={styles.createNewItemText}>{this.props.createNewItemLabel}</Text>
+          <Text
+            style={[
+              styles.createNewItemText,
+              {
+                color: createNewItemTextColor
+              }
+            ]}
+          >
+            {this.props.createNewItemLabel}
+          </Text>
         </View>
       </TouchableWithoutFeedback>
     );
@@ -154,10 +176,10 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
       return renderTopLabelItem ? (
         renderTopLabelItem(topLabel)
       ) : (
-        <View style={styles.topLabelContainer}>
-          <Text style={{ fontSize: 15 }}>{topLabel}</Text>
-        </View>
-      );
+          <View style={styles.topLabelContainer}>
+            <Text style={{ fontSize: 15 }}>{topLabel}</Text>
+          </View>
+        );
     }
 
     return null;

@@ -59,7 +59,7 @@ declare module 'react-native-declarative-ui' {
       errorFloatingLabelColor?: string;
       disabledFloatingLabelColor?: string;
       color?: string;
-      descriptionColor?:string;
+      descriptionColor?: string;
       disabledColor?: string;
       borderColor?: string;
       focusedBorderColor?: string;
@@ -84,6 +84,12 @@ declare module 'react-native-declarative-ui' {
       headerBackgroundColor?: string;
       renderCustomBackground?: () => React.ReactElement<{}>;
       renderCustomCancelButton?: () => React.ReactElement<{}>;
+    };
+    selectPickers?: {
+      selectedItemTextColor?: string;
+      selectedItemIconColor?: string;
+      createNewItemTextColor?: string;
+      createNewItemIconColor?: string;
     };
     segments?: {
       activeItemColor?: string;
