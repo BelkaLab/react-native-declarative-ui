@@ -85,6 +85,12 @@ declare module 'react-native-declarative-ui' {
       renderCustomBackground?: () => React.ReactElement<{}>;
       renderCustomCancelButton?: () => React.ReactElement<{}>;
     };
+    selectPickers?: {
+      selectedItemTextColor?: string;
+      selectedItemIconColor?: string;
+      createNewItemTextColor?: string;
+      createNewItemIconColor?: string;
+    };
     segments?: {
       activeItemColor?: string;
       backgroundColor?: string;

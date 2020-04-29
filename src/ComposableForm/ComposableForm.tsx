@@ -989,7 +989,11 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       },
       renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
       renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem,
-      isBackDropMode: true
+      isBackDropMode: true,
+      selectedItemTextColor: this.getComposableFormOptions().selectPickers.selectedItemTextColor,
+      selectedItemIconColor: this.getComposableFormOptions().selectPickers.selectedItemIconColor,
+      createNewItemTextColor: this.getComposableFormOptions().selectPickers.createNewItemTextColor,
+      createNewItemIconColor: this.getComposableFormOptions().selectPickers.createNewItemIconColor
     });
   };
 
