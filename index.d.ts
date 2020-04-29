@@ -59,7 +59,7 @@ declare module 'react-native-declarative-ui' {
       errorFloatingLabelColor?: string;
       disabledFloatingLabelColor?: string;
       color?: string;
-      descriptionColor?:string;
+      descriptionColor?: string;
       disabledColor?: string;
       borderColor?: string;
       focusedBorderColor?: string;
@@ -93,6 +93,12 @@ declare module 'react-native-declarative-ui' {
       },
       segmentInactiveTextStyle?: {
         color: string;
+      }
+    };
+    toggles?: {
+      trackColor?: {
+        false: string;
+        true: string;
       }
     }
   };
