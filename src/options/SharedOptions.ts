@@ -52,6 +52,12 @@ export type ComposableFormOptions = {
     segmentInactiveTextStyle?: StyleProp<TextStyle>;
     backgroundColor?: string;
   };
+  toggles?: {
+    trackColor?: {
+      false: string;
+      true: string;
+    }
+  }
 };
 
 export type DefinedComposableFormOptions = {
