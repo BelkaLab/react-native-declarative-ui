@@ -136,7 +136,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   componentWillUnmount() {
     if (this.subscriptions) {
       this.subscriptions.forEach(sub => sub.remove());
-    } 
+    }
 
     if (this.navigationSubs) {
       this.navigationSubs.forEach(sub => sub.remove());
@@ -738,7 +738,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         keyboardType="decimal-pad"
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
-        selectionColor={Colors.PRIMARY_BLUE}
+        selectionColor={this.getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
         isLoading={this.props.loadingMapper && this.props.loadingMapper[field.id]}
         onSubmitEditing={() => {
           if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
