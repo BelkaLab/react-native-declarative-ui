@@ -886,7 +886,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         value={model[field.id] as boolean}
         disableSeparator={field.disableSeparator}
         renderCustomLabel={this.getComposableFormCustomComponents().renderToggleLabelItem}
-        // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
+        trackColor={this.getComposableFormOptions().toggles.trackColor}
         label={field.label}
         onValueChange={val => {
           this.setState({

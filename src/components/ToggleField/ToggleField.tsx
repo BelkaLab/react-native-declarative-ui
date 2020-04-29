@@ -8,11 +8,23 @@ export interface IToggleFieldProps extends SwitchProperties {
   containerStyle?: StyleProp<ViewStyle>;
   disableSeparator?: boolean;
   renderCustomLabel?: (label: string) => React.ReactElement<{}>;
+  trackColor?: {
+    false: string;
+    true: string;
+  }
 }
 
 export default class ToggleField extends Component<IToggleFieldProps, React.ComponentState> {
   render() {
-    const { disableSeparator, onRef, label, containerStyle, renderCustomLabel, ...rest } = this.props;
+    const {
+      disableSeparator,
+      onRef,
+      label,
+      containerStyle,
+      renderCustomLabel,
+      trackColor = { true: Colors.PRIMARY_BLUE, false: Colors.GRAY_100 },
+      ...rest
+    } = this.props;
 
     return (
       <View style={this.props.containerStyle ? this.props.containerStyle : styles.containerStyle}>
@@ -21,7 +33,7 @@ export default class ToggleField extends Component<IToggleFieldProps, React.Comp
           <Switch
             {...rest}
             ref={input => input && this.props.onRef && this.props.onRef(input)}
-            trackColor={{ true: Colors.PRIMARY_BLUE, false: '' }}
+            trackColor={trackColor}
           />
         </View>
         {!disableSeparator && <View style={styles.separator} />}

@@ -100,6 +100,12 @@ export type DefinedComposableFormOptions = {
     segmentInactiveTextStyle?: StyleProp<TextStyle>;
     backgroundColor?: string;
   };
+  toggles: {
+    trackColor?: {
+      false: string;
+      true: string;
+    }
+  }
 };
 
 export type ComposableFormCustomComponents = {
@@ -132,7 +138,8 @@ class SharedOptions {
       segmentInactiveTextStyle: {
         color: Colors.BLACK
       }
-    }
+    },
+    toggles: {}
   };
   private _customComponents: ComposableFormCustomComponents = {};
 
