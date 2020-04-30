@@ -1317,7 +1317,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     if (input) {
       input.setNativeProps({
         selection: { start: 0, end: 0 },
-        ellipsizeMod: "tail"
+        ellipsizeMode: "tail"
       });
     }
   }
