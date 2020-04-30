@@ -611,6 +611,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <TextField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          if (field.disabled) {
+            this.setSelectionAtStart(input);
+          }
         }}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
@@ -709,6 +713,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <TextField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          if (field.disabled) {
+            this.setSelectionAtStart(input);
+          }
         }}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
@@ -914,6 +922,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <SelectPickerField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          this.setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
@@ -1026,6 +1036,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <AutocompletePickerField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          this.setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
@@ -1111,6 +1123,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <DatePickerField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          this.setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
@@ -1164,6 +1178,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <MapPickerField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          this.setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
@@ -1245,6 +1261,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       <DurationPickerField
         onRef={input => {
           this.fieldRefs[field.id] = input;
+
+          this.setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
         placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
@@ -1294,6 +1312,15 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       disabledInteraction: Platform.OS === 'android'
     });
   };
+
+  private setSelectionAtStart = (input: TextInput) => {
+    if (input) {
+      input.setNativeProps({
+        selection: { start: 0, end: 0 },
+        ellipsizeMod: "tail"
+      });
+    }
+  }
 
   private getComposableFormOptions = (): DefinedComposableFormOptions => {
     const { customStyle } = this.props;
