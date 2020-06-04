@@ -1,13 +1,13 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { BackHandler, Keyboard, Platform, StyleProp, StyleSheet, TouchableWithoutFeedback, View, ViewStyle, Dimensions } from 'react-native';
+import { BackHandler, Dimensions, Keyboard, Platform, StyleProp, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import Animated from 'react-native-reanimated';
+import { StackActions } from 'react-navigation';
+import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { default as BottomSheet } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
-import { NavigationStackScreenProps } from 'react-navigation-stack';
-import { StackActions } from 'react-navigation';
 
 const HEADER_HEIGHT = 28;
 
@@ -27,13 +27,15 @@ export interface IRNBottomSheetProps extends NavigationStackScreenProps {
 }
 
 const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: FunctionComponent<P>) => {
-  const RNBottomSheet: FunctionComponent<IRNBottomSheetProps> = props => {
+  const RNBottomSheet: FunctionComponent<IRNBottomSheetProps> = () => {
     const navigation = useNavigation();
     const route = useRoute();
 
+    const props: P = (route.params || {}) as P;
+
     const screenHeight = Dimensions.get('window').height;
 
-    const calculateSnaps = (props: IRNBottomSheetProps, currentHeight: number) => {
+    const calculateSnaps = (currentHeight: number) => {
       if (props.hasTextInput) {
         // return this.props.isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
         return ['94%', 350, 0];
@@ -57,7 +59,7 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
     const { hasTextInput, containerStyle } = props;
 
     const [isHeightComputed, setHeightComputed] = useState(false);
-    const [snaps, setSnaps] = useState(calculateSnaps(props, 0));
+    const [snaps, setSnaps] = useState(calculateSnaps(0));
     const [shouldDismissQuickly, setShouldDismissQuickly] = useState(false);
     // const [isFirstOpening, setFirstOpening] = useState(true);
     const isFirstOpening = new Animated.Value(-1);
@@ -175,7 +177,7 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
         <View
           onLayout={({ nativeEvent }) => {
             if (!isHeightComputed) {
-              setSnaps(calculateSnaps(props, nativeEvent.layout.height));
+              setSnaps(calculateSnaps(nativeEvent.layout.height));
               setHeightComputed(true);
             }
           }}
@@ -212,7 +214,7 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
             ref={bottomSheet}
             callbackNode={drawerCallbackNode}
             snapPoints={snaps}
-            enabledGestureInteraction={route.params?.isScrollable}
+            enabledGestureInteraction={props?.isScrollable}
             enabledInnerScrolling={Platform.OS === 'android'}
             renderContent={() => renderContent()}
             initialSnap={hasTextInput ? 2 : 1}
