@@ -7,7 +7,7 @@ import { SearchBar } from '../../base/autocomplete/SearchBar';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
+import { withBottomOverlay, IBottomOverlayProps } from '../../hoc/BottomOverlay';
 
 const TouchableOpacity = Platform.select({
   ios: IosTouchableOpacity,
@@ -29,7 +29,7 @@ export interface IAutocompletePickerOverlayProps {
   isMandatory?: boolean;
 }
 
-const AutocompletePickerOverlay: FunctionComponent<IAutocompletePickerOverlayProps & IRNBottomSheetProps> = (props) => {
+const AutocompletePickerOverlay: FunctionComponent<IAutocompletePickerOverlayProps & IBottomOverlayProps> = (props) => {
   const {
     renderOverlayItem: renderSelectPickerItem,
     onPick,
@@ -212,4 +212,4 @@ const styles = StyleSheet.create({
   helperPickerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
 });
 
-export default withMappedNavigationParams()(withRNBottomSheet(AutocompletePickerOverlay));
+export default withMappedNavigationParams()(withBottomOverlay(AutocompletePickerOverlay));

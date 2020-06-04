@@ -1,13 +1,12 @@
 import delay from 'lodash.delay';
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { StackActions } from 'react-navigation';
 import { NavigationStackScreenProps } from 'react-navigation-stack';
-import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimated-bottom-sheet';
+import { default as BottomSheet } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 export interface IBottomOverlayProps extends NavigationStackScreenProps {
   dismissOverlay: (onDismissedCallback?: () => void) => void;
@@ -27,9 +26,12 @@ type OverlayContent = {
 };
 
 export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps>(ChildComponent: FunctionComponent<P>) => {
-  const BottomOverlay: FunctionComponent<IBottomOverlayProps> = (props) => {
+  const BottomOverlay: FunctionComponent<IBottomOverlayProps> = () => {
+    const navigation = useNavigation();
+    const route = useRoute();
+
+    const props: P = (route.params || {}) as P;
     const {
-      canExtendFullScreen,
       hasTextInput,
       isBackDropMode,
       disabledInteraction,
@@ -38,10 +40,6 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
     const calculateSnaps = (currentHeight: number) => {
       if (hasTextInput) {
         return isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
-      }
-
-      if (canExtendFullScreen) {
-        return ['94%', 350, 0];
       }
 
       // turn to backdrop mode
@@ -54,8 +52,6 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
       }
     };
 
-    const navigation = useNavigation();
-
     const [height, setHeight] = useState<number>(0);
     const [snaps, setSnaps] = useState<Array<string | number>>(calculateSnaps(0));
     const [isHeightComputed, setIsHeightComputed] = useState<boolean>(!isBackDropMode);
@@ -66,8 +62,8 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
     const [subscriptions, setSubscriptions] = useState<EmitterSubscription[]>([]);
     const [timerId, setTimerId] = useState<number | undefined>();
 
-    const bottomSheet = React.createRef<BottomSheetBehavior>();
     const { useCode, set, block, cond, debug, greaterOrEq, lessOrEq, call } = Animated;
+    const bottomSheet = useRef<BottomSheet>();
     const isFirstOpening = new Animated.Value(-1);
     const drawerCallbackNode = React.useRef<any>(new Animated.Value(1)).current;
     const clampedDrawerCallbackNode = React.useRef<Animated.Adaptable<any>>(
@@ -99,19 +95,6 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
         )
       ]);
     }, []);
-
-    const completeTransition = () => {
-      const parent = navigation.dangerouslyGetParent();
-
-      if (parent) {
-        navigation.dispatch(
-          StackActions.completeTransition({
-            key: parent.state.key,
-            toChildKey: parent.state.routes[parent.state.index].key
-          })
-        );
-      }
-    }
 
     useEffect(() => {
       setSubscriptions([
@@ -226,13 +209,13 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
                     setHeight(nativeEvent.layout.height);
                     setSnaps(calculateSnaps(nativeEvent.layout.height));
 
-                    setTimerId(setTimeout(() => {
+                    delay(() => {
                       setIsHeightComputed(true);
 
                       if (bottomSheet.current) {
                         bottomSheet.current.snapTo(1);
                       }
-                    }, 200));
+                    }, 200);
                   }
                 }
               } else {

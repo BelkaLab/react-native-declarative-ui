@@ -4,10 +4,10 @@ import { Dimensions, Platform, View } from 'react-native';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
-import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 export interface IMapPickerOverlayProps {
   apiKey: string;
@@ -19,7 +19,7 @@ export interface IMapPickerOverlayProps {
   renderCustomCancelButton?: () => React.ReactElement<{}>;
 }
 
-const MapPickerOverlay: FunctionComponent<IMapPickerOverlayProps & IRNBottomSheetProps> = props => {
+const MapPickerOverlay: FunctionComponent<IMapPickerOverlayProps & IBottomOverlayProps> = props => {
   const {
     apiKey,
     pickedPosition: initialPosition,
@@ -107,4 +107,4 @@ const MapPickerOverlay: FunctionComponent<IMapPickerOverlayProps & IRNBottomShee
   );
 }
 
-export default withMappedNavigationParams()(withRNBottomSheet(MapPickerOverlay));
+export default withMappedNavigationParams()(withBottomOverlay(MapPickerOverlay));

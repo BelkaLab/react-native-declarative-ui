@@ -5,7 +5,7 @@ import { CalendarPickerOverlay } from '../overlays/CalendarPickerOverlay';
 import { DurationPickerOverlay } from '../overlays/DurationPickerOverlay';
 import { MapPickerOverlay } from '../overlays/MapPickerOverlay';
 import { createStackNavigator } from '@react-navigation/stack';
-import { bottomSheetOptions } from '../hoc/withRNBottomSheet';
+import { bottomSheetOptions } from '../hoc/BottomOverlay';
 
 export const SELECT_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-select-picker-overlay';
 export const AUTOCOMPLETE_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-autocomplete-picker-overlay';

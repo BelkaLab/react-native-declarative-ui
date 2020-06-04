@@ -3,10 +3,10 @@ import { Dimensions, Image, LayoutChangeEvent, Platform, StyleSheet, Text, Touch
 import { FlatList, TouchableOpacity as AndroidTouchableOpacity, TouchableWithoutFeedback as AndroidTouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
-import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 const TouchableOpacity = Platform.select({
   ios: IosTouchableOpacity,
@@ -38,7 +38,7 @@ export interface ISelectPickerOverlayProps {
   createNewItemIconColor?: string;
 }
 
-const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IRNBottomSheetProps> = (props) => {
+const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IBottomOverlayProps> = (props) => {
   const {
     items,
     renderOverlayItem,
@@ -213,4 +213,4 @@ const styles = StyleSheet.create({
   createNewItemText: { fontSize: 17, color: Colors.PRIMARY_BLUE }
 });
 
-export default withMappedNavigationParams()(withRNBottomSheet(SelectPickerOverlay));
+export default withMappedNavigationParams()(withBottomOverlay(SelectPickerOverlay));

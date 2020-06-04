@@ -4,7 +4,7 @@ import { SingleDayCalendar } from '../../base/calendar/SingleDayCalendar';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { globalStyles } from '../../styles/globalStyles';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
-import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 export interface ICalendarPickerOverlayProps {
   mode: 'single-day';
@@ -16,7 +16,7 @@ export interface ICalendarPickerOverlayProps {
   renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
-const CalendarPickerOverlay: FunctionComponent<ICalendarPickerOverlayProps & IRNBottomSheetProps> = (props) => {
+const CalendarPickerOverlay: FunctionComponent<ICalendarPickerOverlayProps & IBottomOverlayProps> = (props) => {
   const {
     onConfirm,
     pickedDate,
@@ -42,4 +42,4 @@ const CalendarPickerOverlay: FunctionComponent<ICalendarPickerOverlayProps & IRN
   );
 }
 
-export default withMappedNavigationParams()(withRNBottomSheet(CalendarPickerOverlay));
+export default withMappedNavigationParams()(withBottomOverlay(CalendarPickerOverlay));

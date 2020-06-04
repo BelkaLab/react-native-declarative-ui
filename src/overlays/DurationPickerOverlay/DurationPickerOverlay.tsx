@@ -7,7 +7,7 @@ import { TextButton } from '../../components/TextButton';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 export interface IDurationPickerOverlayProps {
   pickedAmount: number;
@@ -18,7 +18,7 @@ export interface IDurationPickerOverlayProps {
   headerButtonColor?: string;
 }
 
-const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IRNBottomSheetProps> = props => {
+const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBottomOverlayProps> = props => {
   const {
     onConfirm,
     dismissOverlay,
@@ -169,4 +169,4 @@ const styles = StyleSheet.create({
   spaceBetweenPickers: { width: 20 }
 });
 
-export default withMappedNavigationParams()(withRNBottomSheet(DurationPickerOverlay));
+export default withMappedNavigationParams()(withBottomOverlay(DurationPickerOverlay));
