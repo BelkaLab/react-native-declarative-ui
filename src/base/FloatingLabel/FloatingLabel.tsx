@@ -30,6 +30,7 @@ interface IFloatingLabelProps extends TextInputProperties {
 
 const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
   const {
+    onChangeText,
     value,
     placeholder,
     autoFocus,
@@ -59,8 +60,8 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
   const [passwordToggle, setPasswordToggle] = useState<boolean>(!!isPassword);
   const [input, setInput] = useState<TextInput | null>(null);
 
-  const fontSize = new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize);
-  const top = new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top);
+  const [fontSize] = useState(new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize));
+  const [top] = useState(new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top));
   const hasSymbol = (isFocused || !!value) && (!!currency || !!isPercentage);
 
   useEffect(() => {
@@ -156,7 +157,7 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
           }}
           onBlur={_onBlur}
           onFocus={_onFocus}
-          onChangeText={onChangeText}
+          onChangeText={onChange}
           onEndEditing={onEndEditing}
         />
       </View>
@@ -183,7 +184,7 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
     setPasswordToggle(previous => !previous);
   }
 
-  const onChangeText = (text: string) => {
+  const onChange = (text: string) => {
     setText(text);
 
     if (onChangeText) {

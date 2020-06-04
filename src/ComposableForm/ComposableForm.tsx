@@ -1033,7 +1033,6 @@ const ComposableForm = <T extends ComposableItem>(props: IComposableFormProps<T>
           });
         }
       },
-      canExtendFullScreen: true,
       hasTextInput: true,
       minHeight: 350
     });
@@ -1147,7 +1146,6 @@ const ComposableForm = <T extends ComposableItem>(props: IComposableFormProps<T>
         onChange(field.id, pickedPosition);
       },
       customFormOptions: getComposableFormOptions(),
-      canExtendFullScreen: true,
       hasTextInput: true,
       minHeight: 350
     });

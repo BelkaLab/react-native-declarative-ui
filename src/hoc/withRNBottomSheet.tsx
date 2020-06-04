@@ -15,7 +15,6 @@ const HEADER_HEIGHT = 28;
 export interface IRNBottomSheetProps extends NavigationStackScreenProps {
   dismissOverlay: (onDismissedCallback?: () => void) => void;
   hasTextInput?: boolean;
-  canExtendFullScreen?: boolean;
   isBackDropMode?: boolean;
   disabledInteraction?: boolean;
   minHeight?: number;
@@ -33,16 +32,20 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
     const route = useRoute();
 
     const props: P = (route.params || {}) as P;
+    const {
+      hasTextInput,
+      containerStyle,
+    } = props;
 
     const screenHeight = Dimensions.get('window').height;
 
     const calculateSnaps = (currentHeight: number) => {
-      if (props.hasTextInput) {
-        // return this.props.isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
-        return ['94%', 350, 0];
+      if (hasTextInput) {
+        // return isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
+        return ['94%', 0];
       }
 
-      // if (props.canExtendFullScreen) {
+      // if (canExtendFullScreen) {
       //   return ['94%', 350, 0];
       // }
 
@@ -50,20 +53,18 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
       if (currentHeight >= screenHeight * 0.94 - HEADER_HEIGHT) {
         return [screenHeight * 0.94, 350, 0];
       } else {
-        // return this.props.isBackDropMode
-        // ? [currentHeight + HEADER_HEIGHT || 350, currentHeight + HEADER_HEIGHT || 350, 0]
-        // : [currentHeight || 350, 0];
+        // return isBackDropMode
+        //   ? [currentHeight + HEADER_HEIGHT || 350, currentHeight + HEADER_HEIGHT || 350, 0]
+        //   : [currentHeight || 350, 0];
         return [currentHeight || 350, 0];
       }
     };
-
-    const { hasTextInput, containerStyle } = props;
 
     const [isHeightComputed, setHeightComputed] = useState(false);
     const [snaps, setSnaps] = useState(calculateSnaps(0));
     const [shouldDismissQuickly, setShouldDismissQuickly] = useState(false);
     // const [isFirstOpening, setFirstOpening] = useState(true);
-    const isFirstOpening = new Animated.Value(-1);
+    const [isFirstOpening] = useState(new Animated.Value(-1));
     const [isScrollEnabled, setScrollEnabled] = useState(true);
     const [onDismissedCallback, setOnDismissedCallback] = useState<() => void | undefined>();
 
@@ -133,13 +134,13 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
 
     useEffect(() => {
       if (isHeightComputed) {
-        bottomSheet.current?.snapTo(hasTextInput ? 1 : 0);
+        bottomSheet.current?.snapTo(0);
       }
     }, [isHeightComputed]);
 
     useEffect(() => {
       if (shouldDismissQuickly) {
-        bottomSheet.current?.snapTo(hasTextInput ? 2 : 1);
+        bottomSheet.current?.snapTo(1);
       }
     }, [shouldDismissQuickly]);
 
@@ -258,7 +259,7 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
             enabledInnerScrolling={Platform.OS === 'android'}
             renderHeader={() => renderHeader()}
             renderContent={() => renderContent()}
-            initialSnap={hasTextInput ? 2 : 1}
+            initialSnap={1}
           />
         )}
       </View>

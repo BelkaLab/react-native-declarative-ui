@@ -1,13 +1,13 @@
 import Geolocation from '@react-native-community/geolocation';
 import React, { FunctionComponent, useEffect } from 'react';
-import { Platform, View } from 'react-native';
+import { Dimensions, Platform, View } from 'react-native';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import { GooglePlaceDetail, GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
+import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
 
 export interface IMapPickerOverlayProps {
   apiKey: string;
@@ -51,7 +51,7 @@ const MapPickerOverlay: FunctionComponent<IMapPickerOverlayProps & IRNBottomShee
   }, []);
 
   return (
-    <View style={[globalStyles.pickerContainer, { height: '100%' }]}>
+    <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
       <GooglePlacesAutocomplete
         placeholder="Cerca"
         minLength={3}
