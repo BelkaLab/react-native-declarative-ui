@@ -1,13 +1,13 @@
-import React, { Component } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { Dimensions, Image, Platform, StyleSheet, Text, TouchableOpacity as IosTouchableOpacity, View } from 'react-native';
 import AndroidKeyboardAdjust from 'react-native-android-keyboard-adjust';
 import { FlatList, TouchableOpacity as AndroidTouchableOpacity } from 'react-native-gesture-handler';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { SearchBar } from '../../base/autocomplete/SearchBar';
-import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import withRNBottomSheet, { IRNBottomSheetProps } from '../../hoc/withRNBottomSheet';
 
 const TouchableOpacity = Platform.select({
   ios: IosTouchableOpacity,
@@ -29,118 +29,71 @@ export interface IAutocompletePickerOverlayProps {
   isMandatory?: boolean;
 }
 
-interface IState {
-  items: ComposableItem[] | string[];
-  currentText: string;
-  isLoading: boolean;
-  isFirstLoad: boolean;
-}
+const AutocompletePickerOverlay: FunctionComponent<IAutocompletePickerOverlayProps & IRNBottomSheetProps> = (props) => {
+  const {
+    renderOverlayItem: renderSelectPickerItem,
+    onPick,
+    dismissOverlay,
+    displayProperty,
+    pickedItem,
+    onFilterItems,
+  } = props;
 
-class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProps & IBottomOverlayProps, IState> {
-  constructor(props: IAutocompletePickerOverlayProps & IBottomOverlayProps) {
-    super(props);
-    this.state = {
-      items: props.items,
-      currentText:
-        props.pickedItem && typeof props.pickedItem === 'object'
-          ? (props.pickedItem[props.displayProperty!] as string) || ''
-          : props.pickedItem || '',
-      isLoading: false,
-      isFirstLoad: true
-    };
+  const [items, setItems] = useState<ComposableItem[] | string[]>(props.items);
+  const [currentText, setCurrentText] = useState<string>(
+    props.pickedItem && typeof props.pickedItem === 'object'
+      ? (props.pickedItem[props.displayProperty!] as string) || ''
+      : props.pickedItem || ''
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  useEffect(() => {
     if (Platform.OS === 'android') {
       AndroidKeyboardAdjust.setAdjustPan();
     }
-  }
 
-  componentWillUnmount() {
-    if (Platform.OS === 'android') {
-      AndroidKeyboardAdjust.setAdjustResize();
+    return () => {
+      if (Platform.OS === 'android') {
+        AndroidKeyboardAdjust.setAdjustResize();
+      }
     }
-  }
+  }, []);
 
-  render() {
-    const { currentText, isLoading } = this.state;
-
-    return (
-      <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
-        <SearchBar
-          // placeholder={'Cerca'}
-          value={currentText}
-          onSearch={this.onSearch}
-          onChangeText={this.onChangeText}
-          onDelete={this.onDelete}
-        />
-        {this.renderHelperPicker()}
-        {isLoading ? (
-          <View>
-            <Text>Loader</Text>
-          </View>
-        ) : (
-          <FlatList<string | ComposableItem>
-            keyboardShouldPersistTaps="handled"
-            data={this.state.items}
-            //   contentContainerStyle={styles.listContainer}
-            renderItem={({ item }) => this.renderItem(item)}
-            //   ListEmptyComponent={this.props.emptySetPlaceholder}
-            ItemSeparatorComponent={() => (
-              <View
-                style={{
-                  height: 1,
-                  width: '100%',
-                  backgroundColor: Colors.GRAY_200,
-                  marginLeft: 16
-                }}
-              />
-            )}
-            extraData={this.state}
-            keyExtractor={(item, index) => index.toString()}
-          />
-        )}
-      </View>
-    );
-  }
-
-  private renderItem = (item: ComposableItem | string) => {
-    const { renderOverlayItem: renderSelectPickerItem } = this.props;
-
+  const renderItem = (item: ComposableItem | string) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          this.props.onPick(item);
-          this.props.dismissOverlay();
+          onPick(item);
+          dismissOverlay();
         }}
       >
         {renderSelectPickerItem
-          ? renderSelectPickerItem(item, this.props.displayProperty)
-          : this.renderDefaultItem(item)}
+          ? renderSelectPickerItem(item, displayProperty)
+          : renderDefaultItem(item)}
       </TouchableOpacity>
     );
   };
 
-  private renderDefaultItem = (item: ComposableItem | string) => {
+  const renderDefaultItem = (item: ComposableItem | string) => {
     return (
       <View style={{ padding: 16 }}>
-        {typeof item === 'object' && this.props.displayProperty ? (
-          <Text>{String(item[this.props.displayProperty])}</Text>
+        {typeof item === 'object' && displayProperty ? (
+          <Text>{String(item[displayProperty])}</Text>
         ) : (
-          <Text>{item}</Text>
-        )}
+            <Text>{item}</Text>
+          )}
       </View>
     );
   };
 
-  private renderHelperPicker = () => {
-    const { currentText } = this.state;
-
-    if (this.props.pickedItem && currentText) {
+  const renderHelperPicker = () => {
+    if (pickedItem && currentText) {
       return (
         <View style={styles.helperPickerContainer}>
-          {this.renderUseThisField()}
+          {renderUseThisField()}
           <TouchableOpacity
             onPress={() => {
-              this.props.onPick('');
+              onPick('');
             }}
             style={{ padding: 8, marginHorizontal: 16 }}
           >
@@ -152,17 +105,15 @@ class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProp
         </View>
       );
     } else {
-      return this.renderUseThisField();
+      return renderUseThisField();
     }
   };
 
-  private renderUseThisField = () => {
-    const { currentText } = this.state;
-
+  const renderUseThisField = () => {
     return Boolean(currentText) ? (
       <TouchableOpacity
         onPress={() => {
-          this.props.onPick(currentText);
+          onPick(currentText);
         }}
       >
         <View style={styles.pickedTextContainer}>
@@ -171,46 +122,71 @@ class AutocompletePickerOverlay extends Component<IAutocompletePickerOverlayProp
         </View>
       </TouchableOpacity>
     ) : (
-      <View />
-    );
+        <View />
+      );
   };
 
-  private toggleLoadingIndicator = (show: boolean) => {
-    this.setState({
-      isLoading: show
-    });
+  const toggleLoadingIndicator = (show: boolean) => {
+    setIsLoading(show);
   };
 
-  private onSearch = async (queryText: string) => {
-    const { onFilterItems } = this.props;
-
-    this.toggleLoadingIndicator(true);
+  const onSearch = async (queryText: string) => {
+    toggleLoadingIndicator(true);
     const items = await onFilterItems(queryText);
-    this.toggleLoadingIndicator(false);
+    toggleLoadingIndicator(false);
 
-    this.setState({
-      currentText: queryText,
-      items
-    });
+    setCurrentText(queryText);
+    setItems(items);
   };
 
-  private onChangeText = (filterText: string) => {
-    this.setState({
-      currentText: filterText
-    });
+  const onChangeText = (filterText: string) => {
+    setCurrentText(filterText);
 
-    this.onSearch(filterText);
+    onSearch(filterText);
   };
 
-  private onDelete = () => {
-    const { onFilterItems } = this.props;
-
-    this.setState({
-      currentText: ''
-    });
+  const onDelete = () => {
+    setCurrentText('');
 
     onFilterItems();
   };
+
+  return (
+    <View style={[globalStyles.pickerContainer, { height: Dimensions.get('window').height }]}>
+      <SearchBar
+        // placeholder={'Cerca'}
+        value={currentText}
+        onSearch={onSearch}
+        onChangeText={onChangeText}
+        onDelete={onDelete}
+      />
+      {renderHelperPicker()}
+      {isLoading ? (
+        <View>
+          <Text>Loader</Text>
+        </View>
+      ) : (
+          <FlatList<string | ComposableItem>
+            keyboardShouldPersistTaps="handled"
+            data={items}
+            //   contentContainerStyle={styles.listContainer}
+            renderItem={({ item }) => renderItem(item)}
+            //   ListEmptyComponent={this.props.emptySetPlaceholder}
+            ItemSeparatorComponent={() => (
+              <View
+                style={{
+                  height: 1,
+                  width: '100%',
+                  backgroundColor: Colors.GRAY_200,
+                  marginLeft: 16
+                }}
+              />
+            )}
+            keyExtractor={(item, index) => index.toString()}
+          />
+        )}
+    </View>
+  );
 }
 
 const HEADER_HEIGHT = 48;
@@ -236,4 +212,4 @@ const styles = StyleSheet.create({
   helperPickerContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }
 });
 
-export default withMappedNavigationParams()(withBottomOverlay(AutocompletePickerOverlay));
+export default withMappedNavigationParams()(withRNBottomSheet(AutocompletePickerOverlay));

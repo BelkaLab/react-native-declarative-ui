@@ -1,6 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { BackHandler, Dimensions, Keyboard, Platform, StyleProp, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { BackHandler, Dimensions, Image, Keyboard, Platform, StyleProp, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import Animated from 'react-native-reanimated';
 import { StackActions } from 'react-navigation';
@@ -172,6 +173,45 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
       setScrollEnabled(false);
     };
 
+    const renderHeader = () => {
+      const {
+        headerBackgroundColor = Colors.WHITE,
+        headerHeight = HEADER_HEIGHT,
+        knobColor = Colors.GRAY_400,
+        renderCustomBackground
+      } = props;
+
+      if (renderCustomBackground) {
+        return (
+          <View style={styles.listHeaderCustomContainer}>
+            <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
+            <View style={{ width: 24, height: 24 }} />
+            <View style={[styles.knob, { backgroundColor: knobColor }]} />
+            <TouchableOpacity onPress={() => dismissOverlay()} style={styles.knobContainer}>
+              <Image
+                source={require('../assets/android_clear_input.png')}
+                style={{ tintColor: Colors.PRIMARY_BLUE, width: 16, height: 16 }}
+              />
+            </TouchableOpacity>
+          </View>
+        );
+      }
+
+      return (
+        <View
+          style={[
+            styles.listHeaderContainer,
+            {
+              height: headerHeight,
+              backgroundColor: headerBackgroundColor
+            }
+          ]}
+        >
+          <View style={[styles.knob, { backgroundColor: knobColor }]} />
+        </View>
+      );
+    };
+
     const renderContent = () => {
       return (
         <View
@@ -216,6 +256,7 @@ const withRNBottomSheet = <P extends IRNBottomSheetProps>(ChildComponent: Functi
             snapPoints={snaps}
             enabledGestureInteraction={props?.isScrollable}
             enabledInnerScrolling={Platform.OS === 'android'}
+            renderHeader={() => renderHeader()}
             renderContent={() => renderContent()}
             initialSnap={hasTextInput ? 2 : 1}
           />
@@ -237,7 +278,41 @@ export const bottomSheetOptions = () => {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: 'transparent' },
-  backgroundContainer: { width: '100%', height: '100%', backgroundColor: 'transparent' }
+  backgroundContainer: { width: '100%', height: '100%', backgroundColor: 'transparent' },
+  listHeaderContainer: {
+    height: HEADER_HEIGHT,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12,
+    backgroundColor: Colors.WHITE,
+    paddingHorizontal: 16
+  },
+  listHeaderCustomContainer: {
+    height: HEADER_HEIGHT,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12
+  },
+  customBackgroundContainer: {
+    position: 'absolute',
+    height: HEADER_HEIGHT,
+    width: '100%',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12
+  },
+  knobContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 50,
+    backgroundColor: Colors.WHITE,
+    marginRight: 8,
+    marginTop: 8
+  },
+  knob: { width: 32, height: 4, borderRadius: 4, backgroundColor: Colors.GRAY_400, marginTop: 8 }
 });
 
 export default withRNBottomSheet;
