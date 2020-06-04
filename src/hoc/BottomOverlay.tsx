@@ -1,12 +1,13 @@
 import delay from 'lodash.delay';
-import React, { Component, ComponentType } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { StackActions } from 'react-navigation';
-import { NavigationStackOptions, NavigationStackScreenProps } from 'react-navigation-stack';
+import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { default as BottomSheet, default as BottomSheetBehavior } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
+import { useNavigation } from '@react-navigation/native';
 
 export interface IBottomOverlayProps extends NavigationStackScreenProps {
   dismissOverlay: (onDismissedCallback?: () => void) => void;
@@ -21,49 +22,85 @@ export interface IBottomOverlayProps extends NavigationStackScreenProps {
   renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
-interface IState {
-  height: number;
-  isFirstOpening: boolean;
-  snaps: Array<string | number>;
-  isHeightComputed: boolean;
-  isContentEnoughBig: boolean;
-  onDismissedCallback?: () => void;
-}
-
 type OverlayContent = {
   onListLayout?: (event: LayoutChangeEvent) => void;
 };
 
-export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps>(ChildComponent: ComponentType<P>) =>
-  class WithBottomOverlay extends Component<P & IBottomOverlayProps, IState> {
-    private backButtonSubscription?: NativeEventSubscription;
-    private subscriptions!: EmitterSubscription[];
-    private bottomSheet = React.createRef<BottomSheetBehavior>();
-    private animationState: Animated.Value<number> = new Animated.Value(1);
-    private timerId?: number;
+export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps>(ChildComponent: FunctionComponent<P>) => {
+  const BottomOverlay: FunctionComponent<IBottomOverlayProps> = (props) => {
+    const {
+      canExtendFullScreen,
+      hasTextInput,
+      isBackDropMode,
+      disabledInteraction,
+    } = props;
 
-    constructor(props: P & IBottomOverlayProps) {
-      super(props);
+    const calculateSnaps = (currentHeight: number) => {
+      if (hasTextInput) {
+        return isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
+      }
 
-      this.state = {
-        height: 0,
-        isFirstOpening: true,
-        snaps: this.calcuateSnaps(props, 0),
-        isContentEnoughBig: false,
-        isHeightComputed: !props.isBackDropMode
-      };
-    }
+      if (canExtendFullScreen) {
+        return ['94%', 350, 0];
+      }
 
-    static navigationOptions = (): NavigationStackOptions => {
-      return {
-        gestureEnabled: false,
-        animationEnabled: false,
-        cardStyle: { backgroundColor: 'transparent' }
-      };
+      // turn to backdrop mode
+      if (currentHeight >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT) {
+        return [Dimensions.get('window').height * 0.94, 350, 0];
+      } else {
+        return isBackDropMode
+          ? [currentHeight + HEADER_HEIGHT || 350, currentHeight + HEADER_HEIGHT || 350, 0]
+          : [currentHeight || 350, 0];
+      }
     };
 
-    completeTransition() {
-      const { navigation } = this.props;
+    const navigation = useNavigation();
+
+    const [height, setHeight] = useState<number>(0);
+    const [snaps, setSnaps] = useState<Array<string | number>>(calculateSnaps(0));
+    const [isHeightComputed, setIsHeightComputed] = useState<boolean>(!isBackDropMode);
+    const [isContentEnoughBig, setIsContentEnoughBig] = useState<boolean>(false);
+    const [onDismissedCallback, setOnDismissedCallback] = useState<() => void | undefined>();
+
+    const [backButtonSubscription, setBackButtonSubscription] = useState<NativeEventSubscription | undefined>();
+    const [subscriptions, setSubscriptions] = useState<EmitterSubscription[]>([]);
+    const [timerId, setTimerId] = useState<number | undefined>();
+
+    const bottomSheet = React.createRef<BottomSheetBehavior>();
+    const { useCode, set, block, cond, debug, greaterOrEq, lessOrEq, call } = Animated;
+    const isFirstOpening = new Animated.Value(-1);
+    const drawerCallbackNode = React.useRef<any>(new Animated.Value(1)).current;
+    const clampedDrawerCallbackNode = React.useRef<Animated.Adaptable<any>>(
+      Animated.interpolate(drawerCallbackNode, {
+        extrapolate: Animated.Extrapolate.CLAMP,
+        inputRange: [0, 1],
+        outputRange: [0, 1]
+      })
+    ).current;
+
+    useCode(() => {
+      return block([
+        cond(lessOrEq(clampedDrawerCallbackNode, 0.99), set(isFirstOpening, 1)),
+        cond(
+          greaterOrEq(clampedDrawerCallbackNode, 1),
+          cond(
+            greaterOrEq(isFirstOpening, 1),
+            call([], () => {
+              navigation.goBack();
+              // This is due to a bug in react-navigation https://github.com/react-navigation/react-navigation/issues/4867
+              // completeTransition();
+
+              if (onDismissedCallback) {
+                onDismissedCallback();
+              }
+            })
+          ),
+          set(isFirstOpening, 1)
+        )
+      ]);
+    }, []);
+
+    const completeTransition = () => {
       const parent = navigation.dangerouslyGetParent();
 
       if (parent) {
@@ -76,145 +113,57 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
       }
     }
 
-    private calcuateSnaps = (props: P & IBottomOverlayProps, currentHeight: number) => {
-      if (props.hasTextInput) {
-        return this.props.isBackDropMode ? ['94%', 0, 0] : ['94%', 0];
+    useEffect(() => {
+      setSubscriptions([
+        Keyboard.addListener('keyboardDidShow', keyboardDidShow),
+        Keyboard.addListener('keyboardDidHide', keyboardDidHide)
+      ]);
+
+      setBackButtonSubscription(BackHandler.addEventListener('hardwareBackPress', handleBackButton));
+
+      return () => {
+        subscriptions.forEach(sub => !!sub && sub.remove());
+
+        if (backButtonSubscription) {
+          backButtonSubscription.remove();
+        }
       }
+    }, []);
 
-      if (props.canExtendFullScreen) {
-        return ['94%', 350, 0];
-      }
-
-      // turn to backdrop mode
-      if (currentHeight >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT) {
-        return [Dimensions.get('window').height * 0.94, 350, 0];
-      } else {
-        return this.props.isBackDropMode
-          ? [currentHeight + HEADER_HEIGHT || 350, currentHeight + HEADER_HEIGHT || 350, 0]
-          : [currentHeight || 350, 0];
-      }
-    };
-
-    componentWillMount() {
-      this.subscriptions = [
-        Keyboard.addListener('keyboardDidShow', this.keyboardDidShow),
-        Keyboard.addListener('keyboardDidHide', this.keyboardDidHide)
-      ];
-
-      this.backButtonSubscription = BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
-    }
-
-    componentWillUnmount() {
-      this.subscriptions.forEach(sub => sub.remove());
-
-      if (this.backButtonSubscription) {
-        this.backButtonSubscription.remove();
-      }
-    }
-
-    keyboardDidShow = () => {
-      if (this.bottomSheet.current) {
+    const keyboardDidShow = () => {
+      if (bottomSheet.current) {
         // this.bottomSheet.current.snapTo(1);
       }
     };
 
-    keyboardDidHide = () => {
-      if (this.bottomSheet.current) {
+    const keyboardDidHide = () => {
+      if (bottomSheet.current) {
         // this.bottomSheet.current.snapTo(1);
       }
     };
 
-    handleBackButton = () => {
-      this.dismissOverlay();
+    const handleBackButton = () => {
+      dismissOverlay();
       return true;
     };
 
-    private dismissOverlay = (onDismissedCallback?: () => void) => {
-      this.setState({
-        onDismissedCallback
-      });
+    const dismissOverlay = (onDismissedCallback?: () => void) => {
+      setOnDismissedCallback(onDismissedCallback);
 
       delay(() => {
-        if (this.bottomSheet.current) {
-          this.bottomSheet.current!.snapTo(this.props.isBackDropMode ? 2 : 1);
+        if (bottomSheet.current) {
+          bottomSheet.current!.snapTo(isBackDropMode ? 2 : 1);
         }
       }, 10);
     };
 
-    render() {
-      const { snaps } = this.state;
-
-      return (
-        <View style={styles.root}>
-          <Animated.Code
-            exec={Animated.block([
-              Animated.call([this.animationState], async ([animationStateValue]) => {
-                // console.log(this.state.isFirstOpening, this.state.height, animationStateValue);
-
-                if (animationStateValue >= 0.99 && animationStateValue < 1 && !this.state.isFirstOpening) {
-                  this.props.navigation.goBack();
-
-                  this.completeTransition();
-
-                  if (this.state.onDismissedCallback) {
-                    this.state.onDismissedCallback();
-                  }
-                } else if (animationStateValue < 0.99 && this.state.isFirstOpening) {
-                  this.setState({
-                    isFirstOpening: false
-                  });
-                }
-              })
-            ])}
-          />
-          <TouchableWithoutFeedback
-            style={styles.backgroundContainer}
-            onPress={() =>
-              this.bottomSheet.current && this.bottomSheet.current.snapTo(this.props.isBackDropMode ? 2 : 1)
-            }
-          >
-            <Animated.View
-              style={[
-                {
-                  flex: 1,
-                  backgroundColor: Colors.TOTAL_BLACK,
-                  opacity: Animated.sub(0.5, Animated.multiply(this.animationState, 0.9))
-                }
-              ]}
-            />
-          </TouchableWithoutFeedback>
-          {!this.state.isHeightComputed && (
-            <View style={{ position: 'absolute', bottom: -Dimensions.get('window').height * 10 }}>
-              {this.renderContent()}
-            </View>
-          )}
-          {this.state.isHeightComputed && (
-            <BottomSheet
-              ref={this.bottomSheet}
-              callbackNode={this.animationState}
-              snapPoints={snaps}
-              enabledGestureInteraction={!this.props.disabledInteraction && this.props.isBackDropMode}
-              enabledInnerScrolling={
-                !this.props.disabledInteraction &&
-                this.props.isBackDropMode &&
-                this.state.height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT
-              }
-              renderHeader={() => this.renderHeader()}
-              renderContent={() => this.renderContent()}
-              initialSnap={this.props.isBackDropMode ? 2 : 1}
-            />
-          )}
-        </View>
-      );
-    }
-
-    private renderHeader = () => {
+    const renderHeader = () => {
       const {
         headerBackgroundColor = Colors.WHITE,
         headerHeight = HEADER_HEIGHT,
         knobColor = Colors.GRAY_400,
         renderCustomBackground
-      } = this.props;
+      } = props;
 
       if (renderCustomBackground) {
         return (
@@ -222,7 +171,7 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
             <View style={styles.customBackgroundContainer}>{renderCustomBackground()}</View>
             <View style={{ width: 24, height: 24 }} />
             <View style={[styles.knob, { backgroundColor: knobColor }]} />
-            <TouchableOpacity onPress={() => this.dismissOverlay()} style={styles.knobContainer}>
+            <TouchableOpacity onPress={() => dismissOverlay()} style={styles.knobContainer}>
               <Image
                 source={require('../assets/android_clear_input.png')}
                 style={{ tintColor: Colors.PRIMARY_BLUE, width: 16, height: 16 }}
@@ -231,6 +180,7 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
           </View>
         );
       }
+
       return (
         <View
           style={[
@@ -246,54 +196,47 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
       );
     };
 
-    private renderContent = () => {
-      return this.props.isBackDropMode ? (
+    const renderContent = () => {
+      return isBackDropMode ? (
         <View>
           <ChildComponent
-            {...this.props as P}
-            dismissOverlay={this.dismissOverlay}
+            {...props as P}
+            dismissOverlay={dismissOverlay}
             onListLayout={({ nativeEvent }) => {
-              if (!this.state.isHeightComputed) {
-                if (this.timerId) {
-                  clearTimeout(this.timerId);
-                  this.timerId = undefined;
+              if (!isHeightComputed) {
+                if (timerId) {
+                  clearTimeout(timerId);
+
+                  setTimerId(undefined);
                 }
                 // we're already over max, so it's backdrop mode officially
                 if (nativeEvent.layout.height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT) {
-                  this.setState({
-                    height: nativeEvent.layout.height,
-                    isContentEnoughBig: true,
-                    isHeightComputed: true,
-                    snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
-                  });
+                  setHeight(nativeEvent.layout.height);
+                  setIsContentEnoughBig(true);
+                  setIsHeightComputed(true);
+                  setSnaps(calculateSnaps(nativeEvent.layout.height));
 
                   delay(() => {
-                    if (this.bottomSheet.current) {
-                      this.bottomSheet.current.snapTo(1);
+                    if (bottomSheet.current) {
+                      bottomSheet.current.snapTo(1);
                     }
                   }, 20);
                 } else {
-                  if (!this.state.isContentEnoughBig) {
-                    this.setState({
-                      height: nativeEvent.layout.height,
-                      snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
-                    });
+                  if (!isContentEnoughBig) {
+                    setHeight(nativeEvent.layout.height);
+                    setSnaps(calculateSnaps(nativeEvent.layout.height));
 
-                    this.timerId = setTimeout(() => {
-                      this.setState({
-                        isHeightComputed: true
-                      });
+                    setTimerId(setTimeout(() => {
+                      setIsHeightComputed(true);
 
-                      if (this.bottomSheet.current) {
-                        this.bottomSheet.current.snapTo(1);
+                      if (bottomSheet.current) {
+                        bottomSheet.current.snapTo(1);
                       }
-                    }, 200);
+                    }, 200));
                   }
                 }
               } else {
-                this.setState({
-                  height: nativeEvent.layout.height
-                });
+                setHeight(nativeEvent.layout.height);
               }
             }}
           />
@@ -301,24 +244,75 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
       ) : (
           <View
             onLayout={({ nativeEvent }) => {
-              if (this.state.height === 0) {
-                this.setState({
-                  height: nativeEvent.layout.height,
-                  snaps: this.calcuateSnaps(this.props, nativeEvent.layout.height)
-                });
+              if (height === 0) {
+                setHeight(nativeEvent.layout.height);
+                setSnaps(calculateSnaps(nativeEvent.layout.height));
                 delay(() => {
-                  if (this.bottomSheet.current) {
-                    this.bottomSheet.current.snapTo(0);
+                  if (bottomSheet.current) {
+                    bottomSheet.current.snapTo(0);
                   }
                 }, 10);
               }
             }}
           >
-            <ChildComponent {...this.props as P} dismissOverlay={this.dismissOverlay} />
+            <ChildComponent {...props as P} dismissOverlay={dismissOverlay} />
           </View>
         );
     };
+
+    return (
+      <View style={styles.root}>
+        <TouchableWithoutFeedback
+          style={styles.backgroundContainer}
+          onPress={() =>
+            bottomSheet.current && bottomSheet.current.snapTo(isBackDropMode ? 2 : 1)
+          }
+        >
+          <Animated.View
+            style={[
+              {
+                flex: 1,
+                backgroundColor: Colors.TOTAL_BLACK,
+                opacity: Animated.sub(0.5, Animated.multiply(drawerCallbackNode, 0.9))
+              }
+            ]}
+          />
+        </TouchableWithoutFeedback>
+        {!isHeightComputed && (
+          <View style={{ position: 'absolute', bottom: -Dimensions.get('window').height * 10 }}>
+            {renderContent()}
+          </View>
+        )}
+        {isHeightComputed && (
+          <BottomSheet
+            ref={bottomSheet}
+            callbackNode={drawerCallbackNode}
+            snapPoints={snaps}
+            enabledGestureInteraction={!disabledInteraction && isBackDropMode}
+            enabledInnerScrolling={
+              !disabledInteraction &&
+              isBackDropMode &&
+              height >= Dimensions.get('window').height * 0.94 - HEADER_HEIGHT
+            }
+            renderHeader={() => renderHeader()}
+            renderContent={() => renderContent()}
+            initialSnap={isBackDropMode ? 2 : 1}
+          />
+        )}
+      </View>
+    );
   };
+
+  return BottomOverlay;
+}
+
+export const bottomSheetOptions = () => {
+  return {
+    gestureEnabled: false,
+    animationEnabled: false,
+    cardStyle: { backgroundColor: 'transparent' }
+  };
+};
 
 const HEADER_HEIGHT = 28;
 

@@ -5,6 +5,7 @@ import { CalendarPickerOverlay } from '../overlays/CalendarPickerOverlay';
 import { DurationPickerOverlay } from '../overlays/DurationPickerOverlay';
 import { MapPickerOverlay } from '../overlays/MapPickerOverlay';
 import { createStackNavigator } from '@react-navigation/stack';
+import { bottomSheetOptions } from '../hoc/BottomOverlay';
 
 export const SELECT_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-select-picker-overlay';
 export const AUTOCOMPLETE_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-autocomplete-picker-overlay';
@@ -18,22 +19,27 @@ export const ComposableFormModals = [
   <Stack.Screen
     name={SELECT_PICKER_OVERLAY_KEY}
     component={SelectPickerOverlay}
+    options={bottomSheetOptions}
   />,
   <Stack.Screen
     name={AUTOCOMPLETE_PICKER_OVERLAY_KEY}
     component={AutocompletePickerOverlay}
+    options={bottomSheetOptions}
   />,
   <Stack.Screen
     name={CALENDAR_PICKER_OVERLAY_KEY}
     component={CalendarPickerOverlay}
+    options={bottomSheetOptions}
   />,
   <Stack.Screen
     name={DURATION_PICKER_OVERLAY_KEY}
     component={DurationPickerOverlay}
+    options={bottomSheetOptions}
   />,
   <Stack.Screen
     name={MAP_PICKER_OVERLAY_KEY}
     component={MapPickerOverlay}
+    options={bottomSheetOptions}
   />,
 ];
 
