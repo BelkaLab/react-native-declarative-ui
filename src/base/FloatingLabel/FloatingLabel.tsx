@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Animated, Easing, Image, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableOpacity, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
 
@@ -28,115 +28,71 @@ interface IFloatingLabelProps extends TextInputProperties {
   isMandatory?: boolean;
 }
 
-interface IState {
-  height: number;
-  text?: string;
-  isFocused: boolean;
-  fontSize: Animated.Value;
-  top: Animated.Value;
-  passwordToggle: boolean;
-}
+const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
+  const {
+    value,
+    placeholder,
+    autoFocus,
+    multiline,
+    children,
+    onRef,
+    inputStyle,
+    labelStyle,
+    currencyStyle,
+    dirtyStyle = styles.defaultDirtyStyle,
+    cleanStyle = styles.defaultCleanStyle,
+    isSelectField,
+    isPassword,
+    isPercentage,
+    currency,
+    style,
+    onFocusLabel,
+    onBlurLabel,
+    isMandatory,
+  } = props;
 
-export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IState> {
-  private input: TextInput | null = null;
+  const isDirty = Boolean(value || placeholder);
 
-  constructor(props: IFloatingLabelProps) {
-    super(props);
+  const [height, setHeight] = useState<number>(0);
+  const [text, setText] = useState<string | undefined>(props.value);
+  const [isFocused, setIsFocused] = useState<boolean>(autoFocus || false);
+  const [passwordToggle, setPasswordToggle] = useState<boolean>(!!isPassword);
+  const [input, setInput] = useState<TextInput | null>(null);
 
-    const isDirty = Boolean(this.props.value || this.props.placeholder);
-    const cleanStyle = this.props.cleanStyle || styles.defaultCleanStyle;
-    const dirtyStyle = this.props.dirtyStyle || styles.defaultDirtyStyle;
+  const fontSize = new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize);
+  const top = new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top);
+  const hasSymbol = (isFocused || !!value) && (!!currency || !!isPercentage);
 
-    this.state = {
-      text: props.value,
-      isFocused: this.props.autoFocus || false,
-      height: 0,
-      fontSize: new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize),
-      top: new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top),
-      passwordToggle: !!props.isPassword
-    };
-  }
-
-  componentWillReceiveProps(props: IFloatingLabelProps) {
-    if (props.value !== undefined && props.value !== this.state.text) {
-      const shouldAnimate = Boolean(props.value);
-      this.setState({ text: props.value });
-      if (props.isSelectField) {
-        this.animate(!!props.value);
-      } else {
-        this.animate(shouldAnimate || this.state.isFocused);
+  useEffect(() => {
+    return () => {
+      if (onRef) {
+        onRef(null);
       }
-    } else if (!props.value && !!this.state.text) {
-      if (!isNaN(+this.state.text)) {
+    };
+  }, []);
+
+  useEffect(() => {
+    if (value !== undefined && value !== text) {
+      const shouldAnimate = Boolean(value);
+
+      setText(value);
+
+      if (isSelectField) {
+        animate(!!value);
+      } else {
+        animate(shouldAnimate || isFocused);
+      }
+    } else if (!value && !!text) {
+      if (!isNaN(+text)) {
         return;
       }
-      this.setState({ text: props.value });
-      this.animate(false);
+
+      setText(value);
+      animate(false);
     }
-  }
+  }, [value, text]);
 
-  componentWillUnmount() {
-    if (this.props.onRef) {
-      this.props.onRef(null);
-    }
-  }
-
-  componentDidUpdate() {
-    // if (Platform.OS === 'android' && this.props.isSelectField && this.input) {
-    //   delay(() => {
-    //     if (this.input) {
-    //       this.input.setNativeProps({
-    //         selection: {
-    //           start: 0,
-    //           end: 0
-    //         }
-    //       });
-    //     }
-    //   }, 10);
-    // }
-  }
-
-  render() {
-    const { style, isSelectField, isPercentage, currency, value, isPassword } = this.props;
-    const { passwordToggle } = this.state;
-
-    const hasSymbol = (this.state.isFocused || !!value) && (!!currency || !!isPercentage);
-
-    return (
-      <View style={[styles.element, style]}>
-        {/* {isCurrency && this.renderSymbol(this.props.currency.symbol)}
-        {isPercentage && this.renderSymbol('%')} */}
-        {hasSymbol && this.renderSymbol(currency || '%')}
-        {this.renderLabel()}
-        {isSelectField ? (
-          <View pointerEvents="none">{this.renderTextField(hasSymbol)}</View>
-        ) : (
-            this.renderTextField(hasSymbol)
-          )}
-        {
-          isPassword
-          && (
-            passwordToggle
-              ? (
-                <View style={styles.passwordToggle}>
-                  <TouchableOpacity onPress={this.onTogglePasswordVisibilityPressed}>
-                    <Image source={require('../../assets/eye.png')} />
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                <View style={styles.passwordToggle}>
-                  <TouchableOpacity onPress={this.onTogglePasswordVisibilityPressed}>
-                    <Image source={require('../../assets/eye-slash.png')} />
-                  </TouchableOpacity>
-                </View>
-              )
-          )
-        }
-      </View>
-    );
-  }
-
-  private renderTextField = (hasSymbol: boolean) => {
+  const renderTextField = (hasSymbol: boolean) => {
     const {
       children,
       style,
@@ -145,18 +101,16 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
       onFocusLabel,
       onBlurLabel,
       onEndEditing,
-      inputStyle,
       value,
       ...rest
-    } = this.props;
-    const { passwordToggle } = this.state;
+    } = props;
 
     return (
       <View style={styles.inputContainer}>
         <TouchableWithoutFeedback
           onPress={() => {
-            if (this.input && !this.state.isFocused) {
-              this.input.focus();
+            if (input && !isFocused) {
+              input.focus();
             }
           }}
         >
@@ -166,23 +120,23 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
           {...rest}
           value={value}
           ref={input => {
-            this.input = input;
+            setInput(input);
 
-            if (this.props.onRef) {
-              this.props.onRef(input);
+            if (props.onRef) {
+              props.onRef(input);
             }
           }}
           style={[
             styles.input,
             inputStyle,
             {
-              height: Math.max(INPUT_HEIGHT, this.state.height)
+              height: Math.max(INPUT_HEIGHT, height)
             },
-            Platform.select({ ios: this.props.multiline && { paddingTop: 6 } }),
+            Platform.select({ ios: props.multiline && { paddingTop: 6 } }),
             Platform.select({
               android: {
-                paddingBottom: this.state.height > INPUT_HEIGHT ? 6 : 0,
-                paddingTop: this.state.height > INPUT_HEIGHT ? 4 : 0
+                paddingBottom: height > INPUT_HEIGHT ? 6 : 0,
+                paddingTop: height > INPUT_HEIGHT ? 4 : 0
               }
             }),
             hasSymbol && {
@@ -191,76 +145,70 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
           ]}
           secureTextEntry={passwordToggle}
           onContentSizeChange={event => {
-            if (this.props.multiline) {
+            if (multiline) {
               const height = event.nativeEvent.contentSize.height;
 
-              this.setState({
-                height: Platform.select({
-                  android: height,
-                  ios: this.props.multiline && height > INPUT_HEIGHT ? height + 14 : height
-                })
-              });
+              setHeight(Platform.select({
+                android: height,
+                ios: multiline && height > INPUT_HEIGHT ? height + 14 : height
+              }))
             }
           }}
-          onBlur={this._onBlur}
-          onFocus={this._onFocus}
-          onChangeText={this.onChangeText}
-          onEndEditing={this.onEndEditing}
+          onBlur={_onBlur}
+          onFocus={_onFocus}
+          onChangeText={onChangeText}
+          onEndEditing={onEndEditing}
         />
       </View>
     );
   };
 
-  renderSymbol(symbol: string) {
-    const { currencyStyle } = this.props;
+  const renderSymbol = (symbol: string) => {
     return <Text style={[styles.symbol, currencyStyle]}>{symbol}</Text>;
   }
 
-  renderLabel() {
+  const renderLabel = () => {
     return (
       <Animated.Text
-        style={[styles.label, this.props.labelStyle, { fontSize: this.state.fontSize, top: this.state.top }]}
+        style={[styles.label, labelStyle, { fontSize, top }]}
       >
-        {this.props.children}
-        {this.props.isMandatory && <View style={{ width: 4, height: 4 }} />}
-        {this.props.isMandatory && <Text style={{ color: Colors.RED }}>*</Text>}
+        {children}
+        {isMandatory && <View style={{ width: 4, height: 4 }} />}
+        {isMandatory && <Text style={{ color: Colors.RED }}>*</Text>}
       </Animated.Text>
     );
   }
 
-  onTogglePasswordVisibilityPressed = () => {
-    this.setState(state => ({ passwordToggle: !state.passwordToggle }));
+  const onTogglePasswordVisibilityPressed = () => {
+    setPasswordToggle(previous => !previous);
   }
 
-  onChangeText = (text: string) => {
-    this.setState({ text });
+  const onChangeText = (text: string) => {
+    setText(text);
 
-    if (this.props.onChangeText) {
-      this.props.onChangeText(text);
+    if (onChangeText) {
+      onChangeText(text);
     }
   };
 
-  onEndEditing = (event: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
-    this.setState({ text: event.nativeEvent.text });
+  const onEndEditing = (event: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
+    setText(event.nativeEvent.text);
 
-    if (this.props.onEndEditing) {
-      this.props.onEndEditing(event);
+    if (onEndEditing) {
+      onEndEditing(event);
     }
   };
 
-  private animate = (isDirty: boolean) => {
-    const cleanStyle = this.props.cleanStyle || styles.defaultCleanStyle;
-    const dirtyStyle = this.props.dirtyStyle || styles.defaultDirtyStyle;
-
+  const animate = (isDirty: boolean) => {
     const nextStyle = isDirty ? dirtyStyle : cleanStyle;
 
     Animated.parallel([
-      Animated.timing(this.state.fontSize, {
+      Animated.timing(fontSize, {
         toValue: nextStyle.fontSize,
         duration: 60,
         easing: Easing.ease
       }),
-      Animated.timing(this.state.top, {
+      Animated.timing(top, {
         toValue: nextStyle.top,
         duration: 60,
         easing: Easing.ease,
@@ -269,20 +217,21 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
     ]).start();
   };
 
-  private _onFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    if (!this.state.isFocused) {
-      this.animate(true);
-      this.setState({ isFocused: true }, () => {
-        if (this.props.onFocusLabel) {
-          this.props.onFocusLabel(e);
-        }
-      });
+  const _onFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    if (!isFocused) {
+      animate(true);
+
+      setIsFocused(true);
+
+      if (onFocusLabel) {
+        onFocusLabel(e);
+      }
     }
   };
 
-  private _onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
-    if (!this.state.text) {
-      this.animate(false);
+  const _onBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+    if (!text) {
+      animate(false);
     }
 
     // if (Platform.OS === 'android' && this.input) {
@@ -294,12 +243,45 @@ export default class FloatingLabel extends PureComponent<IFloatingLabelProps, IS
     //   });
     // }
 
-    this.setState({ isFocused: false }, () => {
-      if (this.props.onBlurLabel) {
-        this.props.onBlurLabel(e);
-      }
-    });
+    setIsFocused(false);
+
+    if (onBlurLabel) {
+      onBlurLabel(e);
+    }
   };
+
+  return (
+    <View style={[styles.element, style]}>
+      {/* {isCurrency && this.renderSymbol(this.props.currency.symbol)}
+      {isPercentage && this.renderSymbol('%')} */}
+      {hasSymbol && renderSymbol(currency || '%')}
+      {renderLabel()}
+      {isSelectField ? (
+        <View pointerEvents="none">{renderTextField(hasSymbol)}</View>
+      ) : (
+          renderTextField(hasSymbol)
+        )}
+      {
+        isPassword
+        && (
+          passwordToggle
+            ? (
+              <View style={styles.passwordToggle}>
+                <TouchableOpacity onPress={onTogglePasswordVisibilityPressed}>
+                  <Image source={require('../../assets/eye.png')} />
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.passwordToggle}>
+                <TouchableOpacity onPress={onTogglePasswordVisibilityPressed}>
+                  <Image source={require('../../assets/eye-slash.png')} />
+                </TouchableOpacity>
+              </View>
+            )
+        )
+      }
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -351,3 +333,5 @@ const styles = StyleSheet.create({
     top: -17
   }
 });
+
+export default FloatingLabel;

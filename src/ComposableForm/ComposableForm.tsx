@@ -1,4 +1,5 @@
 import { transformAll } from '@overgear/yup-ast';
+import { useNavigation } from '@react-navigation/native';
 import to from 'await-to-js';
 import every from 'lodash.every';
 import filter from 'lodash.filter';
@@ -10,7 +11,7 @@ import merge from 'lodash.merge';
 import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
-import React, { Component, FunctionComponent, useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { Schema, ValidationError } from 'yup';
@@ -32,7 +33,6 @@ import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, D
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
-import { useNavigation } from '@react-navigation/native';
 
 interface IComposableFormProps<T> {
   model: T;
@@ -64,7 +64,7 @@ interface IComposableFormProps<T> {
   dynamicValidations?: string[] | string[][];
 }
 
-export const ComposableForm2 = <T extends ComposableItem>(props: IComposableFormProps<T>) => {
+const ComposableForm = <T extends ComposableItem>(props: IComposableFormProps<T>) => {
   const {
     model,
     structure,
@@ -95,10 +95,10 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
   const [isAutoFocused, setIsAutoFocused] = useState<boolean>(false);
   const [isFocusingMultiline, setIsFocusingMultiline] = useState<boolean | undefined>();
   const [isScreenVisible, setIsScreenVisible] = useState<boolean>(false);
-  const [fieldRefs, setFieldRefs] = useState<Dictionary<TextInput>>({});
   const [subscriptions, setSubscriptions] = useState<EmitterSubscription[] | undefined>();
   const [navigationSubs, setNavigationSubs] = useState<(() => void)[] | undefined>();
 
+  const fieldRefs: Dictionary<TextInput> = {};
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -131,7 +131,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
 
   useEffect(() => {
     if (!isAutoFocused && isScreenVisible) {
-      const focusField = find(structure.fields, f => f.autoFocus && fieldRefs[f.id]) as
+      const focusField = find(structure.fields, (f: FormField) => f.autoFocus && fieldRefs[f.id]) as
         | FormField
         | undefined;
 
@@ -555,10 +555,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <TextField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           if (field.disabled) {
             setSelectionAtStart(input);
@@ -654,10 +651,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <TextField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           if (field.disabled) {
             setSelectionAtStart(input);
@@ -864,10 +858,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <SelectPickerField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           setSelectionAtStart(input);
         }}
@@ -962,7 +953,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
       return value;
     }
 
-    return find<ComposableItem>(items as ComposableItem[], item => getValueByKey(item, keyProperty) === value);
+    return find<ComposableItem>(items as ComposableItem[], (item: ComposableItem) => getValueByKey(item, keyProperty) === value);
   };
 
   const renderAutocompleteField = (
@@ -977,10 +968,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <AutocompletePickerField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           setSelectionAtStart(input);
         }}
@@ -1064,10 +1052,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <DatePickerField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           setSelectionAtStart(input);
         }}
@@ -1120,10 +1105,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <MapPickerField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           setSelectionAtStart(input);
         }}
@@ -1204,10 +1186,7 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
     return (
       <DurationPickerField
         onRef={input => {
-          setFieldRefs({
-            ...fieldRefs,
-            [field.id]: input
-          });
+          fieldRefs[field.id] = input;
 
           setSelectionAtStart(input);
         }}
@@ -1259,11 +1238,11 @@ export const ComposableForm2 = <T extends ComposableItem>(props: IComposableForm
   };
 
   const hasErrorsInline = (fields: FormField[]): boolean => {
-    return some(fields, f => has(errors, f.id) && errors[f.id]);
+    return some(fields, (f: FormField) => has(errors, f.id) && errors[f.id]);
   };
 
   const retrieveErrorMessageInline = (fields: FormField[]): string => {
-    const found = find(fields, f => errors[f.id] !== undefined);
+    const found = find(fields, (f: FormField) => errors[f.id] !== undefined);
     return found ? errors[found.id] : '';
   };
 
@@ -1311,3 +1290,5 @@ const styles = StyleSheet.create({
   segmentActiveText: { color: Colors.WHITE },
   segmentInactiveText: { color: Colors.BLACK }
 });
+
+export default ComposableForm;
