@@ -14,11 +14,9 @@ export interface IOverlayCalendarProps {
   customFormOptions: ComposableFormOptions;
 }
 
-interface IState {}
+interface IState { }
 
 export default class OverlayCalendar extends Component<IOverlayCalendarProps, IState> {
-  private calendar!: SingleDayCalendar;
-
   constructor(props: IOverlayCalendarProps) {
     super(props);
   }
@@ -41,24 +39,11 @@ export default class OverlayCalendar extends Component<IOverlayCalendarProps, IS
               this.props.onConfirm(pickedDate);
             }
           }}
-          onRef={calendar => {
-            if (calendar) {
-              this.calendar = calendar;
-            }
-          }}
           theme={this.props.customFormOptions.calendars && this.props.customFormOptions.calendars.singleDayTheme}
         />
       </View>
     );
   }
-
-  private onConfirmPressed = () => {
-    const pickedDate = this.calendar.getSelectedDate();
-
-    if (this.props.onConfirm && pickedDate) {
-      this.props.onConfirm(pickedDate);
-    }
-  };
 }
 
 const HEADER_HEIGHT = 48;
