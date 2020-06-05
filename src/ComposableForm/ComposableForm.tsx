@@ -11,7 +11,7 @@ import merge from 'lodash.merge';
 import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useImperativeHandle, forwardRef, Ref } from 'react';
 import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { Schema, ValidationError } from 'yup';
@@ -64,7 +64,10 @@ interface IComposableFormProps<T> {
   dynamicValidations?: string[] | string[][];
 }
 
-const ComposableForm = <T extends ComposableItem>(props: IComposableFormProps<T>) => {
+const ComposableForm = <T extends ComposableItem>(
+  props: IComposableFormProps<T>,
+  ref: Ref<{ isValid: () => void }>
+) => {
   const {
     model,
     structure,
@@ -81,6 +84,8 @@ const ComposableForm = <T extends ComposableItem>(props: IComposableFormProps<T>
     googleApiKey,
     dynamicValidations,
   } = props;
+
+  useImperativeHandle(ref, () => ({ isValid }));
 
   const validateStructureWithProps = (structure: ComposableStructure, props: IComposableFormProps<T>) => {
     // add all fields check here
@@ -1289,4 +1294,4 @@ const styles = StyleSheet.create({
   segmentInactiveText: { color: Colors.BLACK }
 });
 
-export default ComposableForm;
+export default forwardRef(ComposableForm);
