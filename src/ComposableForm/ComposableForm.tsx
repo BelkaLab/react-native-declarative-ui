@@ -11,7 +11,7 @@ import merge from 'lodash.merge';
 import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
-import React, { useEffect, useState, useImperativeHandle, forwardRef, Ref } from 'react';
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useState } from 'react';
 import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
 import { Schema, ValidationError } from 'yup';
@@ -177,9 +177,13 @@ const ComposableForm = <T extends ComposableItem>(
   const blurTextFields = () => {
     // Check if input has focus and remove it
     for (const [, input] of Object.entries(fieldRefs)) {
-      if (input && input.isFocused() && findNodeHandle(input)) {
-        input.blur();
-      }
+      try {
+        if (!input.isMounted || input.isMounted()) {
+          if (input && input.isFocused() && findNodeHandle(input)) {
+            input.blur();
+          }
+        }
+      } catch (e) { }
     }
   };
 
