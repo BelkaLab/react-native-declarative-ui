@@ -1,8 +1,11 @@
+import React from 'react';
 import { SelectPickerOverlay } from '../overlays/SelectPickerOverlay';
 import { AutocompletePickerOverlay } from '../overlays/AutocompletePickerOverlay';
 import { CalendarPickerOverlay } from '../overlays/CalendarPickerOverlay';
 import { DurationPickerOverlay } from '../overlays/DurationPickerOverlay';
 import { MapPickerOverlay } from '../overlays/MapPickerOverlay';
+import { createStackNavigator } from '@react-navigation/stack';
+import { bottomSheetOptions } from '../hoc/BottomOverlay';
 
 export const SELECT_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-select-picker-overlay';
 export const AUTOCOMPLETE_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-autocomplete-picker-overlay';
@@ -10,13 +13,35 @@ export const CALENDAR_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-calendar
 export const DURATION_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-calendar-duration-overlay';
 export const MAP_PICKER_OVERLAY_KEY = 'react-native-declarative-ui-map-picker-overlay';
 
-export const ComposableFormModals = {
-  [SELECT_PICKER_OVERLAY_KEY]: SelectPickerOverlay,
-  [AUTOCOMPLETE_PICKER_OVERLAY_KEY]: AutocompletePickerOverlay,
-  [CALENDAR_PICKER_OVERLAY_KEY]: CalendarPickerOverlay,
-  [DURATION_PICKER_OVERLAY_KEY]: DurationPickerOverlay,
-  [MAP_PICKER_OVERLAY_KEY]: MapPickerOverlay
-}
+const Stack = createStackNavigator();
+
+export const ComposableFormModals = [
+  <Stack.Screen
+    name={SELECT_PICKER_OVERLAY_KEY}
+    component={SelectPickerOverlay}
+    options={bottomSheetOptions}
+  />,
+  <Stack.Screen
+    name={AUTOCOMPLETE_PICKER_OVERLAY_KEY}
+    component={AutocompletePickerOverlay}
+    options={bottomSheetOptions}
+  />,
+  <Stack.Screen
+    name={CALENDAR_PICKER_OVERLAY_KEY}
+    component={CalendarPickerOverlay}
+    options={bottomSheetOptions}
+  />,
+  <Stack.Screen
+    name={DURATION_PICKER_OVERLAY_KEY}
+    component={DurationPickerOverlay}
+    options={bottomSheetOptions}
+  />,
+  <Stack.Screen
+    name={MAP_PICKER_OVERLAY_KEY}
+    component={MapPickerOverlay}
+    options={bottomSheetOptions}
+  />,
+];
 
 // export function showSelectOverlay(passProps: ISelectPickerOverlayProps) {
 //   try {

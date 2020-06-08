@@ -1,4 +1,5 @@
 import { transformAll } from '@overgear/yup-ast';
+import { useNavigation } from '@react-navigation/native';
 import to from 'await-to-js';
 import every from 'lodash.every';
 import filter from 'lodash.filter';
@@ -10,11 +11,9 @@ import merge from 'lodash.merge';
 import some from 'lodash.some';
 import moment from 'moment';
 import numbro from 'numbro';
-import React, { Component } from 'react';
+import React, { forwardRef, Ref, useEffect, useImperativeHandle, useState } from 'react';
 import { EmitterSubscription, findNodeHandle, Keyboard, Linking, Platform, StyleProp, StyleSheet, Text, TextInput, TouchableNativeFeedback, TouchableOpacity, View, ViewStyle } from 'react-native';
 import { GooglePlaceDetail } from 'react-native-google-places-autocomplete';
-import { NavigationEventSubscription, NavigationRoute } from 'react-navigation';
-import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 import { Schema, ValidationError } from 'yup';
 import { RightFieldIcon } from '../base/icons/RightFieldIcon';
 import { AutocompletePickerField } from '../components/AutocompletePickerField';
@@ -36,7 +35,6 @@ import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
 
 interface IComposableFormProps<T> {
-  navigation: StackNavigationProp<NavigationRoute, {}>;
   model: T;
   structure: ComposableStructure;
   onChange: (id: string, value?: unknown) => void;
@@ -66,255 +64,143 @@ interface IComposableFormProps<T> {
   dynamicValidations?: string[] | string[][];
 }
 
-interface IState {
-  structure: ComposableStructure;
-  errors: Dictionary<string>;
-  isFormFilled: boolean;
-  isKeyboardOpened: boolean;
-  isModalVisible: boolean;
-  isAutoFocused: boolean;
-  isFocusingMultiline?: boolean;
-  isScreenVisible: boolean;
-}
+const ComposableForm = <T extends ComposableItem>(
+  props: IComposableFormProps<T>,
+  ref: Ref<{ isValid: () => Promise<boolean> }>
+) => {
+  const {
+    model,
+    structure,
+    onChange,
+    onFormFilled,
+    onFocus,
+    loadingMapper,
+    pickerMapper,
+    searchMapper,
+    createNewItemMapper,
+    externalModel,
+    customStyle,
+    customComponents,
+    googleApiKey,
+    dynamicValidations,
+  } = props;
 
-export default class ComposableForm<T extends ComposableItem> extends Component<IComposableFormProps<T>, IState> {
-  private fieldRefs: Dictionary<TextInput> = {};
-  private errors: Dictionary<string> = {};
-  private subscriptions!: EmitterSubscription[];
-  private navigationSubs!: NavigationEventSubscription[];
+  useImperativeHandle(ref, () => ({ isValid }));
 
-  constructor(props: IComposableFormProps<T>) {
-    super(props);
-
-    this.validateStructureWithProps(props.structure, props);
-
-    this.state = {
-      structure: props.structure,
-      errors: {},
-      isFormFilled: false,
-      isKeyboardOpened: false,
-      isModalVisible: false,
-      isAutoFocused: false,
-      isScreenVisible: false
-    };
-  }
-
-  private validateStructureWithProps = (structure: ComposableStructure, props: IComposableFormProps<T>) => {
+  const validateStructureWithProps = (structure: ComposableStructure, props: IComposableFormProps<T>) => {
     // add all fields check here
     // if props.googleApiKey is undefined, cannot use MapField
     return;
   };
 
-  componentWillMount() {
-    this.subscriptions = [
+  validateStructureWithProps(props.structure, props);
+
+  const [errors, setErrors] = useState<Dictionary<string>>({});
+  const [isKeyboardOpened, setIsKeyboardOpened] = useState<boolean>(false);
+  const [isAutoFocused, setIsAutoFocused] = useState<boolean>(false);
+  const [isFocusingMultiline, setIsFocusingMultiline] = useState<boolean | undefined>();
+  const [isScreenVisible, setIsScreenVisible] = useState<boolean>(false);
+  const [subscriptions, setSubscriptions] = useState<EmitterSubscription[] | undefined>();
+  const [navigationSubs, setNavigationSubs] = useState<(() => void)[] | undefined>();
+
+  const fieldRefs: Dictionary<TextInput> = {};
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    setSubscriptions([
       Keyboard.addListener(
         Platform.select({ ios: 'keyboardWillHide', android: 'keyboardDidHide' }),
-        this.keyboardDidShow
+        keyboardDidShow
       ),
       Keyboard.addListener(
         Platform.select({ ios: 'keyboardWillHide', android: 'keyboardDidHide' }),
-        this.keyboardDidHide
+        keyboardDidHide
       )
-    ];
-  }
+    ]);
 
-  componentDidMount() {
-    this.navigationSubs = [
-      this.props.navigation.addListener('didFocus', () => {
-        this.setState({
-          isScreenVisible: true
-        })
+    return () => subscriptions?.forEach((emitter) => (!!emitter && !!emitter.remove) && emitter.remove());
+  }, []);
+
+  useEffect(() => {
+    setNavigationSubs([
+      navigation.addListener('focus', () => {
+        setIsScreenVisible(true);
       }),
-      this.props.navigation.addListener('didBlur', () => {
-        this.setState({
-          isScreenVisible: false
-        })
-      })
-    ];
-  }
+      navigation.addListener('blur', () => {
+        setIsScreenVisible(false);
+      }),
+    ]);
 
-  componentWillUnmount() {
-    if (this.subscriptions) {
-      this.subscriptions.forEach(sub => sub.remove());
-    }
+    return () => navigationSubs?.forEach((unsubscribe) => unsubscribe());
+  }, []);
 
-    if (this.navigationSubs) {
-      this.navigationSubs.forEach(sub => sub.remove());
-    }
-  }
-
-  keyboardDidShow = () => {
-    this.setState({
-      isKeyboardOpened: true
-    });
-  };
-
-  keyboardDidHide = () => {
-    this.setState({
-      isKeyboardOpened: false
-    });
-
-    if (!this.state.isFocusingMultiline) {
-      this.blurTextFields();
-    }
-  };
-
-  componentDidUpdate() {
-    if (!this.state.isAutoFocused && this.state.isScreenVisible) {
-      const focusField = find(this.state.structure.fields, f => f.autoFocus && this.fieldRefs[f.id]) as
+  useEffect(() => {
+    if (!isAutoFocused && isScreenVisible) {
+      const focusField = find(structure.fields, (f: FormField) => f.autoFocus && fieldRefs[f.id]) as
         | FormField
         | undefined;
 
       if (focusField) {
-        this.fieldRefs[focusField.id].focus();
+        fieldRefs[focusField.id].focus();
       }
 
-      this.setState({
-        isAutoFocused: true
-      });
+      setIsAutoFocused(true);
     }
-  }
+  }, [isAutoFocused, isScreenVisible]);
 
-  async UNSAFE_componentWillReceiveProps(nextProps: IComposableFormProps<T>) {
-    if (!isEqual(nextProps.model, this.props.model)) {
-      this.checkIfFormIsFilled(nextProps.model);
+  useEffect(() => {
+    if (model) {
+      checkIfFormIsFilled(model);
 
-      if (this.state.structure) {
-        this.state.structure.fields.map(field => {
-          if (!field.persistentValue && this.isFieldNotVisible(field, nextProps.model) && !!nextProps.model[field.id]) {
-            this.props.onChange(field.id, undefined);
+      if (structure) {
+        structure.fields.map(field => {
+          if (!field.persistentValue && isFieldNotVisible(field, model) && !!model[field.id]) {
+            onChange(field.id, undefined);
           }
         });
       }
     }
-  }
+  }, [model]);
 
-  render() {
-    const { structure, errors } = this.state;
-    const { model } = this.props;
+  const keyboardDidShow = () => {
+    setIsKeyboardOpened(true);
+  };
 
-    return (
-      <View
-        style={[
-          styles.formContainer,
-          { backgroundColor: this.getComposableFormOptions().formContainer.backgroundColor }
-        ]}
-      >
-        <View
-          style={{
-            backgroundColor: this.getComposableFormOptions().formContainer.backgroundColor,
-            padding: this.getComposableFormOptions().formContainer.externalPadding
-          }}
-        >
-          {structure.fields.map((field, index) => this.renderFields(field, index, model, errors))}
-        </View>
-      </View>
-    );
-  }
+  const keyboardDidHide = () => {
+    setIsKeyboardOpened(false);
 
-  private blurTextFields = () => {
+    if (!isFocusingMultiline) {
+      blurTextFields();
+    }
+  };
+
+  const blurTextFields = () => {
     // Check if input has focus and remove it
-    for (const [_, input] of Object.entries(this.fieldRefs)) {
-      if (input && input.isFocused() && findNodeHandle(input)) {
-        input.blur();
-      }
+    for (const [, input] of Object.entries(fieldRefs)) {
+      try {
+        if (!input.isMounted || input.isMounted()) {
+          if (input && input.isFocused() && findNodeHandle(input)) {
+            input.blur();
+          }
+        }
+      } catch (e) { }
     }
   };
 
-  private isFieldNotVisible = (field: FormField, model: T) => {
-    if (field.visibilityFieldId !== undefined && field.visibilityFieldValue !== undefined) {
-      // This is a visibilityField, that means we have a condition on parent to show/hide the field in the form
-      const {
-        keyProperty,
-        visibilityFieldId,
-        visibilityFieldValue,
-        isVisibilityFieldExternal,
-        isVisibilityConditionInverted
-      } = field;
-      const { externalModel } = this.props;
-
-      if (isVisibilityFieldExternal && !externalModel) {
-        throw new Error(
-          `Field ${field.id} has isVisibilityFieldExternal setted as true, but you forgot to pass dependencyModel to ComposableForm as props`
-        );
-      }
-
-      if (Array.isArray(visibilityFieldValue)) {
-        const shouldFieldBeHidden = isVisibilityConditionInverted
-          ? some(visibilityFieldValue, (value: ComposableItem | string) =>
-            this.shouldFieldBeHidden(
-              !isVisibilityFieldExternal ? model! : externalModel!,
-              visibilityFieldId,
-              value,
-              isVisibilityConditionInverted,
-              keyProperty
-            )
-          )
-          : every(visibilityFieldValue, (value: ComposableItem | string) =>
-            this.shouldFieldBeHidden(
-              !isVisibilityFieldExternal ? model! : externalModel!,
-              visibilityFieldId,
-              value,
-              isVisibilityConditionInverted,
-              keyProperty
-            )
-          );
-
-        return shouldFieldBeHidden;
-      } else {
-        return this.shouldFieldBeHidden(
-          !isVisibilityFieldExternal ? model! : externalModel!,
-          visibilityFieldId,
-          visibilityFieldValue,
-          isVisibilityConditionInverted,
-          keyProperty
-        );
-      }
-    }
-
-    return false;
-  };
-
-  private shouldFieldBeHidden = (
-    model: T,
-    visibilityFieldId: string,
-    visibilityFieldValue: ComposableItem | string,
-    isVisibilityConditionInverted: boolean = false,
-    keyProperty?: string
-  ) => {
-    const isVisible =
-      !model[visibilityFieldId] ||
-      (keyProperty
-        ? (visibilityFieldValue as ComposableItem)[keyProperty] !==
-        (model[visibilityFieldId] as ComposableItem)[keyProperty]
-        : !isEqual(visibilityFieldValue, model[visibilityFieldId]));
-
-    return isVisibilityConditionInverted ? !isVisible : isVisible;
-  };
-
-  isValid = async (): Promise<boolean> => {
-    const { structure } = this.state;
-    const { model } = this.props;
-
-    return await this.validateForm(structure!.fields, model);
-  };
-
-  private checkIfFormIsFilled = (model: T) => {
-    if (this.state.structure) {
+  const checkIfFormIsFilled = (model: T) => {
+    if (structure) {
       // add check if we have errors on non mandatory fields
       const isFilled = !some(
-        filter(this.state.structure.fields, (field: FormField) => this.isFieldMandatoryAndNotFilled(field, model)), // Mandatory fields
+        filter(structure.fields, (field: FormField) => isFieldMandatoryAndNotFilled(field, model)), // Mandatory fields
         (field: FormField) => model[field.id] === undefined || model[field.id] === '' || model[field.id] === false
       );
-      this.setState({
-        isFormFilled: isFilled
-      });
-      this.props.onFormFilled(isFilled);
+
+      onFormFilled(isFilled);
     }
   };
 
-  private isFieldMandatoryAndNotFilled = (field: FormField, model: T): boolean => {
-    if (this.isFieldNotVisible(field, model)) {
+  const isFieldMandatoryAndNotFilled = (field: FormField, model: T): boolean => {
+    if (isFieldNotVisible(field, model)) {
       return false;
     };
 
@@ -330,7 +216,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     } else if ((field.type === 'inline' || field.type === 'group') && field.childs) {
       let isInnerFilled = false;
       for (const child of field.childs) {
-        isInnerFilled = isInnerFilled || this.isFieldMandatoryAndNotFilled(child, model);
+        isInnerFilled = isInnerFilled || isFieldMandatoryAndNotFilled(child, model);
       }
 
       return isInnerFilled;
@@ -339,12 +225,9 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return false;
   };
 
-  private validateForm = async (fields: FormField[], model: T): Promise<boolean> => {
-    const { dynamicValidations } = this.props;
+  const validateForm = async (fields: FormField[], model: T): Promise<boolean> => {
+    setErrors({});
 
-    this.setState({
-      errors: {}
-    });
     let newErrors: Dictionary<string> = {};
 
     for (const field of fields) {
@@ -352,10 +235,10 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         for (const child of field.childs) {
           if ((child.type === 'inline' || child.type === 'group') && child.childs) {
             for (const innerChild of child.childs) {
-              newErrors = await this.validateField(innerChild, model, newErrors);
+              newErrors = await validateField(innerChild, model, newErrors);
             }
           } else {
-            newErrors = await this.validateField(child, model, newErrors);
+            newErrors = await validateField(child, model, newErrors);
           }
         }
       }
@@ -375,7 +258,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       // };
       // }
       else if (!field.skipValidation) {
-        newErrors = await this.validateField(field, model, newErrors);
+        newErrors = await validateField(field, model, newErrors);
       }
     }
 
@@ -394,19 +277,17 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       }
     }
 
-    this.setState({
-      errors: newErrors
-    });
+    setErrors(newErrors);
 
     return !some(newErrors, (error: string) => error !== undefined);
   };
 
-  private validateField = async (
+  const validateField = async (
     field: FormField,
     model: T,
     errors: Dictionary<string>
   ): Promise<Dictionary<string>> => {
-    if (this.isFieldNotVisible(field, model)) {
+    if (isFieldNotVisible(field, model)) {
       return errors;
     };
 
@@ -437,16 +318,89 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return Promise.resolve(errors);
   };
 
-  private hasErrorsInline = (fields: FormField[]): boolean => {
-    return some(fields, f => has(this.state.errors, f.id) && this.state.errors[f.id]);
+  const isFieldNotVisible = (field: FormField, model: T) => {
+    if (field.visibilityFieldId !== undefined && field.visibilityFieldValue !== undefined) {
+      // This is a visibilityField, that means we have a condition on parent to show/hide the field in the form
+      const {
+        keyProperty,
+        visibilityFieldId,
+        visibilityFieldValue,
+        isVisibilityFieldExternal,
+        isVisibilityConditionInverted
+      } = field;
+
+      if (isVisibilityFieldExternal && !externalModel) {
+        throw new Error(
+          `Field ${field.id} has isVisibilityFieldExternal setted as true, but you forgot to pass dependencyModel to ComposableForm as props`
+        );
+      }
+
+      if (Array.isArray(visibilityFieldValue)) {
+        const shouldBeHidden = isVisibilityConditionInverted
+          ? some(visibilityFieldValue, (value: ComposableItem | string) =>
+            shouldFieldBeHidden(
+              !isVisibilityFieldExternal ? model! : externalModel!,
+              visibilityFieldId,
+              value,
+              isVisibilityConditionInverted,
+              keyProperty
+            )
+          )
+          : every(visibilityFieldValue, (value: ComposableItem | string) =>
+            shouldFieldBeHidden(
+              !isVisibilityFieldExternal ? model! : externalModel!,
+              visibilityFieldId,
+              value,
+              isVisibilityConditionInverted,
+              keyProperty
+            )
+          );
+
+        return shouldBeHidden;
+      } else {
+        return shouldFieldBeHidden(
+          !isVisibilityFieldExternal ? model! : externalModel!,
+          visibilityFieldId,
+          visibilityFieldValue,
+          isVisibilityConditionInverted,
+          keyProperty
+        );
+      }
+    }
+
+    return false;
   };
 
-  private retrieveErrorMessageInline = (fields: FormField[]): string => {
-    const found = find(fields, f => this.state.errors[f.id] !== undefined);
-    return found ? this.state.errors[found.id] : '';
+  const shouldFieldBeHidden = (
+    model: T,
+    visibilityFieldId: string,
+    visibilityFieldValue: ComposableItem | string,
+    isVisibilityConditionInverted: boolean = false,
+    keyProperty?: string
+  ) => {
+    const isVisible =
+      !model[visibilityFieldId] ||
+      (keyProperty
+        ? (visibilityFieldValue as ComposableItem)[keyProperty] !==
+        (model[visibilityFieldId] as ComposableItem)[keyProperty]
+        : !isEqual(visibilityFieldValue, model[visibilityFieldId]));
+
+    return isVisibilityConditionInverted ? !isVisible : isVisible;
   };
 
-  private renderFields = (
+  const isValid = async (): Promise<boolean> => {
+    return await validateForm(structure!.fields, model);
+  };
+
+  const getComposableFormOptions = (): DefinedComposableFormOptions => {
+    return merge({}, SharedOptions.getDefaultOptions(), customStyle);
+  };
+
+  const getComposableFormCustomComponents = (): ComposableFormCustomComponents => {
+    return merge({}, SharedOptions.getCustomComponents(), customComponents);
+  };
+
+  const renderFields = (
     field: FormField,
     index: string | number,
     model: T,
@@ -455,7 +409,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     flex?: number,
     customStyle?: StyleProp<ViewStyle>
   ) => {
-    if (this.isFieldNotVisible(field, model)) {
+    if (isFieldNotVisible(field, model)) {
       return <View key={index} />;
     }
 
@@ -467,11 +421,11 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           <View
             key={index}
             style={{
-              marginTop: this.getComposableFormOptions().formContainer.inlinePadding
+              marginTop: getComposableFormOptions().formContainer.inlinePadding
             }}
           >
-            {!!this.getComposableFormCustomComponents().renderHeaderTitle ? (
-              this.getComposableFormCustomComponents().renderHeaderTitle!(field.label)
+            {!!getComposableFormCustomComponents().renderHeaderTitle ? (
+              getComposableFormCustomComponents().renderHeaderTitle!(field.label)
             ) : (
                 <Text
                   style={{
@@ -488,90 +442,90 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderTextField(field, model, errors, isInline, customStyle)}
+            {renderTextField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'number':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderNumberField(field, model, errors, isInline, customStyle)}
+            {renderNumberField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'checkbox':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderCheckBoxField(field, model, errors, customStyle)}
+            {renderCheckBoxField(field, model, errors, customStyle)}
           </View>
         );
       case 'toggle':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderToggleField(field, model, errors, customStyle)}
+            {renderToggleField(field, model, errors, customStyle)}
           </View>
         );
       case 'select':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderSelectField(field, model, errors, isInline, customStyle)}
+            {renderSelectField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'autocomplete':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderAutocompleteField(field, model, errors, isInline, customStyle)}
+            {renderAutocompleteField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'date':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderDateField(field, model, errors, isInline, customStyle)}
+            {renderDateField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'duration':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderDurationField(field, model, errors, isInline, customStyle)}
+            {renderDurationField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'map':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderMapField(field, model, errors, isInline, customStyle)}
+            {renderMapField(field, model, errors, isInline, customStyle)}
           </View>
         );
       case 'segment':
         return (
           <View
             key={index}
-            style={[styles.formRow, { flex, marginTop: this.getComposableFormOptions().formContainer.inlinePadding }]}
+            style={[styles.formRow, { flex, marginTop: getComposableFormOptions().formContainer.inlinePadding }]}
           >
-            {this.renderSegment(field, model, customStyle)}
+            {renderSegment(field, model, customStyle)}
           </View>
         );
       case 'inline':
@@ -579,7 +533,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           <View key={index}>
             <View style={styles.formRow}>
               {field.childs!.map((childField, childIndex) =>
-                this.renderFields(
+                renderFields(
                   childField,
                   field.id + childIndex,
                   model,
@@ -590,8 +544,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
                 )
               )}
             </View>
-            {this.hasErrorsInline(field.childs!) && (
-              <Text style={globalStyles.errorMessage}>{this.retrieveErrorMessageInline(field.childs!)}</Text>
+            {hasErrorsInline(field.childs!) && (
+              <Text style={globalStyles.errorMessage}>{retrieveErrorMessageInline(field.childs!)}</Text>
             )}
           </View>
         );
@@ -600,7 +554,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
   };
 
-  private renderTextField = (
+  const renderTextField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -610,34 +564,34 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return (
       <TextField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
           if (field.disabled) {
-            this.setSelectionAtStart(input);
+            setSelectionAtStart(input);
           }
         }}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         description={field.description}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
-        color={this.getComposableFormOptions().textFields.color}
-        descriptionColor={this.getComposableFormOptions().textFields.descriptionColor}
-        disabledColor={this.getComposableFormOptions().textFields.disabledColor}
-        backgroundColor={this.getComposableFormOptions().textFields.backgroundColor}
-        disabledBackgroundColor={this.getComposableFormOptions().textFields.disabledBackgroundColor}
-        floatingLabelColor={this.getComposableFormOptions().textFields.floatingLabelColor}
-        focusedFloatingLabelColor={this.getComposableFormOptions().textFields.focusedFloatingLabelColor}
-        errorFloatingLabelColor={this.getComposableFormOptions().textFields.errorFloatingLabelColor}
-        disabledFloatingLabelColor={this.getComposableFormOptions().textFields.disabledFloatingLabelColor}
-        borderColor={this.getComposableFormOptions().textFields.borderColor}
-        errorBorderColor={this.getComposableFormOptions().textFields.errorBorderColor}
-        focusedBorderColor={this.getComposableFormOptions().textFields.focusedBorderColor}
-        disabledBorderColor={this.getComposableFormOptions().textFields.disabledBorderColor}
-        errorMessageColor={this.getComposableFormOptions().textFields.errorMessageColor}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
+        color={getComposableFormOptions().textFields.color}
+        descriptionColor={getComposableFormOptions().textFields.descriptionColor}
+        disabledColor={getComposableFormOptions().textFields.disabledColor}
+        backgroundColor={getComposableFormOptions().textFields.backgroundColor}
+        disabledBackgroundColor={getComposableFormOptions().textFields.disabledBackgroundColor}
+        floatingLabelColor={getComposableFormOptions().textFields.floatingLabelColor}
+        focusedFloatingLabelColor={getComposableFormOptions().textFields.focusedFloatingLabelColor}
+        errorFloatingLabelColor={getComposableFormOptions().textFields.errorFloatingLabelColor}
+        disabledFloatingLabelColor={getComposableFormOptions().textFields.disabledFloatingLabelColor}
+        borderColor={getComposableFormOptions().textFields.borderColor}
+        errorBorderColor={getComposableFormOptions().textFields.errorBorderColor}
+        focusedBorderColor={getComposableFormOptions().textFields.focusedBorderColor}
+        disabledBorderColor={getComposableFormOptions().textFields.disabledBorderColor}
+        errorMessageColor={getComposableFormOptions().textFields.errorMessageColor}
         value={model[field.id] as string | undefined}
-        editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
+        editable={!field.disabled && !(loadingMapper && loadingMapper[field.id])}
         multiline={field.multiline}
         maxLength={field.maxLength}
         scrollEnabled={false} // fix for trigger scroll on iOS when keyboard opens
@@ -648,51 +602,45 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         }
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
-        selectionColor={this.getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
+        selectionColor={getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
         onSubmitEditing={event => {
-          if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
-            this.fieldRefs[field.nextField].focus();
+          if (field.nextField && fieldRefs[field.nextField] && !fieldRefs[field.nextField].isFocused()) {
+            fieldRefs[field.nextField].focus();
           }
         }}
         onChangeText={val => {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.id]: ''
-            }
+          setErrors({
+            ...errors,
+            [field.id]: ''
           });
-          this.props.onChange(field.id, val);
+
+          onChange(field.id, val);
         }}
         rightContent={
           <RightFieldIcon
             rightIcon={Platform.select({ ios: 'cancel', android: 'clear' })}
             onRightIconClick={() => {
-              this.setState({
-                errors: {
-                  ...this.state.errors,
-                  [field.id]: ''
-                }
+              setErrors({
+                ...errors,
+                [field.id]: ''
               });
-              this.props.onChange(field.id, '');
+
+              onChange(field.id, '');
             }}
           />
         }
         rightContentVisibility={field.isPassword || !!model[field.id]}
-        isLoading={this.props.loadingMapper && this.props.loadingMapper[field.id]}
+        isLoading={loadingMapper && loadingMapper[field.id]}
         onFocusLabel={() => {
-          if (this.props.onFocus) {
-            this.props.onFocus(this.fieldRefs[field.id]);
+          if (onFocus) {
+            onFocus(fieldRefs[field.id]);
           }
 
-          this.setState({
-            isFocusingMultiline: false
-          });
+          setIsFocusingMultiline(false);
         }}
         onTouchStart={() => {
           if (field.multiline) {
-            this.setState({
-              isFocusingMultiline: true
-            });
+            setIsFocusingMultiline(true);
           }
         }}
         error={errors[field.id]}
@@ -702,7 +650,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private renderNumberField = (
+  const renderNumberField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -712,63 +660,62 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return (
       <TextField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
           if (field.disabled) {
-            this.setSelectionAtStart(input);
+            setSelectionAtStart(input);
           }
         }}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         description={field.description}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
-        color={this.getComposableFormOptions().textFields.color}
-        descriptionColor={this.getComposableFormOptions().textFields.descriptionColor}
-        disabledColor={this.getComposableFormOptions().textFields.disabledColor}
-        backgroundColor={this.getComposableFormOptions().textFields.backgroundColor}
-        disabledBackgroundColor={this.getComposableFormOptions().textFields.disabledBackgroundColor}
-        floatingLabelColor={this.getComposableFormOptions().textFields.floatingLabelColor}
-        focusedFloatingLabelColor={this.getComposableFormOptions().textFields.focusedFloatingLabelColor}
-        errorFloatingLabelColor={this.getComposableFormOptions().textFields.errorFloatingLabelColor}
-        disabledFloatingLabelColor={this.getComposableFormOptions().textFields.disabledFloatingLabelColor}
-        borderColor={this.getComposableFormOptions().textFields.borderColor}
-        errorBorderColor={this.getComposableFormOptions().textFields.errorBorderColor}
-        focusedBorderColor={this.getComposableFormOptions().textFields.focusedBorderColor}
-        disabledBorderColor={this.getComposableFormOptions().textFields.disabledBorderColor}
-        errorMessageColor={this.getComposableFormOptions().textFields.errorMessageColor}
-        value={this.formatNumberWithLocale(model[field.id] as string | number | undefined)}
-        editable={!field.disabled && !(this.props.loadingMapper && this.props.loadingMapper[field.id])}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
+        color={getComposableFormOptions().textFields.color}
+        descriptionColor={getComposableFormOptions().textFields.descriptionColor}
+        disabledColor={getComposableFormOptions().textFields.disabledColor}
+        backgroundColor={getComposableFormOptions().textFields.backgroundColor}
+        disabledBackgroundColor={getComposableFormOptions().textFields.disabledBackgroundColor}
+        floatingLabelColor={getComposableFormOptions().textFields.floatingLabelColor}
+        focusedFloatingLabelColor={getComposableFormOptions().textFields.focusedFloatingLabelColor}
+        errorFloatingLabelColor={getComposableFormOptions().textFields.errorFloatingLabelColor}
+        disabledFloatingLabelColor={getComposableFormOptions().textFields.disabledFloatingLabelColor}
+        borderColor={getComposableFormOptions().textFields.borderColor}
+        errorBorderColor={getComposableFormOptions().textFields.errorBorderColor}
+        focusedBorderColor={getComposableFormOptions().textFields.focusedBorderColor}
+        disabledBorderColor={getComposableFormOptions().textFields.disabledBorderColor}
+        errorMessageColor={getComposableFormOptions().textFields.errorMessageColor}
+        value={formatNumberWithLocale(model[field.id] as string | number | undefined)}
+        editable={!field.disabled && !(loadingMapper && loadingMapper[field.id])}
         currency={field.currency}
         maxLength={field.maxLength}
         isPercentage={field.isPercentage}
         keyboardType="decimal-pad"
         returnKeyType={field.nextField ? 'next' : 'done'}
         blurOnSubmit={field.multiline ? false : !field.nextField}
-        selectionColor={this.getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
-        isLoading={this.props.loadingMapper && this.props.loadingMapper[field.id]}
+        selectionColor={getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
+        isLoading={loadingMapper && loadingMapper[field.id]}
         onSubmitEditing={() => {
-          if (field.nextField && this.fieldRefs[field.nextField] && !this.fieldRefs[field.nextField].isFocused()) {
-            this.fieldRefs[field.nextField].focus();
+          if (field.nextField && fieldRefs[field.nextField] && !fieldRefs[field.nextField].isFocused()) {
+            fieldRefs[field.nextField].focus();
           }
         }}
         onChangeText={val => {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.id]: ''
-            }
+          setErrors({
+            ...errors,
+            [field.id]: ''
           });
-          this.props.onChange(field.id, this.convertStringToNumber(val));
+
+          onChange(field.id, convertStringToNumber(val));
         }}
         onFocusLabel={() => {
-          if (this.props.onFocus) {
-            this.props.onFocus(this.fieldRefs[field.id]);
+          if (onFocus) {
+            onFocus(fieldRefs[field.id]);
           }
         }}
         onBlurLabel={() => {
-          this.props.onChange(field.id, this.restoreNumberWithLocale(model[field.id] as string | number | undefined));
+          onChange(field.id, restoreNumberWithLocale(model[field.id] as string | number | undefined));
         }}
         error={errors[field.id]}
         isMandatory={field.isMandatory}
@@ -777,7 +724,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private restoreNumberWithLocale = (val?: string | number): number | undefined => {
+  const restoreNumberWithLocale = (val?: string | number): number | undefined => {
     if (!val) {
       return undefined;
     }
@@ -789,8 +736,8 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return numbro.unformat(String(val));
   };
 
-  private formatNumberWithLocale = (n?: string | number): string | undefined => {
-    if (!!n && this.isSeparatorLastChar(String(n))) {
+  const formatNumberWithLocale = (n?: string | number): string | undefined => {
+    if (!!n && isSeparatorLastChar(String(n))) {
       const numberString = String(n);
       return `${numberString.slice(0, numberString.length - 1)},`;
     }
@@ -802,23 +749,23 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return !!n ? String(n) : undefined;
   };
 
-  private convertStringToNumber = (val: string) => {
+  const convertStringToNumber = (val: string) => {
     if (!val) {
       return undefined;
     }
 
-    if (this.isSeparatorLastChar(val) || ((val.includes(',') || val.includes('.')) && val.slice(-1) === '0')) {
+    if (isSeparatorLastChar(val) || ((val.includes(',') || val.includes('.')) && val.slice(-1) === '0')) {
       return val;
     }
 
     return numbro.unformat(val);
   };
 
-  private isSeparatorLastChar = (n: string) => {
+  const isSeparatorLastChar = (n: string) => {
     return n.match(/^-?\d*(\.|,)$/) !== null;
   };
 
-  private renderCheckBoxField = (
+  const renderCheckBoxField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -826,19 +773,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
   ) => {
     return (
       <CheckBoxField
-        color={this.getComposableFormOptions().checkBoxes?.color}
+        color={getComposableFormOptions().checkBoxes?.color}
         containerStyle={[{ flex: 1 }, customStyle]}
         isChecked={model[field.id] as boolean}
         rightTextView={
           field.urlLink
-            ? this.renderCheckBoxLink(field)
+            ? renderCheckBoxLink(field)
             : undefined
         }
         rightText={field.checkboxTextPosition === 'right' ? field.label : undefined}
         leftText={!field.checkboxTextPosition || field.checkboxTextPosition === 'left' ? field.label : undefined}
         onClick={() => {
           Keyboard.dismiss();
-          this.props.onChange(field.id, !model[field.id]);
+          onChange(field.id, !model[field.id]);
         }}
         error={errors[field.id]}
         isMandatory={field.isMandatory}
@@ -846,7 +793,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private renderCheckBoxLink = (field: FormField) => {
+  const renderCheckBoxLink = (field: FormField) => {
     if (Platform.OS === 'android') {
       return (
         <View style={styles.checkboxUrlContainer}>
@@ -854,7 +801,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
           <TouchableNativeFeedback onPress={() => Linking.openURL(field.urlLink!)}>
             <Text
               style={{
-                color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
+                color: getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
                 fontWeight: '600'
               }}
             >
@@ -871,7 +818,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         <TouchableOpacity onPress={() => Linking.openURL(field.urlLink!)}>
           <Text
             style={{
-              color: this.getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
+              color: getComposableFormOptions().checkBoxes?.urlColor || Colors.PRIMARY_BLUE,
               fontWeight: '600'
             }}
           >
@@ -882,7 +829,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   }
 
-  private renderToggleField = (
+  const renderToggleField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -893,17 +840,16 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         containerStyle={[{ flex: 1 }, customStyle]}
         value={model[field.id] as boolean}
         disableSeparator={field.disableSeparator}
-        renderCustomLabel={this.getComposableFormCustomComponents().renderToggleLabelItem}
-        trackColor={this.getComposableFormOptions().toggles.trackColor}
+        renderCustomLabel={getComposableFormCustomComponents().renderToggleLabelItem}
+        trackColor={getComposableFormOptions().toggles.trackColor}
         label={field.label}
         onValueChange={val => {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.id]: ''
-            }
+          setErrors({
+            ...errors,
+            [field.id]: ''
           });
-          this.props.onChange(field.id, val);
+
+          onChange(field.id, val);
         }}
         disabled={field.disabled}
         isMandatory={field.isMandatory}
@@ -911,7 +857,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private renderSelectField = (
+  const renderSelectField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -921,16 +867,16 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return (
       <SelectPickerField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
-          this.setSelectionAtStart(input);
+          setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
-        onPress={() => this.openSelectPicker(field, model)}
+        onPress={() => openSelectPicker(field, model)}
         itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
         displayProperty={field.displayProperty}
@@ -938,37 +884,35 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         error={errors[field.id]}
         disableErrorMessage={isInline}
         isMandatory={field.isMandatory}
-        options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
+        options={pickerMapper ? pickerMapper[field.id] || field.options : field.options}
       />
     );
   };
 
-  private openSelectPicker = (field: FormField, model: T) => {
+  const openSelectPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
+    const items = pickerMapper ? pickerMapper[field.id] || field.options! : field.options!;
 
-    this.props.navigation.navigate(SELECT_PICKER_OVERLAY_KEY, {
-      pickedItem: this.retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
+    navigation.navigate(SELECT_PICKER_OVERLAY_KEY, {
+      pickedItem: retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
       items,
       displayProperty: field.displayProperty,
       keyProperty: field.keyProperty,
       topLabel: field.pickerLabel,
-      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
-      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-      knobColor: this.getComposableFormOptions().pickers.knobColor,
+      headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: getComposableFormOptions().pickers.knobColor,
       onCreateNewItemPressed: () => {
-        if (this.props.createNewItemMapper) {
-          this.props.createNewItemMapper[field.id].callback();
+        if (createNewItemMapper) {
+          createNewItemMapper[field.id].callback();
         }
       },
-      createNewItemLabel: this.props.createNewItemMapper && this.props.createNewItemMapper[field.id].label,
+      createNewItemLabel: createNewItemMapper && createNewItemMapper[field.id].label,
       onPick: (selectedItem: ComposableItem | string) => {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [field.id]: ''
-          }
+        setErrors({
+          ...errors,
+          [field.id]: ''
         });
 
         if (field.shouldReturnKey) {
@@ -982,32 +926,30 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
               `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
             );
           }
-          this.props.onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
+          onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
         } else {
-          this.props.onChange(field.id, selectedItem);
+          onChange(field.id, selectedItem);
         }
 
         if (field.updateFieldId && field.updateFieldKeyProperty) {
-          this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.updateFieldId]: ''
-            }
+          onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
+          setErrors({
+            ...errors,
+            [field.updateFieldId]: ''
           });
         }
       },
-      renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
-      renderTopLabelItem: this.getComposableFormCustomComponents().renderTopLabelItem,
+      renderOverlayItem: getComposableFormCustomComponents().renderOverlayItem,
+      renderTopLabelItem: getComposableFormCustomComponents().renderTopLabelItem,
       isBackDropMode: true,
-      selectedItemTextColor: this.getComposableFormOptions().selectPickers.selectedItemTextColor,
-      selectedItemIconColor: this.getComposableFormOptions().selectPickers.selectedItemIconColor,
-      createNewItemTextColor: this.getComposableFormOptions().selectPickers.createNewItemTextColor,
-      createNewItemIconColor: this.getComposableFormOptions().selectPickers.createNewItemIconColor
+      selectedItemTextColor: getComposableFormOptions().selectPickers.selectedItemTextColor,
+      selectedItemIconColor: getComposableFormOptions().selectPickers.selectedItemIconColor,
+      createNewItemTextColor: getComposableFormOptions().selectPickers.createNewItemTextColor,
+      createNewItemIconColor: getComposableFormOptions().selectPickers.createNewItemIconColor
     });
   };
 
-  private retrievePickedItem = (
+  const retrievePickedItem = (
     items: ComposableItem[] | string[],
     value: ComposableItem | string,
     keyProperty?: string
@@ -1020,31 +962,31 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
       return value;
     }
 
-    return find<ComposableItem>(items as ComposableItem[], item => getValueByKey(item, keyProperty) === value);
+    return find<ComposableItem>(items as ComposableItem[], (item: ComposableItem) => getValueByKey(item, keyProperty) === value);
   };
 
-  private renderAutocompleteField = (
+  const renderAutocompleteField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
     isInline: boolean = false,
     customStyle: StyleProp<ViewStyle> = {}
   ) => {
-    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
+    const items = pickerMapper ? pickerMapper[field.id] || field.options! : field.options!;
 
     return (
       <AutocompletePickerField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
-          this.setSelectionAtStart(input);
+          setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
-        onPress={() => this.openAutocompletePicker(field, model)}
+        onPress={() => openAutocompletePicker(field, model)}
         itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
         displayProperty={field.displayProperty}
@@ -1057,60 +999,56 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private openAutocompletePicker = (field: FormField, model: T) => {
+  const openAutocompletePicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    const items = this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options! : field.options!;
+    const items = pickerMapper ? pickerMapper[field.id] || field.options! : field.options!;
 
-    this.props.navigation.navigate(AUTOCOMPLETE_PICKER_OVERLAY_KEY, {
+    navigation.navigate(AUTOCOMPLETE_PICKER_OVERLAY_KEY, {
       pickedItem: model[field.id] as ComposableItem | string,
       items,
       displayProperty: field.displayProperty,
       keyProperty: field.keyProperty,
-      renderOverlayItem: this.getComposableFormCustomComponents().renderOverlayItem,
-      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
-      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-      knobColor: this.getComposableFormOptions().pickers.knobColor,
-      onFilterItems: (text: string) => this.props.searchMapper![field.id](text),
+      renderOverlayItem: getComposableFormCustomComponents().renderOverlayItem,
+      headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: getComposableFormOptions().pickers.knobColor,
+      onFilterItems: (text: string) => searchMapper![field.id](text),
       onPick: (selectedItem: ComposableItem | string) => {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [field.id]: ''
-          }
+        setErrors({
+          ...errors,
+          [field.id]: ''
         });
+
         if (field.shouldReturnKey) {
           if (typeof selectedItem === 'string') {
-            this.props.onChange(field.id, selectedItem);
+            onChange(field.id, selectedItem);
             if (field.updateFieldId && field.updateFieldKeyProperty) {
-              this.props.onChange(field.updateFieldId, undefined);
+              onChange(field.updateFieldId, undefined);
             }
           } else {
-            this.props.onChange(field.id, selectedItem[field.keyProperty!] as string);
+            onChange(field.id, selectedItem[field.keyProperty!] as string);
             if (field.updateFieldId && field.updateFieldKeyProperty) {
-              this.props.onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
+              onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
             }
           }
         } else {
-          this.props.onChange(field.id, selectedItem);
+          onChange(field.id, selectedItem);
         }
         if (field.updateFieldId && field.updateFieldKeyProperty) {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              [field.updateFieldId]: ''
-            }
+          setErrors({
+            ...errors,
+            [field.updateFieldId]: ''
           });
         }
       },
-      canExtendFullScreen: true,
       hasTextInput: true,
       minHeight: 350
     });
   };
 
-  // This is a date picker field renderer for fields of type date
-  private renderDateField = (
+  // is a date picker field renderer for fields of type date
+  const renderDateField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -1122,19 +1060,19 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return (
       <DatePickerField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
-          this.setSelectionAtStart(input);
+          setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
         value={date}
         // floatingLabel={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         // editable={false}
-        onPress={() => this.openCalendar(field, model)}
-        onRightIconClick={() => this.openCalendar(field, model)}
+        onPress={() => openCalendar(field, model)}
+        onRightIconClick={() => openCalendar(field, model)}
         error={errors[field.id]}
         isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
@@ -1142,32 +1080,30 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private openCalendar = (field: FormField, model: T) => {
+  const openCalendar = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    this.props.navigation.navigate(CALENDAR_PICKER_OVERLAY_KEY, {
+    navigation.navigate(CALENDAR_PICKER_OVERLAY_KEY, {
       pickedDate: model[field.id] ? moment(model[field.id] as string, 'YYYY-MM-DD').format('YYYY-MM-DD') : Date(),
       isAlreadyPicked: Boolean(model[field.id]),
       mode: 'single-day',
-      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
-      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-      knobColor: this.getComposableFormOptions().pickers.knobColor,
+      headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: getComposableFormOptions().pickers.knobColor,
       onConfirm: (selectedItem: string) => {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [field.id]: ''
-          }
+        setErrors({
+          ...errors,
+          [field.id]: ''
         });
 
-        this.props.onChange(field.id, selectedItem);
+        onChange(field.id, selectedItem);
       },
-      customFormOptions: this.getComposableFormOptions()
+      customFormOptions: getComposableFormOptions()
     });
   };
 
-  // This is a map picker field renderer for fields of type date
-  private renderMapField = (
+  // is a map picker field renderer for fields of type date
+  const renderMapField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
@@ -1177,16 +1113,16 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return (
       <MapPickerField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
-          this.setSelectionAtStart(input);
+          setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
-        onPress={() => this.openMapPicker(field, model)}
+        onPress={() => openMapPicker(field, model)}
         positionValue={model[field.id] as GooglePlaceDetail}
         // itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
@@ -1195,40 +1131,37 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         error={errors[field.id]}
         isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
-      // options={this.props.pickerMapper ? this.props.pickerMapper[field.id] || field.options : field.options}
+      // options={pickerMapper ? pickerMapper[field.id] || field.options : field.options}
       />
     );
   };
 
-  private openMapPicker = (field: FormField, model: T) => {
+  const openMapPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    this.props.navigation.navigate(MAP_PICKER_OVERLAY_KEY, {
-      apiKey: this.props.googleApiKey!,
+    navigation.navigate(MAP_PICKER_OVERLAY_KEY, {
+      apiKey: googleApiKey!,
       pickedPosition: model[field.id] as GooglePlaceDetail,
-      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
-      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-      knobColor: this.getComposableFormOptions().pickers.knobColor,
-      renderCustomCancelButton: this.getComposableFormOptions().pickers.renderCustomCancelButton,
+      headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: getComposableFormOptions().pickers.knobColor,
+      renderCustomCancelButton: getComposableFormOptions().pickers.renderCustomCancelButton,
       onConfirm: (pickedPosition: GooglePlaceDetail) => {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [field.id]: ''
-          }
+        setErrors({
+          ...errors,
+          [field.id]: ''
         });
 
-        this.props.onChange(field.id, pickedPosition);
+        onChange(field.id, pickedPosition);
       },
-      customFormOptions: this.getComposableFormOptions(),
-      canExtendFullScreen: true,
+      customFormOptions: getComposableFormOptions(),
       hasTextInput: true,
       minHeight: 350
     });
   };
 
-  // This is a component to pick between several items
-  private renderSegment = (
+  // is a component to pick between several items
+  const renderSegment = (
     field: FormField,
     model: T,
     customStyle: StyleProp<ViewStyle> = {}
@@ -1238,39 +1171,39 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
         data={field.options as string[]}
         containerStyle={[{ flex: 1 }, customStyle]}
         activeItemIndex={model[field.id] as number}
-        onChange={(index) => this.props.onChange(field.id, index)}
-        backgroundColor={this.getComposableFormOptions().segments.backgroundColor}
-        activeTextStyle={this.getComposableFormOptions().segments.segmentActiveTextStyle}
-        inactiveTextStyle={this.getComposableFormOptions().segments.segmentInactiveTextStyle}
-        activeItemColor={this.getComposableFormOptions().segments.activeItemColor}
+        onChange={(index) => onChange(field.id, index)}
+        backgroundColor={getComposableFormOptions().segments.backgroundColor}
+        activeTextStyle={getComposableFormOptions().segments.segmentActiveTextStyle}
+        inactiveTextStyle={getComposableFormOptions().segments.segmentInactiveTextStyle}
+        activeItemColor={getComposableFormOptions().segments.activeItemColor}
       />
     );
   };
 
-  // This is a duration picker field renderer for fields of type date
-  private renderDurationField = (
+  // is a duration picker field renderer for fields of type date
+  const renderDurationField = (
     field: FormField,
     model: T,
     errors: Dictionary<string>,
     isInline: boolean = false,
     customStyle: StyleProp<ViewStyle> = {}
   ) => {
-    const duration = this.retrieveDuration(model[field.id] as number | undefined);
+    const duration = retrieveDuration(model[field.id] as number | undefined);
 
     return (
       <DurationPickerField
         onRef={input => {
-          this.fieldRefs[field.id] = input;
+          fieldRefs[field.id] = input;
 
-          this.setSelectionAtStart(input);
+          setSelectionAtStart(input);
         }}
         containerStyle={[{ flex: 1 }, customStyle]}
-        placeholderStyle={this.getComposableFormOptions().labels.placeholderStyle}
-        inputStyle={this.getComposableFormOptions().labels.inputStyle}
+        placeholderStyle={getComposableFormOptions().labels.placeholderStyle}
+        inputStyle={getComposableFormOptions().labels.inputStyle}
         value={duration}
         label={field.label}
-        onPress={() => this.openDuration(field, model)}
-        onRightIconClick={() => this.openDuration(field, model)}
+        onPress={() => openDuration(field, model)}
+        onRightIconClick={() => openDuration(field, model)}
         error={errors[field.id]}
         isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
@@ -1278,7 +1211,7 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     );
   };
 
-  private retrieveDuration = (duration?: number) => {
+  const retrieveDuration = (duration?: number) => {
     if (!duration) {
       return undefined;
     }
@@ -1289,31 +1222,38 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     return `${hours}:${minutes}`;
   };
 
-  private openDuration = (field: FormField, model: T) => {
+  const openDuration = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    this.props.navigation.navigate(DURATION_PICKER_OVERLAY_KEY, {
+    navigation.navigate(DURATION_PICKER_OVERLAY_KEY, {
       pickedAmount: model[field.id] as number,
-      headerBackgroundColor: this.getComposableFormOptions().pickers.headerBackgroundColor,
-      renderCustomBackground: this.getComposableFormOptions().pickers.renderCustomBackground,
-      knobColor: this.getComposableFormOptions().pickers.knobColor,
+      headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: getComposableFormOptions().pickers.knobColor,
       headerHeight: 14,
       onConfirm: (selectedItem: number) => {
-        this.setState({
-          errors: {
-            ...this.state.errors,
-            [field.id]: ''
-          }
+        setErrors({
+          ...errors,
+          [field.id]: ''
         });
 
-        this.props.onChange(field.id, selectedItem);
+        onChange(field.id, selectedItem);
       },
-      customFormOptions: this.getComposableFormOptions(),
+      customFormOptions: getComposableFormOptions(),
       disabledInteraction: Platform.OS === 'android'
     });
   };
 
-  private setSelectionAtStart = (input: TextInput) => {
+  const hasErrorsInline = (fields: FormField[]): boolean => {
+    return some(fields, (f: FormField) => has(errors, f.id) && errors[f.id]);
+  };
+
+  const retrieveErrorMessageInline = (fields: FormField[]): string => {
+    const found = find(fields, (f: FormField) => errors[f.id] !== undefined);
+    return found ? errors[found.id] : '';
+  };
+
+  const setSelectionAtStart = (input: TextInput) => {
     if (input) {
       input.setNativeProps({
         selection: { start: 0, end: 0 }
@@ -1321,17 +1261,23 @@ export default class ComposableForm<T extends ComposableItem> extends Component<
     }
   }
 
-  private getComposableFormOptions = (): DefinedComposableFormOptions => {
-    const { customStyle } = this.props;
-
-    return merge({}, SharedOptions.getDefaultOptions(), customStyle);
-  };
-
-  private getComposableFormCustomComponents = (): ComposableFormCustomComponents => {
-    const { customComponents } = this.props;
-
-    return merge({}, SharedOptions.getCustomComponents(), customComponents);
-  };
+  return (
+    <View
+      style={[
+        styles.formContainer,
+        { backgroundColor: getComposableFormOptions().formContainer.backgroundColor }
+      ]}
+    >
+      <View
+        style={{
+          backgroundColor: getComposableFormOptions().formContainer.backgroundColor,
+          padding: getComposableFormOptions().formContainer.externalPadding
+        }}
+      >
+        {structure.fields.map((field, index) => renderFields(field, index, model, errors))}
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -1351,3 +1297,5 @@ const styles = StyleSheet.create({
   segmentActiveText: { color: Colors.WHITE },
   segmentInactiveText: { color: Colors.BLACK }
 });
+
+export default forwardRef(ComposableForm);

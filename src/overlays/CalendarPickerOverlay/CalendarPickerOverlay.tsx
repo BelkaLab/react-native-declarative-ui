@@ -1,11 +1,10 @@
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { FunctionComponent, useState } from 'react';
+import { View } from 'react-native';
 import { SingleDayCalendar } from '../../base/calendar/SingleDayCalendar';
-import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
-import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 export interface ICalendarPickerOverlayProps {
   mode: 'single-day';
@@ -17,61 +16,30 @@ export interface ICalendarPickerOverlayProps {
   renderCustomBackground?: () => React.ReactElement<{}>;
 }
 
-interface IState {}
+const CalendarPickerOverlay: FunctionComponent<ICalendarPickerOverlayProps & IBottomOverlayProps> = (props) => {
+  const {
+    onConfirm,
+    pickedDate,
+    isAlreadyPicked,
+    dismissOverlay,
+    customFormOptions,
+  } = props;
 
-class CalendarPickerOverlay extends Component<ICalendarPickerOverlayProps & IBottomOverlayProps, IState> {
-  private calendar!: SingleDayCalendar;
-
-  constructor(props: ICalendarPickerOverlayProps & IBottomOverlayProps) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
-        <SingleDayCalendar
-          pickedDate={this.props.pickedDate}
-          isAlreadyPicked={this.props.isAlreadyPicked}
-          onPickDate={pickedDate => {
-            if (this.props.onConfirm) {
-              this.props.onConfirm(pickedDate);
-            }
-            this.props.dismissOverlay();
-          }}
-          onRef={calendar => {
-            if (calendar) {
-              this.calendar = calendar;
-            }
-          }}
-          theme={this.props.customFormOptions.calendars && this.props.customFormOptions.calendars.singleDayTheme}
-        />
-      </View>
-    );
-  }
-
-  private onConfirmPressed = () => {
-    const pickedDate = this.calendar.getSelectedDate();
-
-    if (this.props.onConfirm && pickedDate) {
-      this.props.onConfirm(pickedDate);
-    }
-  };
+  return (
+    <View style={[globalStyles.pickerContainer, { paddingBottom: 34 }]}>
+      <SingleDayCalendar
+        pickedDate={pickedDate}
+        isAlreadyPicked={isAlreadyPicked}
+        onPickDate={pickedDate => {
+          if (onConfirm) {
+            onConfirm(pickedDate);
+          }
+          dismissOverlay();
+        }}
+        theme={customFormOptions.calendars && customFormOptions.calendars.singleDayTheme}
+      />
+    </View>
+  );
 }
-
-const HEADER_HEIGHT = 48;
-
-const styles = StyleSheet.create({
-  listHeaderContainer: {
-    height: HEADER_HEIGHT,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderTopRightRadius: 6,
-    borderTopLeftRadius: 6,
-    backgroundColor: Colors.GRAY_200,
-    paddingHorizontal: 16
-  },
-  buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' }
-});
 
 export default withMappedNavigationParams()(withBottomOverlay(CalendarPickerOverlay));

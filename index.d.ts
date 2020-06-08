@@ -2,8 +2,6 @@
 declare module 'react-native-declarative-ui' {
   import { ScrollViewProperties } from 'react-native';
   import { CalendarTheme } from 'react-native-calendars';
-  import { NavigationParams, NavigationRoute } from 'react-navigation';
-  import { StackNavigationProp } from 'react-navigation-stack/lib/typescript/src/vendor/types';
 
   export type ComposableItem = {
     [key: string]: unknown;
@@ -19,7 +17,6 @@ declare module 'react-native-declarative-ui' {
     onClear?: () => void;
     onFocus?: (input: TextInput) => void;
     onFormFilled: (isFilled: boolean) => void;
-    navigation: StackNavigationProp<NavigationRoute<NavigationParams>, NavigationParams>;
     backgroundColor?: string;
     loadingMapper?: {
       [id: string]: boolean;
@@ -142,6 +139,6 @@ declare module 'react-native-declarative-ui' {
 
   export class KeyboardAvoidingScrollView extends React.Component<IKeyboardAvoidingScrollViewProps, any> { }
 
-  const ComposableFormModals: object
+  const ComposableFormModals: React.ReactElement[];
 
 }

@@ -1,12 +1,12 @@
-import React, { Component } from 'react';
+import React, { FunctionComponent } from 'react';
 import { Dimensions, Image, LayoutChangeEvent, Platform, StyleSheet, Text, TouchableOpacity as IosTouchableOpacity, TouchableWithoutFeedback as IosTouchableWithoutFeedback, View } from 'react-native';
 import { FlatList, TouchableOpacity as AndroidTouchableOpacity, TouchableWithoutFeedback as AndroidTouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { isIphoneX } from 'react-native-iphone-x-helper';
 import { withMappedNavigationParams } from 'react-navigation-props-mapper';
-import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 const TouchableOpacity = Platform.select({
   ios: IosTouchableOpacity,
@@ -38,79 +38,42 @@ export interface ISelectPickerOverlayProps {
   createNewItemIconColor?: string;
 }
 
-interface IState {
-  items: ComposableItem[] | string[];
-  isLoading: boolean;
-  isFirstLoad: boolean;
-}
+const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IBottomOverlayProps> = (props) => {
+  const {
+    items,
+    renderOverlayItem,
+    keyProperty,
+    displayProperty,
+    onPick,
+    dismissOverlay,
+    onCreateNewItemPressed,
+    createNewItemLabel,
+    onListLayout,
+    pickedItem,
+    selectedItemTextColor = Colors.PRIMARY_BLUE,
+    selectedItemIconColor = Colors.PRIMARY_BLUE,
+    createNewItemTextColor = Colors.PRIMARY_BLUE,
+    createNewItemIconColor = Colors.PRIMARY_BLUE,
+    topLabel,
+    renderTopLabelItem,
+  } = props;
 
-class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomOverlayProps, IState> {
-  constructor(props: ISelectPickerOverlayProps & IBottomOverlayProps) {
-    super(props);
-    this.state = {
-      items: props.items,
-      isLoading: false,
-      isFirstLoad: true
-    };
-  }
-
-  render() {
-    const { isLoading } = this.state;
-
-    return (
-      <View style={[globalStyles.pickerContainer]} onLayout={this.props.onListLayout}>
-        {this.props.createNewItemLabel && this.renderCreateNewItem()}
-        {this.renderTopLabel()}
-        {isLoading ? (
-          <View>Loader</View>
-        ) : (
-            <FlatList<string | ComposableItem>
-              keyboardShouldPersistTaps="handled"
-              data={this.state.items}
-              scrollEnabled={true}
-              style={{ maxHeight: Dimensions.get('window').height * 0.94 - 40 }}
-              contentContainerStyle={isIphoneX() && { paddingBottom: 34 }}
-              renderItem={({ item }) => this.renderItem(item)}
-              ItemSeparatorComponent={() => (
-                <View
-                  style={{
-                    height: 1,
-                    width: '100%',
-                    backgroundColor: Colors.GRAY_200,
-                    marginLeft: 16
-                  }}
-                />
-              )}
-              extraData={this.state}
-              keyExtractor={(item, index) => index.toString()}
-            />
-          )}
-      </View>
-    );
-  }
-  private renderItem = (item: ComposableItem | string) => {
-    const { renderOverlayItem, keyProperty, displayProperty } = this.props;
-
+  const renderItem = (item: ComposableItem | string) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          this.props.onPick(item);
-          this.props.dismissOverlay();
+          onPick(item);
+          dismissOverlay();
         }}
       >
         {renderOverlayItem
           ? renderOverlayItem(item, displayProperty)
-          : this.renderDefaultItem(item, keyProperty, displayProperty)}
+          : renderDefaultItem(item, keyProperty, displayProperty)}
       </TouchableOpacity>
     );
   };
 
-  private renderDefaultItem = (item: ComposableItem | string, keyProperty?: string, displayProperty?: string) => {
-    const {
-      pickedItem,
-      selectedItemTextColor = Colors.PRIMARY_BLUE,
-      selectedItemIconColor = Colors.PRIMARY_BLUE
-    } = this.props;
+  const renderDefaultItem = (item: ComposableItem | string, keyProperty?: string, displayProperty?: string) => {
     if (typeof item === 'object' && typeof pickedItem === 'object' && keyProperty && displayProperty) {
       const isSelected = item[keyProperty] === pickedItem[keyProperty];
 
@@ -137,16 +100,11 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
     );
   };
 
-  private renderCreateNewItem = () => {
-    const {
-      createNewItemTextColor = Colors.PRIMARY_BLUE,
-      createNewItemIconColor = Colors.PRIMARY_BLUE
-    } = this.props;
-
+  const renderCreateNewItem = () => {
     return (
       <TouchableWithoutFeedback
         onPress={() => {
-          this.props.dismissOverlay(this.props.onCreateNewItemPressed);
+          dismissOverlay(onCreateNewItemPressed);
         }}
       >
         <View style={styles.createNewItemButton}>
@@ -162,16 +120,14 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
               }
             ]}
           >
-            {this.props.createNewItemLabel}
+            {createNewItemLabel}
           </Text>
         </View>
       </TouchableWithoutFeedback>
     );
   };
 
-  private renderTopLabel = () => {
-    const { topLabel, renderTopLabelItem } = this.props;
-
+  const renderTopLabel = () => {
     if (topLabel) {
       return renderTopLabelItem ? (
         renderTopLabelItem(topLabel)
@@ -184,6 +140,32 @@ class SelectPickerOverlay extends Component<ISelectPickerOverlayProps & IBottomO
 
     return null;
   };
+
+  return (
+    <View style={[globalStyles.pickerContainer]} onLayout={onListLayout}>
+      {createNewItemLabel && renderCreateNewItem()}
+      {renderTopLabel()}
+      <FlatList<string | ComposableItem>
+        keyboardShouldPersistTaps="handled"
+        data={items}
+        scrollEnabled={true}
+        style={{ maxHeight: Dimensions.get('window').height * 0.94 - 40 }}
+        contentContainerStyle={isIphoneX() && { paddingBottom: 34 }}
+        renderItem={({ item }) => renderItem(item)}
+        ItemSeparatorComponent={() => (
+          <View
+            style={{
+              height: 1,
+              width: '100%',
+              backgroundColor: Colors.GRAY_200,
+              marginLeft: 16
+            }}
+          />
+        )}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    </View>
+  );
 }
 
 const HEADER_HEIGHT = 48;
