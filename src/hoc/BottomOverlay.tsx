@@ -3,12 +3,11 @@ import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
-import { NavigationStackScreenProps } from 'react-navigation-stack';
 import { default as BottomSheet } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-export interface IBottomOverlayProps extends NavigationStackScreenProps {
+export interface IBottomOverlayProps {
   dismissOverlay: (onDismissedCallback?: () => void) => void;
   canExtendFullScreen?: boolean;
   hasTextInput?: boolean;
