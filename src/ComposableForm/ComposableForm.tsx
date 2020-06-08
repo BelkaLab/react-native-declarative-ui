@@ -66,7 +66,7 @@ interface IComposableFormProps<T> {
 
 const ComposableForm = <T extends ComposableItem>(
   props: IComposableFormProps<T>,
-  ref: Ref<{ isValid: () => void }>
+  ref: Ref<{ isValid: () => Promise<boolean> }>
 ) => {
   const {
     model,
