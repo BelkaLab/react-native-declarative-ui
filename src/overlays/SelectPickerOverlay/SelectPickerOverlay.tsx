@@ -7,6 +7,7 @@ import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
+import { isEmpty } from 'lodash';
 
 const TouchableOpacity = Platform.select({
   ios: IosTouchableOpacity,
@@ -36,6 +37,7 @@ export interface ISelectPickerOverlayProps {
   selectedItemIconColor?: string;
   createNewItemTextColor?: string;
   createNewItemIconColor?: string;
+  ListEmptyComponent?: () => (React.ComponentType<any> | React.ReactElement | null);
 }
 
 const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IBottomOverlayProps> = (props) => {
@@ -56,6 +58,7 @@ const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IBottom
     createNewItemIconColor = Colors.PRIMARY_BLUE,
     topLabel,
     renderTopLabelItem,
+    ListEmptyComponent,
   } = props;
 
   const renderItem = (item: ComposableItem | string) => {
@@ -141,10 +144,12 @@ const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IBottom
     return null;
   };
 
+  const shouldShowEmptySet = isEmpty(items) && !!ListEmptyComponent;
+
   return (
     <View style={[globalStyles.pickerContainer]} onLayout={onListLayout}>
-      {createNewItemLabel && renderCreateNewItem()}
-      {renderTopLabel()}
+      {!shouldShowEmptySet && createNewItemLabel && renderCreateNewItem()}
+      {!shouldShowEmptySet && renderTopLabel()}
       <FlatList<string | ComposableItem>
         keyboardShouldPersistTaps="handled"
         data={items}
@@ -162,6 +167,7 @@ const SelectPickerOverlay: FunctionComponent<ISelectPickerOverlayProps & IBottom
             }}
           />
         )}
+        ListEmptyComponent={ListEmptyComponent && ListEmptyComponent()}
         keyExtractor={(item, index) => index.toString()}
       />
     </View>
