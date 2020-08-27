@@ -57,6 +57,9 @@ interface IComposableFormProps<T> {
       callback: () => void;
     };
   };
+  emptySetMapper?: {
+    [id: string]: () => (React.ComponentType<any> | React.ReactElement);
+  };
   externalModel?: T;
   customStyle?: ComposableFormOptions;
   customComponents?: ComposableFormCustomComponents;
@@ -78,6 +81,7 @@ const ComposableForm = <T extends ComposableItem>(
     pickerMapper,
     searchMapper,
     createNewItemMapper,
+    emptySetMapper,
     externalModel,
     customStyle,
     customComponents,
@@ -945,7 +949,8 @@ const ComposableForm = <T extends ComposableItem>(
       selectedItemTextColor: getComposableFormOptions().selectPickers.selectedItemTextColor,
       selectedItemIconColor: getComposableFormOptions().selectPickers.selectedItemIconColor,
       createNewItemTextColor: getComposableFormOptions().selectPickers.createNewItemTextColor,
-      createNewItemIconColor: getComposableFormOptions().selectPickers.createNewItemIconColor
+      createNewItemIconColor: getComposableFormOptions().selectPickers.createNewItemIconColor,
+      ListEmptyComponent: !!emptySetMapper ? emptySetMapper[field.id] : null
     });
   };
 

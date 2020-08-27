@@ -33,6 +33,9 @@ declare module 'react-native-declarative-ui' {
         callback: () => void;
       };
     };
+    emptySetMapper?: {
+      [id: string]: () => (React.ComponentType<any> | React.ReactElement);
+    };
     externalModel?: T;
     customStyle?: ComposableFormOptions;
     customComponents?: ComposableFormCustomComponents;
