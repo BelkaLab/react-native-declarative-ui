@@ -112,6 +112,14 @@ export type DefinedComposableFormOptions = {
     createNewItemTextColor?: string;
     createNewItemIconColor?: string;
   };
+  selectSectionPickers: {
+    selectedItemTextColor?: string;
+    selectedItemIconColor?: string;
+    createNewItemTextColor?: string;
+    createNewItemIconColor?: string;
+    sectionHeaderColor?: string;
+    sectionHeaderBackgroundColor?: string;
+  };
   segments: {
     activeItemColor?: string;
     segmentActiveTextStyle?: StyleProp<TextStyle>;
@@ -148,6 +156,7 @@ class SharedOptions {
     calendars: {},
     pickers: {},
     selectPickers: {},
+    selectSectionPickers: {},
     segments: {
       activeItemColor: Colors.PRIMARY_BLUE,
       backgroundColor: Colors.WHITE,

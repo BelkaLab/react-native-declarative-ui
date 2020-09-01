@@ -24,6 +24,12 @@ declare module 'react-native-declarative-ui' {
     pickerMapper?: {
       [id: string]: ComposableItem[] | string[];
     };
+    sectionPickerMapper?: {
+      [id: string]: {
+        title: string;
+        data: ComposableItem[];
+      }[]
+    }
     searchMapper?: {
       [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
     };
@@ -90,6 +96,14 @@ declare module 'react-native-declarative-ui' {
       selectedItemIconColor?: string;
       createNewItemTextColor?: string;
       createNewItemIconColor?: string;
+    };
+    selectSectionPickers: {
+      selectedItemTextColor?: string;
+      selectedItemIconColor?: string;
+      createNewItemTextColor?: string;
+      createNewItemIconColor?: string;
+      sectionHeaderColor?: string;
+      sectionHeaderBackgroundColor?: string;
     };
     segments?: {
       activeItemColor?: string;
