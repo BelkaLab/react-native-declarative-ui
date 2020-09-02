@@ -907,121 +907,80 @@ const ComposableForm = <T extends ComposableItem>(
   const openSelectPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
+    const selectPickersSharedOptions = {
+      displayProperty: field.displayProperty,
+      keyProperty: field.keyProperty,
+      topLabel: field.pickerLabel,
+      headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
+      renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
+      knobColor: getComposableFormOptions().pickers.knobColor,
+      onCreateNewItemPressed: () => {
+        if (createNewItemMapper) {
+          createNewItemMapper[field.id].callback();
+        }
+      },
+      createNewItemLabel: createNewItemMapper && createNewItemMapper[field.id].label,
+      onPick: (selectedItem: ComposableItem | string) => {
+        setErrors({
+          ...errors,
+          [field.id]: ''
+        });
+
+        if (field.shouldReturnKey) {
+          if (!isObject(selectedItem)) {
+            throw new Error(
+              `Field ${field.id} is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
+            );
+          }
+          if (!field.keyProperty) {
+            throw new Error(
+              `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
+            );
+          }
+          onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
+        } else {
+          onChange(field.id, selectedItem);
+        }
+
+        if (field.updateFieldId && field.updateFieldKeyProperty) {
+          onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
+          setErrors({
+            ...errors,
+            [field.updateFieldId]: ''
+          });
+        }
+      },
+      renderOverlayItem: getComposableFormCustomComponents().renderOverlayItem,
+      renderTopLabelItem: getComposableFormCustomComponents().renderTopLabelItem,
+      isBackDropMode: true,
+      ListEmptyComponent: !!emptySetMapper ? emptySetMapper[field.id] : null
+    }
+
     if (field.isSectionList && sectionPickerMapper) {
       const sections = sectionPickerMapper[field.id];
 
       navigation.navigate(SELECT_PICKER_SECTION_OVERLAY_KEY, {
+        ...selectPickersSharedOptions,
         pickedItem: retrievePickedSectionItem(sections, model[field.id] as ComposableItem, field.keyProperty),
         sections,
-        displayProperty: field.displayProperty,
-        keyProperty: field.keyProperty,
-        topLabel: field.pickerLabel,
-        headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
-        renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
-        knobColor: getComposableFormOptions().pickers.knobColor,
-        onCreateNewItemPressed: () => {
-          if (createNewItemMapper) {
-            createNewItemMapper[field.id].callback();
-          }
-        },
-        createNewItemLabel: createNewItemMapper && createNewItemMapper[field.id].label,
-        onPick: (selectedItem: ComposableItem | string) => {
-          setErrors({
-            ...errors,
-            [field.id]: ''
-          });
-
-          if (field.shouldReturnKey) {
-            if (!isObject(selectedItem)) {
-              throw new Error(
-                `Field ${field.id} is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
-              );
-            }
-            if (!field.keyProperty) {
-              throw new Error(
-                `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
-              );
-            }
-            onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
-          } else {
-            onChange(field.id, selectedItem);
-          }
-
-          if (field.updateFieldId && field.updateFieldKeyProperty) {
-            onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
-            setErrors({
-              ...errors,
-              [field.updateFieldId]: ''
-            });
-          }
-        },
-        renderOverlayItem: getComposableFormCustomComponents().renderOverlayItem,
-        renderTopLabelItem: getComposableFormCustomComponents().renderTopLabelItem,
-        isBackDropMode: true,
         selectedItemTextColor: getComposableFormOptions().selectSectionPickers.selectedItemTextColor,
         selectedItemIconColor: getComposableFormOptions().selectSectionPickers.selectedItemIconColor,
         createNewItemTextColor: getComposableFormOptions().selectSectionPickers.createNewItemTextColor,
         createNewItemIconColor: getComposableFormOptions().selectSectionPickers.createNewItemIconColor,
         sectionHeaderColor: getComposableFormOptions().selectSectionPickers.sectionHeaderColor,
         sectionHeaderBackgroundColor: getComposableFormOptions().selectSectionPickers.sectionHeaderBackgroundColor,
-        ListEmptyComponent: !!emptySetMapper ? emptySetMapper[field.id] : null
       });
     } else {
       const items = pickerMapper ? pickerMapper[field.id] || field.options! : field.options!;
 
       navigation.navigate(SELECT_PICKER_OVERLAY_KEY, {
+        ...selectPickersSharedOptions,
         pickedItem: retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
         items,
-        displayProperty: field.displayProperty,
-        keyProperty: field.keyProperty,
-        topLabel: field.pickerLabel,
-        headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
-        renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
-        knobColor: getComposableFormOptions().pickers.knobColor,
-        onCreateNewItemPressed: () => {
-          if (createNewItemMapper) {
-            createNewItemMapper[field.id].callback();
-          }
-        },
-        createNewItemLabel: createNewItemMapper && createNewItemMapper[field.id].label,
-        onPick: (selectedItem: ComposableItem | string) => {
-          setErrors({
-            ...errors,
-            [field.id]: ''
-          });
-
-          if (field.shouldReturnKey) {
-            if (!isObject(selectedItem)) {
-              throw new Error(
-                `Field ${field.id} is setted as "shouldReturnKey" but your picker is returning a string instead of an object`
-              );
-            }
-            if (!field.keyProperty) {
-              throw new Error(
-                `Field ${field.id} is setted as "shouldReturnKey" but your json is not specifying a keyProperty`
-              );
-            }
-            onChange(field.id, getValueByKey(selectedItem as ComposableItem, field.keyProperty));
-          } else {
-            onChange(field.id, selectedItem);
-          }
-
-          if (field.updateFieldId && field.updateFieldKeyProperty) {
-            onChange(field.updateFieldId, (selectedItem as ComposableItem)[field.updateFieldKeyProperty]);
-            setErrors({
-              ...errors,
-              [field.updateFieldId]: ''
-            });
-          }
-        },
-        renderOverlayItem: getComposableFormCustomComponents().renderOverlayItem,
-        renderTopLabelItem: getComposableFormCustomComponents().renderTopLabelItem,
-        isBackDropMode: true,
         selectedItemTextColor: getComposableFormOptions().selectPickers.selectedItemTextColor,
         selectedItemIconColor: getComposableFormOptions().selectPickers.selectedItemIconColor,
         createNewItemTextColor: getComposableFormOptions().selectPickers.createNewItemTextColor,
         createNewItemIconColor: getComposableFormOptions().selectPickers.createNewItemIconColor,
-        ListEmptyComponent: !!emptySetMapper ? emptySetMapper[field.id] : null
       });
     }
   };
