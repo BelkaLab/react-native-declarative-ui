@@ -1,3 +1,4 @@
+import { SelectPickerSection } from './src/models/selectPickerSection';
 
 declare module 'react-native-declarative-ui' {
   import { ScrollViewProperties } from 'react-native';
@@ -25,10 +26,7 @@ declare module 'react-native-declarative-ui' {
       [id: string]: ComposableItem[] | string[];
     };
     sectionPickerMapper?: {
-      [id: string]: {
-        title: string;
-        data: ComposableItem[];
-      }[]
+      [id: string]: SelectPickerSection[];
     }
     searchMapper?: {
       [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;

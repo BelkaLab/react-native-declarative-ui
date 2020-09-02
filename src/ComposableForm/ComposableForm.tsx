@@ -34,6 +34,7 @@ import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
 import { map } from 'lodash';
+import { SelectPickerSection } from '../models/selectPickerSection';
 
 interface IComposableFormProps<T> {
   model: T;
@@ -50,10 +51,7 @@ interface IComposableFormProps<T> {
     [id: string]: ComposableItem[] | string[];
   };
   sectionPickerMapper?: {
-    [id: string]: {
-      title: string;
-      data: ComposableItem[];
-    }[]
+    [id: string]: SelectPickerSection[];
   }
   searchMapper?: {
     [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
@@ -876,6 +874,10 @@ const ComposableForm = <T extends ComposableItem>(
     isInline: boolean = false,
     customStyle: StyleProp<ViewStyle> = {}
   ) => {
+    const options = field.isSectionList
+      ? sectionPickerMapper ? sectionPickerMapper[field.id] || field.options : field.options
+      : pickerMapper ? pickerMapper[field.id] || field.options : field.options;
+
     return (
       <SelectPickerField
         onRef={input => {
@@ -896,7 +898,8 @@ const ComposableForm = <T extends ComposableItem>(
         error={errors[field.id]}
         disableErrorMessage={isInline}
         isMandatory={field.isMandatory}
-        options={pickerMapper ? pickerMapper[field.id] || field.options : field.options}
+        isSectionList={field.isSectionList}
+        options={options}
       />
     );
   };
@@ -1040,10 +1043,7 @@ const ComposableForm = <T extends ComposableItem>(
   };
 
   const retrievePickedSectionItem = (
-    sections: {
-      title: string;
-      data: ComposableItem[]
-    }[],
+    sections: SelectPickerSection[],
     value: ComposableItem,
     keyProperty?: string
   ) => {

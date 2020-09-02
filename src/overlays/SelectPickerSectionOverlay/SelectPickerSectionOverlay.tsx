@@ -8,6 +8,7 @@ import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
 import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { isEmpty } from 'lodash';
+import { SelectPickerSection } from '../../models/selectPickerSection';
 
 const TouchableOpacity = Platform.select({
   ios: IosTouchableOpacity,
@@ -19,10 +20,7 @@ const TouchableWithoutFeedback = Platform.select({
 });
 
 export interface ISelectPickerSectionOverlayProps {
-  sections: {
-    title: string;
-    data: ComposableItem[];
-  }[];
+  sections: SelectPickerSection[];
   pickedItem?: ComposableItem | string;
   displayProperty?: string;
   keyProperty?: string;
@@ -225,7 +223,14 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 6,
     borderTopRightRadius: 6
   },
-  sectionHeader: { paddingVertical: 8, paddingHorizontal: 16 },
+  sectionHeader: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.GRAY_200,
+    borderTopWidth: 1,
+    borderTopColor: Colors.GRAY_200,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
   buttonContainer: { height: HEADER_HEIGHT, justifyContent: 'center' },
   topLabelContainer: {
     height: TOP_LABEL_HEIGHT,
