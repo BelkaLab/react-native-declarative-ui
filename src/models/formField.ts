@@ -46,6 +46,7 @@ export type FormField = {
   shouldReturnKey?: boolean;
   updateFieldId?: string;
   updateFieldKeyProperty?: string;
+  shouldShowClearButton?: boolean;
   // visibility props
   visibilityFieldId?: string;
   visibilityFieldValue?: ComposableItem | ComposableItem[] | string | string[];

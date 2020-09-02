@@ -881,6 +881,14 @@ const ComposableForm = <T extends ComposableItem>(
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         onPress={() => openSelectPicker(field, model)}
+        onClear={() => {
+          setErrors({
+            ...errors,
+            [field.id]: ''
+          });
+
+          onChange(field.id, undefined);
+        }}
         itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
         displayProperty={field.displayProperty}
@@ -889,6 +897,7 @@ const ComposableForm = <T extends ComposableItem>(
         disableErrorMessage={isInline}
         isMandatory={field.isMandatory}
         options={pickerMapper ? pickerMapper[field.id] || field.options : field.options}
+        shouldShowClearButton={field.shouldShowClearButton}
       />
     );
   };
