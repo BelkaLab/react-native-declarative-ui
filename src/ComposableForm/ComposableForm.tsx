@@ -33,7 +33,7 @@ import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, D
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
-import { map } from 'lodash';
+import { map, flatMap } from 'lodash';
 import { SelectPickerSection } from '../models/selectPickerSection';
 
 interface IComposableFormProps<T> {
@@ -1047,7 +1047,7 @@ const ComposableForm = <T extends ComposableItem>(
     value: ComposableItem,
     keyProperty?: string
   ) => {
-    if (!keyProperty || !isObject(first<ComposableItem | string>(sections))) {
+    if (!keyProperty || !isObject(first<SelectPickerSection>(sections))) {
       return value;
     }
 
@@ -1056,8 +1056,8 @@ const ComposableForm = <T extends ComposableItem>(
     }
 
     return find(
-      map(sections, section => section.data),
-      (item: ComposableItem) => getValueByKey(item, keyProperty) === value
+      flatMap(map(sections, section => section.data)),
+      item => getValueByKey(item, keyProperty) === value
     );
   };
 
