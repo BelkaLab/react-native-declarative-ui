@@ -41,6 +41,7 @@ export type FormField = {
   // toggle props
   disableSeparator?: boolean;
   // select props
+  isSectionList?: boolean;
   options?: ComposableItem[] | string[];
   keyProperty?: string;
   displayProperty?: string;
