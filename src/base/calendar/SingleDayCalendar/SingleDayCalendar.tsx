@@ -39,6 +39,7 @@ const SingleDayCalendar: FunctionComponent<ISingleDayCalendarProps> = (props) =>
       <Calendar
         current={selectedDay}
         markedDates={markedDate}
+        firstDay={1}
         onDayPress={date => {
           setMarkedDate({
             [date.dateString]: { selected: true }
