@@ -28,11 +28,13 @@ import { ToggleField } from '../components/ToggleField';
 import { ComposableItem } from '../models/composableItem';
 import { ComposableStructure, Dictionary } from '../models/composableStructure';
 import { FormField } from '../models/formField';
-import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, DURATION_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY } from '../navigation/integration';
+import { AUTOCOMPLETE_PICKER_OVERLAY_KEY, CALENDAR_PICKER_OVERLAY_KEY, DURATION_PICKER_OVERLAY_KEY, MAP_PICKER_OVERLAY_KEY, SELECT_PICKER_OVERLAY_KEY, SELECT_PICKER_SECTION_OVERLAY_KEY } from '../navigation/integration';
 import SharedOptions, { ComposableFormCustomComponents, ComposableFormOptions, DefinedComposableFormOptions } from '../options/SharedOptions';
 import { Colors } from '../styles/colors';
 import { globalStyles } from '../styles/globalStyles';
 import { getValueByKey, isObject } from '../utils/helper';
+import { map, flatMap } from 'lodash';
+import { SelectPickerSection } from '../models/selectPickerSection';
 
 interface IComposableFormProps<T> {
   model: T;
@@ -48,6 +50,9 @@ interface IComposableFormProps<T> {
   pickerMapper?: {
     [id: string]: ComposableItem[] | string[];
   };
+  sectionPickerMapper?: {
+    [id: string]: SelectPickerSection[];
+  }
   searchMapper?: {
     [id: string]: (filterText?: string) => Promise<ComposableItem[] | string[]>;
   };
@@ -79,6 +84,7 @@ const ComposableForm = <T extends ComposableItem>(
     onFocus,
     loadingMapper,
     pickerMapper,
+    sectionPickerMapper,
     searchMapper,
     createNewItemMapper,
     emptySetMapper,
@@ -604,7 +610,7 @@ const ComposableForm = <T extends ComposableItem>(
         autoCapitalize={
           field.autoCapitalize || (field.keyboard && field.keyboard === 'email-address' ? 'none' : 'sentences')
         }
-        returnKeyType={field.nextField ? 'next' : 'done'}
+        returnKeyType={field.returnKeyType || (field.nextField ? 'next' : 'done')}
         blurOnSubmit={field.multiline ? false : !field.nextField}
         selectionColor={getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
         onSubmitEditing={event => {
@@ -868,6 +874,10 @@ const ComposableForm = <T extends ComposableItem>(
     isInline: boolean = false,
     customStyle: StyleProp<ViewStyle> = {}
   ) => {
+    const options = field.isSectionList
+      ? sectionPickerMapper ? sectionPickerMapper[field.id] || field.options : field.options
+      : pickerMapper ? pickerMapper[field.id] || field.options : field.options;
+
     return (
       <SelectPickerField
         onRef={input => {
@@ -896,8 +906,9 @@ const ComposableForm = <T extends ComposableItem>(
         error={errors[field.id]}
         disableErrorMessage={isInline}
         isMandatory={field.isMandatory}
-        options={pickerMapper ? pickerMapper[field.id] || field.options : field.options}
         shouldShowClearButton={field.shouldShowClearButton}
+        isSectionList={field.isSectionList}
+        options={options}
       />
     );
   };
@@ -905,11 +916,7 @@ const ComposableForm = <T extends ComposableItem>(
   const openSelectPicker = (field: FormField, model: T) => {
     Keyboard.dismiss();
 
-    const items = pickerMapper ? pickerMapper[field.id] || field.options! : field.options!;
-
-    navigation.navigate(SELECT_PICKER_OVERLAY_KEY, {
-      pickedItem: retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
-      items,
+    const selectPickersSharedOptions = {
       displayProperty: field.displayProperty,
       keyProperty: field.keyProperty,
       topLabel: field.pickerLabel,
@@ -955,12 +962,36 @@ const ComposableForm = <T extends ComposableItem>(
       renderOverlayItem: getComposableFormCustomComponents().renderOverlayItem,
       renderTopLabelItem: getComposableFormCustomComponents().renderTopLabelItem,
       isBackDropMode: true,
-      selectedItemTextColor: getComposableFormOptions().selectPickers.selectedItemTextColor,
-      selectedItemIconColor: getComposableFormOptions().selectPickers.selectedItemIconColor,
-      createNewItemTextColor: getComposableFormOptions().selectPickers.createNewItemTextColor,
-      createNewItemIconColor: getComposableFormOptions().selectPickers.createNewItemIconColor,
       ListEmptyComponent: !!emptySetMapper ? emptySetMapper[field.id] : null
-    });
+    }
+
+    if (field.isSectionList && sectionPickerMapper) {
+      const sections = sectionPickerMapper[field.id];
+
+      navigation.navigate(SELECT_PICKER_SECTION_OVERLAY_KEY, {
+        ...selectPickersSharedOptions,
+        pickedItem: retrievePickedSectionItem(sections, model[field.id] as ComposableItem, field.keyProperty),
+        sections,
+        selectedItemTextColor: getComposableFormOptions().selectSectionPickers.selectedItemTextColor,
+        selectedItemIconColor: getComposableFormOptions().selectSectionPickers.selectedItemIconColor,
+        createNewItemTextColor: getComposableFormOptions().selectSectionPickers.createNewItemTextColor,
+        createNewItemIconColor: getComposableFormOptions().selectSectionPickers.createNewItemIconColor,
+        sectionHeaderColor: getComposableFormOptions().selectSectionPickers.sectionHeaderColor,
+        sectionHeaderBackgroundColor: getComposableFormOptions().selectSectionPickers.sectionHeaderBackgroundColor,
+      });
+    } else {
+      const items = pickerMapper ? pickerMapper[field.id] || field.options! : field.options!;
+
+      navigation.navigate(SELECT_PICKER_OVERLAY_KEY, {
+        ...selectPickersSharedOptions,
+        pickedItem: retrievePickedItem(items, model[field.id] as ComposableItem | string, field.keyProperty),
+        items,
+        selectedItemTextColor: getComposableFormOptions().selectPickers.selectedItemTextColor,
+        selectedItemIconColor: getComposableFormOptions().selectPickers.selectedItemIconColor,
+        createNewItemTextColor: getComposableFormOptions().selectPickers.createNewItemTextColor,
+        createNewItemIconColor: getComposableFormOptions().selectPickers.createNewItemIconColor,
+      });
+    }
   };
 
   const retrievePickedItem = (
@@ -978,6 +1009,26 @@ const ComposableForm = <T extends ComposableItem>(
 
     return find<ComposableItem>(items as ComposableItem[], (item: ComposableItem) => getValueByKey(item, keyProperty) === value);
   };
+
+  const retrievePickedSectionItem = (
+    sections: SelectPickerSection[],
+    value: ComposableItem,
+    keyProperty?: string
+  ) => {
+    if (!keyProperty || !isObject(first<SelectPickerSection>(sections))) {
+      return value;
+    }
+
+    if (keyProperty && isObject(value)) {
+      return value;
+    }
+
+    return find(
+      flatMap(map(sections, section => section.data)),
+      item => getValueByKey(item, keyProperty) === value
+    );
+  };
+
 
   const renderAutocompleteField = (
     field: FormField,

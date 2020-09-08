@@ -1,4 +1,5 @@
 import { ComposableItem } from './composableItem';
+import { ReturnKeyTypeOptions } from 'react-native';
 
 export type FormField = {
   id: string;
@@ -22,6 +23,7 @@ export type FormField = {
   // text props
   description?: string;
   nextField?: string;
+  returnKeyType?: ReturnKeyTypeOptions;
   autoFocus?: boolean;
   disabled?: boolean;
   multiline?: boolean;
@@ -39,6 +41,7 @@ export type FormField = {
   // toggle props
   disableSeparator?: boolean;
   // select props
+  isSectionList?: boolean;
   options?: ComposableItem[] | string[];
   keyProperty?: string;
   displayProperty?: string;

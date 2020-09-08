@@ -7,6 +7,8 @@ import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
+import { SelectPickerSection } from '../../models/selectPickerSection';
+import { map, flatMap } from 'lodash';
 
 export interface ISelectPickerFieldProps extends TextInputProperties {
   onRef?: (input: TextInput) => void;
@@ -20,7 +22,8 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
   disableErrorMessage?: boolean;
-  options?: ComposableItem[] | string[];
+  options?: ComposableItem[] | string[] | SelectPickerSection[];
+  isSectionList?: boolean;
   displayProperty?: string;
   keyProperty?: string;
   itemValue?: ComposableItem | string;
@@ -55,6 +58,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       placeholderStyle,
       inputStyle,
       options,
+      isSectionList = false,
       error,
       shouldShowClearButton = false,
       ...rest
@@ -162,7 +166,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
 
   private retrieveDisplayValue = (itemValue?: ComposableItem | string) => {
     // Add isPercentage check
-    const { displayProperty, keyProperty, options } = this.props;
+    const { displayProperty, keyProperty, options, isSectionList } = this.props;
 
     if (!itemValue) {
       return undefined;
@@ -172,8 +176,22 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       return String(itemValue[displayProperty]);
     }
 
-    if (options && options.length > 0 && displayProperty && keyProperty) {
-      return String(find(options as ComposableItem[], item => item[keyProperty] === itemValue)![displayProperty]);
+    if (isSectionList) {
+      if (options && options.length > 0 && displayProperty && keyProperty) {
+        return String(find(
+          flatMap(
+            map(
+              options as SelectPickerSection[],
+              option => option.data
+            )
+          ),
+          item => item[keyProperty] === itemValue
+        )![displayProperty]);
+      }
+    } else {
+      if (options && options.length > 0 && displayProperty && keyProperty) {
+        return String(find(options as ComposableItem[], item => item[keyProperty] === itemValue)![displayProperty]);
+      }
     }
 
     return String(itemValue);
