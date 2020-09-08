@@ -891,6 +891,23 @@ const ComposableForm = <T extends ComposableItem>(
         // label={localizations.getString(field.label, localizations.getLanguage()) || field.label}
         label={field.label}
         onPress={() => openSelectPicker(field, model)}
+        onClear={() => {
+          setErrors({
+            ...errors,
+            [field.id]: ''
+          });
+
+          onChange(field.id, undefined);
+
+          if (field.updateFieldId) {
+            setErrors({
+              ...errors,
+              [field.updateFieldId]: ''
+            });
+
+            onChange(field.updateFieldId, undefined);
+          }
+        }}
         itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
         displayProperty={field.displayProperty}
@@ -898,6 +915,7 @@ const ComposableForm = <T extends ComposableItem>(
         error={errors[field.id]}
         disableErrorMessage={isInline}
         isMandatory={field.isMandatory}
+        shouldShowClearButton={field.shouldShowClearButton}
         isSectionList={field.isSectionList}
         options={options}
       />

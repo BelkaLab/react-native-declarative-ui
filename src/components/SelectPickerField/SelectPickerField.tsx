@@ -2,6 +2,7 @@ import find from 'lodash.find';
 import React from 'react';
 import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { FloatingLabel } from '../../base/FloatingLabel';
+import { ClearPickerFieldIcon } from '../../base/icons/ClearPickerFieldIcon';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { ComposableItem } from '../../models/composableItem';
 import { Colors } from '../../styles/colors';
@@ -13,6 +14,7 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   onRef?: (input: TextInput) => void;
   label: string;
   onPress: () => void;
+  onClear: () => void;
   onFocusLabel?: () => void;
   onBlurLabel?: () => void;
   containerStyle?: StyleProp<ViewStyle>;
@@ -27,6 +29,7 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   itemValue?: ComposableItem | string;
   isPercentage?: boolean;
   isMandatory?: boolean;
+  shouldShowClearButton?: boolean;
 }
 
 type State = {
@@ -48,6 +51,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       onFocusLabel,
       onBlurLabel,
       onPress,
+      onClear,
       displayProperty,
       keyProperty,
       itemValue,
@@ -56,6 +60,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       options,
       isSectionList = false,
       error,
+      shouldShowClearButton = false,
       ...rest
     } = this.props;
 
@@ -112,7 +117,11 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
             >
               {this.props.label}
             </FloatingLabel>
-            <OpenPickerFieldIcon onOpenPickerIconClicked={onPress} />
+            {
+              !!itemValue && shouldShowClearButton
+                ? <ClearPickerFieldIcon onClearPickerIconClicked={onClear} />
+                : <OpenPickerFieldIcon onOpenPickerIconClicked={onPress} />
+            }
           </View>
         </TouchableWithoutFeedback>
         {!!error && this.renderError(error, !!this.props.disableErrorMessage)}
