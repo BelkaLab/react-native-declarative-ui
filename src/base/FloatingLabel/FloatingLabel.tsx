@@ -84,10 +84,6 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
         animate(shouldAnimate || isFocused);
       }
     } else if (!value && !!text) {
-      if (!isNaN(+text)) {
-        return;
-      }
-
       setText(value);
       animate(false);
     }

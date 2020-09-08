@@ -898,6 +898,15 @@ const ComposableForm = <T extends ComposableItem>(
           });
 
           onChange(field.id, undefined);
+
+          if (field.updateFieldId) {
+            setErrors({
+              ...errors,
+              [field.updateFieldId]: ''
+            });
+
+            onChange(field.updateFieldId, undefined);
+          }
         }}
         itemValue={model[field.id] as ComposableItem | string}
         // isPercentage={field.isPercentage}
