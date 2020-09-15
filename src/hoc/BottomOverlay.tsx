@@ -1,11 +1,11 @@
+import { useNavigation, useRoute } from '@react-navigation/native';
 import delay from 'lodash.delay';
-import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { default as BottomSheet } from 'reanimated-bottom-sheet';
 import { Colors } from '../styles/colors';
-import { useNavigation, useRoute } from '@react-navigation/native';
 
 export interface IBottomOverlayProps {
   dismissOverlay: (onDismissedCallback?: () => void) => void;
@@ -64,6 +64,7 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
     const { useCode, set, block, cond, debug, greaterOrEq, lessOrEq, call } = Animated;
     const bottomSheet = useRef<BottomSheet>();
     const isFirstOpening = new Animated.Value(-1);
+    const isAlreadyClosed = new Animated.Value(-1);
     const drawerCallbackNode = React.useRef<any>(new Animated.Value(1)).current;
     const clampedDrawerCallbackNode = React.useRef<Animated.Adaptable<any>>(
       Animated.interpolate(drawerCallbackNode, {
@@ -75,20 +76,25 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
 
     useCode(() => {
       return block([
-        cond(lessOrEq(clampedDrawerCallbackNode, 0.99), set(isFirstOpening, 1)),
         cond(
-          greaterOrEq(clampedDrawerCallbackNode, 1),
+          greaterOrEq(clampedDrawerCallbackNode, 0.99),
           cond(
             greaterOrEq(isFirstOpening, 1),
-            call([], () => {
-              navigation.goBack();
-              // This is due to a bug in react-navigation https://github.com/react-navigation/react-navigation/issues/4867
-              // completeTransition();
+            cond(
+              lessOrEq(isAlreadyClosed, 0),
+              block([
+                set(isAlreadyClosed, 1),
+                call([], () => {
+                  navigation.goBack();
+                  // This is due to a bug in react-navigation https://github.com/react-navigation/react-navigation/issues/4867
+                  // completeTransition();
 
-              if (onDismissedCallback) {
-                onDismissedCallback();
-              }
-            })
+                  if (onDismissedCallback) {
+                    onDismissedCallback();
+                  }
+                })
+              ])
+            ),
           ),
           set(isFirstOpening, 1)
         )
