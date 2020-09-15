@@ -717,7 +717,7 @@ const ComposableForm = <T extends ComposableItem>(
             [field.id]: ''
           });
 
-          onChange(field.id, convertStringToNumber(val));
+          onChange(field.id, numbro.unformat(val));
         }}
         onFocusLabel={() => {
           if (onFocus) {
@@ -757,18 +757,6 @@ const ComposableForm = <T extends ComposableItem>(
     }
 
     return !!n ? String(n) : undefined;
-  };
-
-  const convertStringToNumber = (val: string) => {
-    if (!val) {
-      return undefined;
-    }
-
-    if (isSeparatorLastChar(val) || ((val.includes(',') || val.includes('.')) && val.slice(-1) === '0')) {
-      return val;
-    }
-
-    return numbro.unformat(val);
   };
 
   const isSeparatorLastChar = (n: string) => {

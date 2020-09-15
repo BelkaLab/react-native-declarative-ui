@@ -1,3 +1,5 @@
+import { isEmpty } from 'lodash';
+import numbro from 'numbro';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Animated, Easing, Image, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableOpacity, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 import { Colors } from '../../styles/colors';
@@ -50,6 +52,7 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
     onFocusLabel,
     onBlurLabel,
     isMandatory,
+    keyboardType,
   } = props;
 
   const isDirty = Boolean(value || placeholder);
@@ -62,7 +65,8 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
 
   const [fontSize] = useState(new Animated.Value(isDirty ? dirtyStyle.fontSize : cleanStyle.fontSize));
   const [top] = useState(new Animated.Value(isDirty ? dirtyStyle.top : cleanStyle.top));
-  const hasSymbol = (isFocused || !!value) && (!!currency || !!isPercentage);
+  const hasSymbol = (isFocused || !!text) && (!!currency || !!isPercentage);
+  const isTypeNumeric = keyboardType === 'decimal-pad' || keyboardType === 'numeric';
 
   useEffect(() => {
     return () => {
@@ -73,19 +77,22 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (value !== undefined && value !== text) {
-      const shouldAnimate = Boolean(value);
+    // The label should never go down when the input is focused
+    if (!isFocused) {
+      if (value !== undefined && value !== text) {
+        const shouldAnimate = Boolean(value);
 
-      setText(value);
+        setText(value);
 
-      if (isSelectField) {
-        animate(!!value);
-      } else {
-        animate(shouldAnimate || isFocused);
+        if (isSelectField) {
+          animate(!!value);
+        } else {
+          animate(shouldAnimate || isFocused);
+        }
+      } else if (!value && !!text) {
+        setText(value);
+        animate(false);
       }
-    } else if (!value && !!text) {
-      setText(value);
-      animate(false);
     }
   }, [value, text]);
 
@@ -115,7 +122,7 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
         </TouchableWithoutFeedback>
         <TextInput
           {...rest}
-          value={value}
+          value={text}
           ref={input => {
             setInput(input);
 
@@ -181,11 +188,43 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
   }
 
   const onChange = (text: string) => {
-    setText(text);
+    // This is needed to unwrap text of type "number" because on RN TextEdits
+    // only works with strings
+    const value = isTypeNumeric ? formatNumber(text) : text;
+
+    if (value === undefined) {
+      return;
+    }
+
+    setText(value);
 
     if (onChangeText) {
-      onChangeText(text);
+      onChangeText(value);
     }
+  }
+
+  const formatNumber = (text: string): string | undefined => {
+    if (text === undefined) {
+      return undefined;
+    }
+
+    if (isEmpty(text)) {
+      return '';
+    }
+
+    if (isSeparator(text)) {
+      return `0${text}`;
+    }
+
+    return isValidNumber(text) ? text : undefined;
+  }
+
+  const isSeparator = (text: string) => {
+    return text.match(/^(\.|,)$/) !== null;
+  }
+
+  const isValidNumber = (text: string) => {
+    return numbro.unformat(text) !== undefined;
   };
 
   const onEndEditing = (event: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
