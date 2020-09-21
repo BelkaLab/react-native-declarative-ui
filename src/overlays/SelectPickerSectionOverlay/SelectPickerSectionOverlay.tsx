@@ -186,6 +186,8 @@ const SelectPickerSectionOverlay: FunctionComponent<ISelectPickerSectionOverlayP
         )}
         ListEmptyComponent={ListEmptyComponent && ListEmptyComponent()}
         keyExtractor={(item, index) => index.toString()}
+        // This is due to a bug with iOS 13 and "inset" FlatList (https://github.com/facebook/react-native/issues/28085#issuecomment-586745905)
+        scrollIndicatorInsets={{ right: 1 }}
       />
     </View>
   );
