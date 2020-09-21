@@ -71,15 +71,15 @@ declare module 'react-native-declarative-ui' {
       disabledBorderColor?: string;
       selectionColor?: string;
       errorMessageColor?: string;
-    },
+    };
     checkBoxes?: {
       color?: string;
       urlColor?: string;
-    },
+    };
     labels?: {
       placeholderStyle?: StyleProp<TextStyle>;
       inputStyle?: StyleProp<TextStyle>;
-    },
+    };
     calendars?: {
       singleDayTheme?: CalendarTheme;
     };
@@ -118,7 +118,7 @@ declare module 'react-native-declarative-ui' {
         false: string;
         true: string;
       }
-    }
+    };
   };
 
   export type ComposableFormCustomComponents = {
