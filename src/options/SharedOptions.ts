@@ -132,7 +132,6 @@ export type DefinedComposableFormOptions = {
       true: string;
     }
   };
-  locale?: string;
 };
 
 export type ComposableFormCustomComponents = {
@@ -169,9 +168,9 @@ class SharedOptions {
       }
     },
     toggles: {},
-    locale: undefined
   };
   private _customComponents: ComposableFormCustomComponents = {};
+  private _locale?: string;
 
   private constructor() {
     // do something construct...
@@ -208,8 +207,12 @@ class SharedOptions {
     return this._customComponents;
   }
 
+  getCustomLocale() {
+    return this._locale;
+  }
+
   setLocale(locale: string) {
-    this._options.locale = locale;
+    this._locale = locale;
 
     // react-native-calendars
     LocaleConfig.defaultLocale = locale;

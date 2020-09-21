@@ -217,7 +217,7 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
       return `0${text}`;
     }
 
-    const locale = SharedOptions.getDefaultOptions().locale;
+    const locale = SharedOptions.getCustomLocale();
     if (!!locale && locale === 'it-IT') {
       const textWithCommas = replace(text, '.', ',');
       return isValidNumber(textWithCommas) ? textWithCommas : undefined;

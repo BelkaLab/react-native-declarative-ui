@@ -119,7 +119,6 @@ declare module 'react-native-declarative-ui' {
         true: string;
       }
     };
-    locale?: string;
   };
 
   export type ComposableFormCustomComponents = {
