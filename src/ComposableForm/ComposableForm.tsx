@@ -610,7 +610,7 @@ const ComposableForm = <T extends ComposableItem>(
         autoCapitalize={
           field.autoCapitalize || (field.keyboard && field.keyboard === 'email-address' ? 'none' : 'sentences')
         }
-        returnKeyType={field.returnKeyType || (field.nextField ? 'next' : 'done')}
+        returnKeyType={field.returnKeyType || (field.multiline ? 'default' : (field.nextField ? 'next' : 'done'))}
         blurOnSubmit={field.multiline ? false : !field.nextField}
         selectionColor={getComposableFormOptions().textFields.selectionColor || Colors.PRIMARY_BLUE}
         onSubmitEditing={event => {
