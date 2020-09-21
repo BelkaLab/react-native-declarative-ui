@@ -1,7 +1,8 @@
-import { isEmpty } from 'lodash';
+import { isEmpty, replace } from 'lodash';
 import numbro from 'numbro';
 import React, { FunctionComponent, useEffect, useState } from 'react';
 import { Animated, Easing, Image, NativeSyntheticEvent, Platform, StyleProp, StyleSheet, Text, TextInput, TextInputEndEditingEventData, TextInputFocusEventData, TextInputProperties, TextStyle, TouchableOpacity, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
+import SharedOptions from '../../options/SharedOptions';
 import { Colors } from '../../styles/colors';
 
 const INPUT_HEIGHT = 35;
@@ -216,7 +217,13 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
       return `0${text}`;
     }
 
-    return isValidNumber(text) ? text : undefined;
+    const locale = SharedOptions.getDefaultOptions().locale;
+    if (!!locale && locale === 'it-IT') {
+      const textWithCommas = replace(text, '.', ',');
+      return isValidNumber(textWithCommas) ? textWithCommas : undefined;
+    } else {
+      return isValidNumber(text) ? text : undefined;
+    }
   }
 
   const isSeparator = (text: string) => {

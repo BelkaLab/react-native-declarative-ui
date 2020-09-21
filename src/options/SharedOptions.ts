@@ -88,15 +88,15 @@ export type DefinedComposableFormOptions = {
     disabledBorderColor?: string;
     selectionColor?: string;
     errorMessageColor?: string;
-  },
+  };
   checkBoxes?: {
     color?: string;
     urlColor?: string;
-  },
+  };
   labels: {
     placeholderStyle?: StyleProp<TextStyle>;
     inputStyle?: StyleProp<TextStyle>;
-  },
+  };
   calendars: {
     singleDayTheme?: CalendarTheme;
   };
@@ -131,7 +131,8 @@ export type DefinedComposableFormOptions = {
       false: string;
       true: string;
     }
-  }
+  };
+  locale?: string;
 };
 
 export type ComposableFormCustomComponents = {
@@ -167,7 +168,8 @@ class SharedOptions {
         color: Colors.BLACK
       }
     },
-    toggles: {}
+    toggles: {},
+    locale: undefined
   };
   private _customComponents: ComposableFormCustomComponents = {};
 
@@ -207,7 +209,12 @@ class SharedOptions {
   }
 
   setLocale(locale: string) {
+    this._options.locale = locale;
+
+    // react-native-calendars
     LocaleConfig.defaultLocale = locale;
+
+    // numbro.js
     numbro.registerLanguage(Languages[locale]);
     numbro.setLanguage(locale);
   }
