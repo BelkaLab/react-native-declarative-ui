@@ -78,20 +78,24 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    // The label should never go down when the input is focused
-    if (!isFocused) {
-      if (value !== undefined && value !== text) {
-        const shouldAnimate = Boolean(value);
-
-        setText(value);
-
+    if (value !== undefined && value !== text) {
+      const shouldAnimate = Boolean(value);
+      
+      setText(value);
+      
+      // The label should never go down when the input is focused
+      if (!isFocused) {
         if (isSelectField) {
           animate(!!value);
         } else {
           animate(shouldAnimate || isFocused);
         }
-      } else if (!value && !!text) {
-        setText(value);
+      }
+    } else if (!value && !!text) {
+      setText(value);
+
+      // The label should never go down when the input is focused
+      if (!isFocused) {
         animate(false);
       }
     }
