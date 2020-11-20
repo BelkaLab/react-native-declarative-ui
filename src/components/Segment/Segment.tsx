@@ -9,10 +9,14 @@ export interface ISegmentProps {
   activeItemIndex?: number;
   onChange?(index: number): void;
   activeItemColor?: string;
+  disabledActiveItemColor?: string;
   activeTextStyle?: StyleProp<TextStyle>;
   inactiveTextStyle?: StyleProp<TextStyle>;
   backgroundColor?: string;
+  disabledBackgroundColor?: string;
   borderColor?: string;
+  disabledBorderColor?: string;
+  disabled?: boolean;
 }
 
 const Segment = (props: ISegmentProps) => {
@@ -22,10 +26,14 @@ const Segment = (props: ISegmentProps) => {
     activeItemIndex = 0,
     onChange,
     activeItemColor = Colors.PRIMARY_BLUE,
+    disabledActiveItemColor = Colors.GRAY_600,
     activeTextStyle = { color: Colors.WHITE },
     inactiveTextStyle = { color: Colors.BLACK },
     backgroundColor = Colors.WHITE,
-    borderColor = Colors.GRAY_500
+    disabledBackgroundColor = Colors.GRAY_200,
+    borderColor = Colors.GRAY_500,
+    disabledBorderColor = Colors.GRAY_200,
+    disabled = false
   } = props;
 
   const [activeIndex, setIndex] = useState(activeItemIndex);
@@ -39,7 +47,14 @@ const Segment = (props: ISegmentProps) => {
   }
 
   return (
-    <View style={[styles.container, { borderColor, backgroundColor }, containerStyle]}>
+    <View style={[
+      styles.container,
+      {
+        borderColor: disabled ? disabledBorderColor : borderColor,
+        backgroundColor: disabled ? disabledBackgroundColor : backgroundColor
+      },
+      containerStyle
+    ]}>
       {map(data, (item, index) => {
         const isActive = index === activeIndex;
         const isLastItem = index === (data.length - 1);
@@ -48,12 +63,15 @@ const Segment = (props: ISegmentProps) => {
           return (
             <TouchableNativeFeedback
               onPress={() => itemPressed(index)}
-              disabled={isActive}>
+              disabled={disabled || isActive}
+            >
               <View
                 style={[
                   styles.segmentItem,
                   {
-                    backgroundColor: isActive ? activeItemColor : backgroundColor,
+                    backgroundColor: disabled
+                      ? (isActive ? disabledActiveItemColor : disabledBackgroundColor)
+                      : (isActive ? activeItemColor : backgroundColor),
                     marginRight: !isLastItem ? 1 : 0
                   }
                 ]}>
@@ -70,11 +88,13 @@ const Segment = (props: ISegmentProps) => {
             style={[
               styles.segmentItem,
               {
-                backgroundColor: isActive ? activeItemColor : backgroundColor,
+                backgroundColor: disabled
+                  ? (isActive ? disabledActiveItemColor : disabledBackgroundColor)
+                  : (isActive ? activeItemColor : backgroundColor),
                 marginRight: !isLastItem ? 1 : 0
               }
             ]}
-            disabled={isActive}>
+            disabled={disabled || isActive}>
             <Text style={isActive ? activeTextStyle : inactiveTextStyle}>
               {item}
             </Text>

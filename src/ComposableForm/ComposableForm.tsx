@@ -906,6 +906,7 @@ const ComposableForm = <T extends ComposableItem>(
         shouldShowClearButton={field.shouldShowClearButton}
         isSectionList={field.isSectionList}
         options={options}
+        disabled={field.disabled}
       />
     );
   };
@@ -1137,6 +1138,7 @@ const ComposableForm = <T extends ComposableItem>(
         onPress={() => openCalendar(field, model)}
         onRightIconClick={() => openCalendar(field, model)}
         error={errors[field.id]}
+        disabled={field.disabled}
         isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
       />
@@ -1239,6 +1241,7 @@ const ComposableForm = <T extends ComposableItem>(
         activeTextStyle={getComposableFormOptions().segments.segmentActiveTextStyle}
         inactiveTextStyle={getComposableFormOptions().segments.segmentInactiveTextStyle}
         activeItemColor={getComposableFormOptions().segments.activeItemColor}
+        disabled={field.disabled}
       />
     );
   };
