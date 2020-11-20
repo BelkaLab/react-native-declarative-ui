@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     borderWidth: 1
   },
-  disabled: { backgroundColor: Colors.GRAY_200 },
   segmentItem: {
     flex: 1,
     flexDirection: 'row',
