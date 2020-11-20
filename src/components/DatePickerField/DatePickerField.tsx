@@ -106,7 +106,9 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
             >
               {label}
             </FloatingLabel>
-            <OpenPickerFieldIcon disabled={disabled} onOpenPickerIconClicked={onPress} />
+            {!disabled && (
+              <OpenPickerFieldIcon onOpenPickerIconClicked={onPress} />
+            )}
           </View>
         </TouchableWithoutFeedback>
         {!!error && this.renderError(error, !!disableErrorMessage)}

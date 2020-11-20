@@ -59,9 +59,9 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       placeholderStyle,
       inputStyle,
       options,
+      error,
       isSectionList = false,
       disabled = false,
-      error,
       shouldShowClearButton = false,
       ...rest
     } = this.props;
@@ -124,11 +124,11 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
             >
               {this.props.label}
             </FloatingLabel>
-            {
+            {!disabled && (
               !!itemValue && shouldShowClearButton
-                ? <ClearPickerFieldIcon disabled={disabled} onClearPickerIconClicked={onClear} />
-                : <OpenPickerFieldIcon disabled={disabled} onOpenPickerIconClicked={onPress} />
-            }
+                ? <ClearPickerFieldIcon onClearPickerIconClicked={onClear} />
+                : <OpenPickerFieldIcon onOpenPickerIconClicked={onPress} />
+            )}
           </View>
         </TouchableWithoutFeedback>
         {!!error && this.renderError(error, !!this.props.disableErrorMessage)}

@@ -9,6 +9,7 @@ export interface ISegmentProps {
   activeItemIndex?: number;
   onChange?(index: number): void;
   activeItemColor?: string;
+  disabledActiveItemColor?: string;
   activeTextStyle?: StyleProp<TextStyle>;
   inactiveTextStyle?: StyleProp<TextStyle>;
   backgroundColor?: string;
@@ -25,6 +26,7 @@ const Segment = (props: ISegmentProps) => {
     activeItemIndex = 0,
     onChange,
     activeItemColor = Colors.PRIMARY_BLUE,
+    disabledActiveItemColor = Colors.GRAY_600,
     activeTextStyle = { color: Colors.WHITE },
     inactiveTextStyle = { color: Colors.BLACK },
     backgroundColor = Colors.WHITE,
@@ -67,7 +69,9 @@ const Segment = (props: ISegmentProps) => {
                 style={[
                   styles.segmentItem,
                   {
-                    backgroundColor: isActive ? activeItemColor : (disabled ? disabledBackgroundColor : backgroundColor),
+                    backgroundColor: disabled
+                      ? (isActive ? disabledActiveItemColor : disabledBackgroundColor)
+                      : (isActive ? activeItemColor : backgroundColor),
                     marginRight: !isLastItem ? 1 : 0
                   }
                 ]}>
@@ -84,7 +88,9 @@ const Segment = (props: ISegmentProps) => {
             style={[
               styles.segmentItem,
               {
-                backgroundColor: isActive ? activeItemColor : (disabled ? disabledBackgroundColor : backgroundColor),
+                backgroundColor: disabled
+                  ? (isActive ? disabledActiveItemColor : disabledBackgroundColor)
+                  : (isActive ? activeItemColor : backgroundColor),
                 marginRight: !isLastItem ? 1 : 0
               }
             ]}
