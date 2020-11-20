@@ -70,6 +70,12 @@ interface IComposableFormProps<T> {
   customComponents?: ComposableFormCustomComponents;
   googleApiKey?: string;
   dynamicValidations?: string[] | string[][];
+  durationPickerConfiguration?: {
+    maxHours?: number;
+    hoursInterval?: number;
+    maxMinutes?: number;
+    minutesInterval?: number;
+  }
 }
 
 const ComposableForm = <T extends ComposableItem>(
@@ -93,6 +99,7 @@ const ComposableForm = <T extends ComposableItem>(
     customComponents,
     googleApiKey,
     dynamicValidations,
+    durationPickerConfiguration
   } = props;
 
   useImperativeHandle(ref, () => ({ isValid }));
@@ -1306,7 +1313,11 @@ const ComposableForm = <T extends ComposableItem>(
         onChange(field.id, selectedItem);
       },
       customFormOptions: getComposableFormOptions(),
-      disabledInteraction: Platform.OS === 'android'
+      disabledInteraction: Platform.OS === 'android',
+      maxHours: durationPickerConfiguration?.maxHours,
+      hoursInterval: durationPickerConfiguration?.hoursInterval,
+      maxMinutes: durationPickerConfiguration?.maxMinutes,
+      minutesInterval: durationPickerConfiguration?.minutesInterval,
     });
   };
 
