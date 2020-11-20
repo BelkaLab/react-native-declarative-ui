@@ -15,6 +15,7 @@ export interface IDatePickerFieldProps extends TextInputProperties {
   inputStyle?: StyleProp<ViewStyle>;
   placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
+  disabled?: boolean;
   disableErrorMessage?: boolean;
   onRightIconClick?: () => void;
   rightContent?: JSX.Element;
@@ -33,11 +34,24 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
   }
 
   render() {
-    const { onRef, onFocusLabel, onBlurLabel, onPress, error, placeholderStyle, inputStyle, ...rest } = this.props;
+    const {
+      onRef,
+      onFocusLabel,
+      onBlurLabel,
+      onPress,
+      label,
+      error,
+      disableErrorMessage,
+      placeholderStyle,
+      inputStyle,
+      containerStyle,
+      disabled = false,
+      ...rest
+    } = this.props;
 
     return (
-      <View style={[styles.containerStyle, this.props.containerStyle]}>
-        <TouchableWithoutFeedback onPress={this.props.onPress}>
+      <View style={[styles.containerStyle, containerStyle]}>
+        <TouchableWithoutFeedback disabled={disabled} onPress={onPress}>
           <View
             style={[
               globalStyles.inputContainer,
@@ -53,7 +67,12 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
               }}
               editable={false}
               isSelectField={true} // Check if needed
-              style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
+              style={[
+                globalStyles.input,
+                this.retrieveBorderColor(),
+                disabled && styles.disabled,
+                { paddingRight: 28 }
+              ]}
               labelStyle={[{ backgroundColor: 'transparent', color: Colors.GRAY_600 }, placeholderStyle]}
               inputStyle={[styles.inputStyle, inputStyle]}
               dirtyStyle={{
@@ -71,8 +90,8 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
                   });
                 }
 
-                if (this.props.onFocusLabel) {
-                  this.props.onFocusLabel();
+                if (onFocusLabel) {
+                  onFocusLabel();
                 }
               }}
               onBlurLabel={() => {
@@ -80,17 +99,17 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
                   this.setState({ isFocused: false });
                 }
 
-                if (this.props.onBlurLabel) {
-                  this.props.onBlurLabel();
+                if (onBlurLabel) {
+                  onBlurLabel();
                 }
               }}
             >
-              {this.props.label}
+              {label}
             </FloatingLabel>
-            <OpenPickerFieldIcon onOpenPickerIconClicked={onPress} />
+            <OpenPickerFieldIcon disabled={disabled} onOpenPickerIconClicked={onPress} />
           </View>
         </TouchableWithoutFeedback>
-        {!!error && this.renderError(error, !!this.props.disableErrorMessage)}
+        {!!error && this.renderError(error, !!disableErrorMessage)}
       </View>
     );
   }
@@ -104,8 +123,14 @@ export default class DatePickerField extends React.Component<IDatePickerFieldPro
   };
 
   private retrieveBorderColor = () => {
-    const { error, value } = this.props;
+    const { error, disabled = false, value } = this.props;
     const { isFocused } = this.state;
+
+    if (disabled) {
+      return {
+        borderColor: Colors.GRAY_200
+      }
+    }
 
     if (isFocused) {
       return {
@@ -138,6 +163,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  disabled: { backgroundColor: Colors.GRAY_200 },
   inputStyle: {
     borderWidth: 0,
     fontSize: 17

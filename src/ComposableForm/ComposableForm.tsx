@@ -1138,6 +1138,7 @@ const ComposableForm = <T extends ComposableItem>(
         onPress={() => openCalendar(field, model)}
         onRightIconClick={() => openCalendar(field, model)}
         error={errors[field.id]}
+        disabled={field.disabled}
         isMandatory={field.isMandatory}
         disableErrorMessage={isInline}
       />
