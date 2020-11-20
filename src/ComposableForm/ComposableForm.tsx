@@ -1240,6 +1240,7 @@ const ComposableForm = <T extends ComposableItem>(
         activeTextStyle={getComposableFormOptions().segments.segmentActiveTextStyle}
         inactiveTextStyle={getComposableFormOptions().segments.segmentInactiveTextStyle}
         activeItemColor={getComposableFormOptions().segments.activeItemColor}
+        disabled={field.disabled}
       />
     );
   };
