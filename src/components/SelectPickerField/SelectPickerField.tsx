@@ -1,3 +1,4 @@
+import { flatMap, map } from 'lodash';
 import find from 'lodash.find';
 import React from 'react';
 import { Platform, StyleProp, StyleSheet, Text, TextInput, TextInputProperties, TextStyle, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
@@ -5,10 +6,9 @@ import { FloatingLabel } from '../../base/FloatingLabel';
 import { ClearPickerFieldIcon } from '../../base/icons/ClearPickerFieldIcon';
 import { OpenPickerFieldIcon } from '../../base/icons/OpenPickerFieldIcon';
 import { ComposableItem } from '../../models/composableItem';
+import { SelectPickerSection } from '../../models/selectPickerSection';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import { SelectPickerSection } from '../../models/selectPickerSection';
-import { map, flatMap } from 'lodash';
 
 export interface ISelectPickerFieldProps extends TextInputProperties {
   onRef?: (input: TextInput) => void;
@@ -21,6 +21,7 @@ export interface ISelectPickerFieldProps extends TextInputProperties {
   inputStyle?: StyleProp<ViewStyle>;
   placeholderStyle?: StyleProp<TextStyle>;
   error?: string;
+  disabled?: boolean;
   disableErrorMessage?: boolean;
   options?: ComposableItem[] | string[] | SelectPickerSection[];
   isSectionList?: boolean;
@@ -59,6 +60,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
       inputStyle,
       options,
       isSectionList = false,
+      disabled = false,
       error,
       shouldShowClearButton = false,
       ...rest
@@ -66,7 +68,7 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
 
     return (
       <View style={[styles.containerStyle, this.props.containerStyle]}>
-        <TouchableWithoutFeedback onPress={this.props.onPress}>
+        <TouchableWithoutFeedback disabled={disabled} onPress={this.props.onPress}>
           <View
             style={[
               globalStyles.inputContainer,
@@ -83,7 +85,12 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
               editable={false}
               isSelectField={true}
               value={this.retrieveDisplayValue(itemValue)}
-              style={[globalStyles.input, this.retrieveBorderColor(), { paddingRight: 28 }]}
+              style={[
+                globalStyles.input,
+                this.retrieveBorderColor(),
+                disabled && styles.disabled,
+                { paddingRight: 28 }
+              ]}
               labelStyle={[{ backgroundColor: 'transparent', color: Colors.GRAY_600 }, placeholderStyle]}
               inputStyle={[styles.inputStyle, inputStyle]}
               dirtyStyle={{
@@ -119,8 +126,8 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
             </FloatingLabel>
             {
               !!itemValue && shouldShowClearButton
-                ? <ClearPickerFieldIcon onClearPickerIconClicked={onClear} />
-                : <OpenPickerFieldIcon onOpenPickerIconClicked={onPress} />
+                ? <ClearPickerFieldIcon disabled={disabled} onClearPickerIconClicked={onClear} />
+                : <OpenPickerFieldIcon disabled={disabled} onOpenPickerIconClicked={onPress} />
             }
           </View>
         </TouchableWithoutFeedback>
@@ -138,8 +145,14 @@ export default class SelectPickerField extends React.Component<ISelectPickerFiel
   };
 
   private retrieveBorderColor = () => {
-    const { error, value } = this.props;
+    const { error, disabled = false, value } = this.props;
     const { isFocused } = this.state;
+
+    if (disabled) {
+      return {
+        borderColor: Colors.GRAY_200
+      }
+    }
 
     if (isFocused) {
       return {
@@ -205,6 +218,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
+  disabled: { backgroundColor: Colors.GRAY_200 },
   inputStyle: {
     borderWidth: 0,
     padding: 0,

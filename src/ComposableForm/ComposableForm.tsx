@@ -906,6 +906,7 @@ const ComposableForm = <T extends ComposableItem>(
         shouldShowClearButton={field.shouldShowClearButton}
         isSectionList={field.isSectionList}
         options={options}
+        disabled={field.disabled}
       />
     );
   };
