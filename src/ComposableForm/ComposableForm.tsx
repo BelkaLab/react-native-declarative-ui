@@ -58,8 +58,8 @@ interface IComposableFormProps<T> {
   };
   createNewItemMapper?: {
     [id: string]: {
-      label: string;
-      callback: () => void;
+      label: string | null;
+      callback: () => void | null;
     };
   };
   emptySetMapper?: {
@@ -922,7 +922,7 @@ const ComposableForm = <T extends ComposableItem>(
       renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
       knobColor: getComposableFormOptions().pickers.knobColor,
       onCreateNewItemPressed: () => {
-        if (createNewItemMapper) {
+        if (createNewItemMapper && createNewItemMapper[field.id].callback) {
           createNewItemMapper[field.id].callback();
         }
       },

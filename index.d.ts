@@ -33,8 +33,8 @@ declare module 'react-native-declarative-ui' {
     };
     createNewItemMapper?: {
       [id: string]: {
-        label: string;
-        callback: () => void;
+        label: string | null;
+        callback: () => void | null;
       };
     };
     emptySetMapper?: {
