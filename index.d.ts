@@ -45,6 +45,12 @@ declare module 'react-native-declarative-ui' {
     customComponents?: ComposableFormCustomComponents;
     googleApiKey?: string;
     dynamicValidations?: unknown;
+    durationPickerConfiguration?: {
+      maxHours?: number;
+      hoursInterval?: number;
+      maxMinutes?: number;
+      minutesInterval?: number;
+    }
   }
 
   export class ComposableForm<T> extends React.Component<ComposableFormProps<T>, any> { }

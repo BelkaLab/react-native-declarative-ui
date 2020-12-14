@@ -4,18 +4,19 @@ import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { Picker } from '../../components/Picker';
 import { ITEM_HEIGHT, PickerItem } from '../../components/Picker/Picker';
 import { TextButton } from '../../components/TextButton';
-import { ComposableFormOptions } from '../../options/SharedOptions';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { Colors } from '../../styles/colors';
 import { globalStyles } from '../../styles/globalStyles';
-import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 export interface IDurationPickerOverlayProps {
   pickedAmount: number;
   onConfirm?: (pickedAmount: number) => void;
-  customFormOptions: ComposableFormOptions;
   headerBackgroundColor?: string;
-  renderCustomBackground?: () => React.ReactElement<{}>;
   headerButtonColor?: string;
+  maxHours?: number;
+  hoursInterval?: number;
+  maxMinutes?: number;
+  minutesInterval?: number;
 }
 
 const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBottomOverlayProps> = props => {
@@ -24,6 +25,10 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
     dismissOverlay,
     headerButtonColor = Colors.WHITE,
     headerBackgroundColor = Colors.PRIMARY_BLUE,
+    maxHours = 8,
+    hoursInterval = 1,
+    maxMinutes = 55,
+    minutesInterval = 5
   } = props;
 
   const [selectedHour, setSelectedHour] = useState<number | undefined>(Math.floor((props.pickedAmount || 0) / 60));
@@ -67,12 +72,10 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
   const getHourItems = () => {
     const items = [];
     // const { maxHour, hourInterval, hourUnit } = this.props;
-    const maxHour = 8;
-    const hourInterval = 1;
     const hourUnit = '';
-    const interval = maxHour / hourInterval;
+    const interval = maxHours / hoursInterval;
     for (let i = 0; i <= interval; i++) {
-      const value = `${i * hourInterval}`;
+      const value = `${i * hoursInterval}`;
       //const item = <Picker.Item key={value} value={value} label={value + hourUnit} />;
       const item: PickerItem = {
         value: value,
@@ -86,12 +89,10 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
   const getMinuteItems = () => {
     const items = [];
     // const { maxMinute, minuteInterval, minuteUnit } = this.props;
-    const maxMinute = 55;
-    const minuteInterval = 5;
     const minuteUnit = '';
-    const interval = maxMinute / minuteInterval;
+    const interval = maxMinutes / minutesInterval;
     for (let i = 0; i <= interval; i++) {
-      const value = i * minuteInterval;
+      const value = i * minutesInterval;
       const newValue = value < 10 ? `0${value}` : `${value}`;
       //const item = <Picker.Item key={value} value={newValue} label={newValue + minuteUnit} />;
       const item: PickerItem = {
