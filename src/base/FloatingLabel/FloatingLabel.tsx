@@ -78,11 +78,14 @@ const FloatingLabel: FunctionComponent<IFloatingLabelProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (value !== undefined && value !== text) {
+    const isSameValue = (value === text) || (isTypeNumeric && value !== undefined && text !== undefined && numbro.unformat(value) === numbro.unformat(text));
+
+    // Value change has priority, so update text in order to follow value
+    if (value !== undefined && !isSameValue) {
       const shouldAnimate = Boolean(value);
-      
+
       setText(value);
-      
+
       // The label should never go down when the input is focused
       if (!isFocused) {
         if (isSelectField) {
