@@ -79,12 +79,13 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
     const hourUnit = '';
     const interval = maxHours / hoursInterval;
     for (let i = 0; i <= interval; i++) {
-      const value = `${i * hoursInterval}`;
-      //const item = <Picker.Item key={value} value={value} label={value + hourUnit} />;
+      const value = i * hoursInterval;
+
       const item: PickerItem = {
         value: value,
         label: value + hourUnit
-      }
+      };
+
       items.push(item);
     }
     return items;
@@ -98,11 +99,12 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
     for (let i = 0; i <= interval; i++) {
       const value = i * minutesInterval;
       const newValue = value < 10 ? `0${value}` : `${value}`;
-      //const item = <Picker.Item key={value} value={newValue} label={newValue + minuteUnit} />;
+
       const item: PickerItem = {
-        value: newValue,
+        value,
         label: newValue + minuteUnit
-      }
+      };
+
       items.push(item);
     }
     return items;

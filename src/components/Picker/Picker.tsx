@@ -14,16 +14,16 @@ const ITEM_LAYOUT = (index: number) => ({
 export interface IPickerProps {
   data: PickerItem[];
   label?: string;
-  selectedValue?: unknown;
+  selectedValue?: number;
   containerStyle?: StyleProp<ViewStyle>;
   itemContainerStyle?: StyleProp<ViewStyle>;
-  onValueChange?(value: unknown): void;
+  onValueChange?(value: number): void;
   activeColor?: string;
   inactiveColor?: string;
 }
 
 export interface PickerItem {
-  value: unknown;
+  value: number;
   label: string;
 }
 
@@ -50,8 +50,11 @@ class Picker extends React.Component<IPickerProps, IState> {
   componentDidMount() {
     const { data, selectedValue } = this.props;
     if (selectedValue) {
-      const index = findIndex(data, (item) => String(item.value) === String(selectedValue));
-      delay(() => this.flatListRef?.scrollToIndex({ animated: false, index }), 100);
+      const index = findIndex(data, (item) => item.value === selectedValue);
+
+      if (index !== -1) {
+        delay(() => this.flatListRef?.scrollToIndex({ animated: false, index }), 250);
+      }
     }
   }
 
