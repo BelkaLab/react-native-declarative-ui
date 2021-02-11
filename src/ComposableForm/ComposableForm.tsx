@@ -75,6 +75,7 @@ interface IComposableFormProps<T> {
     hoursInterval?: number;
     maxMinutes?: number;
     minutesInterval?: number;
+    disableZeroDuration?: boolean;
   }
 }
 
@@ -1300,6 +1301,8 @@ const ComposableForm = <T extends ComposableItem>(
 
     navigation.navigate(DURATION_PICKER_OVERLAY_KEY, {
       pickedAmount: model[field.id] as number,
+      headerButtonColor: getComposableFormOptions().pickers.headerButtonColor,
+      headerButtonDisabledColor: getComposableFormOptions().pickers.headerButtonDisabledColor,
       headerBackgroundColor: getComposableFormOptions().pickers.headerBackgroundColor,
       renderCustomBackground: getComposableFormOptions().pickers.renderCustomBackground,
       knobColor: getComposableFormOptions().pickers.knobColor,
@@ -1318,6 +1321,7 @@ const ComposableForm = <T extends ComposableItem>(
       hoursInterval: durationPickerConfiguration?.hoursInterval,
       maxMinutes: durationPickerConfiguration?.maxMinutes,
       minutesInterval: durationPickerConfiguration?.minutesInterval,
+      disableZeroDuration: durationPickerConfiguration?.disableZeroDuration,
     });
   };
 

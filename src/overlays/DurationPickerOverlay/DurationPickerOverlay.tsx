@@ -13,10 +13,12 @@ export interface IDurationPickerOverlayProps {
   onConfirm?: (pickedAmount: number) => void;
   headerBackgroundColor?: string;
   headerButtonColor?: string;
+  headerButtonDisabledColor?: string;
   maxHours?: number;
   hoursInterval?: number;
   maxMinutes?: number;
   minutesInterval?: number;
+  disableZeroDuration?: boolean;
 }
 
 const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBottomOverlayProps> = props => {
@@ -24,11 +26,13 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
     onConfirm,
     dismissOverlay,
     headerButtonColor = Colors.WHITE,
+    headerButtonDisabledColor = Colors.LIGHT_PRIMARY_BLUE,
     headerBackgroundColor = Colors.PRIMARY_BLUE,
     maxHours = 8,
     hoursInterval = 1,
     maxMinutes = 55,
-    minutesInterval = 5
+    minutesInterval = 5,
+    disableZeroDuration = true
   } = props;
 
   const [selectedHour, setSelectedHour] = useState<number | undefined>(Math.floor((props.pickedAmount || 0) / 60));
@@ -111,6 +115,8 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
     dismissOverlay();
   };
 
+  const isConfirmDisabled = disableZeroDuration && (selectedHour === 0 && selectedMinute === 0);
+
   return (
     <View style={[globalStyles.pickerContainer, { height: "100%" }]}>
       <View style={[styles.header, { backgroundColor: headerBackgroundColor }]}>
@@ -122,9 +128,10 @@ const DurationPickerOverlay: FunctionComponent<IDurationPickerOverlayProps & IBo
         />
         <TextButton
           title="Conferma"
-          color={headerButtonColor}
+          color={isConfirmDisabled ? headerButtonDisabledColor : headerButtonColor}
           fontWeight="600"
           onPress={onConfirmPressed}
+          disabled={isConfirmDisabled}
         />
       </View>
       {renderPicker()}

@@ -12,7 +12,7 @@ export type ComposableFormOptions = {
     inlinePadding?: number;
     backgroundColor?: string;
   };
-  textFields: {
+  textFields?: {
     backgroundColor?: string;
     disabledBackgroundColor?: string;
     floatingLabelColor?: string;
@@ -28,11 +28,11 @@ export type ComposableFormOptions = {
     disabledBorderColor?: string;
     selectionColor?: string;
     errorMessageColor?: string;
-  },
+  };
   checkBoxes?: {
     color?: string;
     urlColor?: string;
-  },
+  };
   labels?: {
     placeholderStyle?: StyleProp<TextStyle>;
     inputStyle?: StyleProp<TextStyle>;
@@ -43,6 +43,8 @@ export type ComposableFormOptions = {
   pickers?: {
     knobColor?: string;
     headerBackgroundColor?: string;
+    headerButtonColor?: string;
+    headerButtonDisabledColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
     renderCustomCancelButton?: () => React.ReactElement<{}>;
   };
@@ -52,18 +54,30 @@ export type ComposableFormOptions = {
     createNewItemTextColor?: string;
     createNewItemIconColor?: string;
   };
+  selectSectionPickers?: {
+    selectedItemTextColor?: string;
+    selectedItemIconColor?: string;
+    createNewItemTextColor?: string;
+    createNewItemIconColor?: string;
+    sectionHeaderColor?: string;
+    sectionHeaderBackgroundColor?: string;
+  };
   segments?: {
     activeItemColor?: string;
-    segmentActiveTextStyle?: StyleProp<TextStyle>;
-    segmentInactiveTextStyle?: StyleProp<TextStyle>;
     backgroundColor?: string;
+    segmentActiveTextStyle?: {
+      color: string;
+    },
+    segmentInactiveTextStyle?: {
+      color: string;
+    }
   };
   toggles?: {
     trackColor?: {
       false: string;
       true: string;
     }
-  }
+  };
 };
 
 export type DefinedComposableFormOptions = {
@@ -89,7 +103,7 @@ export type DefinedComposableFormOptions = {
     selectionColor?: string;
     errorMessageColor?: string;
   };
-  checkBoxes?: {
+  checkBoxes: {
     color?: string;
     urlColor?: string;
   };
@@ -103,6 +117,8 @@ export type DefinedComposableFormOptions = {
   pickers: {
     knobColor?: string;
     headerBackgroundColor?: string;
+    headerButtonColor?: string;
+    headerButtonDisabledColor?: string;
     renderCustomBackground?: () => React.ReactElement<{}>;
     renderCustomCancelButton?: () => React.ReactElement<{}>;
   };
@@ -122,9 +138,13 @@ export type DefinedComposableFormOptions = {
   };
   segments: {
     activeItemColor?: string;
-    segmentActiveTextStyle?: StyleProp<TextStyle>;
-    segmentInactiveTextStyle?: StyleProp<TextStyle>;
     backgroundColor?: string;
+    segmentActiveTextStyle?: {
+      color: string;
+    },
+    segmentInactiveTextStyle?: {
+      color: string;
+    }
   };
   toggles: {
     trackColor?: {
