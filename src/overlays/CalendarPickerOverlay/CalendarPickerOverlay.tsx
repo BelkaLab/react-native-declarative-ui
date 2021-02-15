@@ -1,10 +1,10 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { View } from 'react-native';
+import { withMappedNavigationParams } from 'react-navigation-props-mapper';
 import { SingleDayCalendar } from '../../base/calendar/SingleDayCalendar';
+import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 import { ComposableFormOptions } from '../../options/SharedOptions';
 import { globalStyles } from '../../styles/globalStyles';
-import { withMappedNavigationParams } from 'react-navigation-props-mapper';
-import { IBottomOverlayProps, withBottomOverlay } from '../../hoc/BottomOverlay';
 
 export interface ICalendarPickerOverlayProps {
   mode: 'single-day';

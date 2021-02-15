@@ -50,6 +50,7 @@ declare module 'react-native-declarative-ui' {
       hoursInterval?: number;
       maxMinutes?: number;
       minutesInterval?: number;
+      disableZeroDuration?: boolean;
     }
   }
 
@@ -92,6 +93,8 @@ declare module 'react-native-declarative-ui' {
     pickers?: {
       knobColor?: string;
       headerBackgroundColor?: string;
+      headerButtonColor?: string;
+      headerButtonDisabledColor?: string;
       renderCustomBackground?: () => React.ReactElement<{}>;
       renderCustomCancelButton?: () => React.ReactElement<{}>;
     };
@@ -101,7 +104,7 @@ declare module 'react-native-declarative-ui' {
       createNewItemTextColor?: string;
       createNewItemIconColor?: string;
     };
-    selectSectionPickers: {
+    selectSectionPickers?: {
       selectedItemTextColor?: string;
       selectedItemIconColor?: string;
       createNewItemTextColor?: string;

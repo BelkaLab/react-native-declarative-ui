@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { View } from 'react-native';
 import { Calendar, CalendarTheme, DotMarking } from 'react-native-calendars';
 import { Colors } from '../../../styles/colors';
 
@@ -13,21 +13,23 @@ export interface ISingleDayCalendarProps {
 const CALENDAR_HEIGHT = 350;
 
 const SingleDayCalendar: FunctionComponent<ISingleDayCalendarProps> = (props) => {
+  const {
+    pickedDate,
+    isAlreadyPicked,
+    onPickDate,
+    theme,
+  } = props;
+
   const [markedDate, setMarkedDate] = useState<{ [date: string]: DotMarking; }>(
-    props.isAlreadyPicked && props.pickedDate
+    isAlreadyPicked && pickedDate
       ? {
-        [props.pickedDate]: {
+        [pickedDate]: {
           selected: true
         }
       }
       : {}
   );
-  const [selectedDay, setSelectedDay] = useState<string | undefined>();
-
-  const {
-    theme,
-    onPickDate,
-  } = props;
+  const [selectedDay, setSelectedDay] = useState<string | undefined>(pickedDate);
 
   return (
     <View
@@ -55,24 +57,5 @@ const SingleDayCalendar: FunctionComponent<ISingleDayCalendarProps> = (props) =>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  pickerContainer: {}
-});
-
-const singleDayCalendarStyle: CalendarTheme = {
-  // calendarBackground: Colors.MIDDLE_LIGHT_GRAY,
-  // textSectionTitleColor: Colors.GRAY_TEXT,
-  // selectedDayBackgroundColor: Colors.BLUE_PRIMARY,
-  // selectedDayTextColor: Colors.WHITE,
-  // todayTextColor: Colors.BLUE_PRIMARY,
-  // dayTextColor: Colors.BLACK,
-  // arrowColor: Colors.BLUE_PRIMARY,
-  // monthTextColor: Colors.BLUE_PRIMARY,
-  // textMonthFontWeight: '600',
-  // textDayFontSize: 17,
-  // textMonthFontSize: 17,
-  // textDayHeaderFontSize: 15
-};
 
 export default SingleDayCalendar;
