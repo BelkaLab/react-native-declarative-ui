@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
 import delay from 'lodash.delay';
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { BackHandler, Dimensions, EmitterSubscription, Image, Keyboard, LayoutChangeEvent, NativeEventSubscription, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { BackHandler, Dimensions, Image, Keyboard, LayoutChangeEvent, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Animated from 'react-native-reanimated';
 import { default as BottomSheet } from 'reanimated-bottom-sheet';
@@ -57,8 +57,6 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
     const [isContentEnoughBig, setIsContentEnoughBig] = useState<boolean>(false);
     const [onDismissedCallback, setOnDismissedCallback] = useState<() => void | undefined>();
 
-    const [backButtonSubscription, setBackButtonSubscription] = useState<NativeEventSubscription | undefined>();
-    const [subscriptions, setSubscriptions] = useState<EmitterSubscription[]>([]);
     const [timerId, setTimerId] = useState<number | undefined>();
 
     const { useCode, set, block, cond, debug, greaterOrEq, lessOrEq, call } = Animated;
@@ -101,23 +99,6 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
       ]);
     }, []);
 
-    useEffect(() => {
-      setSubscriptions([
-        Keyboard.addListener('keyboardDidShow', keyboardDidShow),
-        Keyboard.addListener('keyboardDidHide', keyboardDidHide)
-      ]);
-
-      setBackButtonSubscription(BackHandler.addEventListener('hardwareBackPress', handleBackButton));
-
-      return () => {
-        subscriptions.forEach(sub => !!sub && sub.remove());
-
-        if (backButtonSubscription) {
-          backButtonSubscription.remove();
-        }
-      }
-    }, []);
-
     const keyboardDidShow = () => {
       if (bottomSheet.current) {
         // this.bottomSheet.current.snapTo(1);
@@ -134,6 +115,18 @@ export const withBottomOverlay = <P extends OverlayContent & IBottomOverlayProps
       dismissOverlay();
       return true;
     };
+
+    useEffect(() => {
+      const keyboardShowSubscription = Keyboard.addListener('keyboardDidShow', keyboardDidShow);
+      const keyboardHideSubscription = Keyboard.addListener('keyboardDidHide', keyboardDidHide);
+      const backHandlerSubscription = BackHandler.addEventListener('hardwareBackPress', handleBackButton);
+
+      return () => {
+        keyboardShowSubscription.remove();
+        keyboardHideSubscription.remove();
+        backHandlerSubscription.remove();
+      }
+    }, [keyboardDidShow, keyboardDidHide, handleBackButton]);
 
     const dismissOverlay = (onDismissedCallback?: () => void) => {
       setOnDismissedCallback(onDismissedCallback);
