@@ -610,6 +610,7 @@ const ComposableForm = <T extends ComposableItem>(
         errorMessageColor={getComposableFormOptions().textFields.errorMessageColor}
         value={model[field.id] as string | undefined}
         editable={!field.disabled && !(loadingMapper && loadingMapper[field.id])}
+        textContentType={field.textContentType || (field.isPassword ? 'password' : undefined)}
         multiline={field.multiline}
         maxLength={field.maxLength}
         scrollEnabled={false} // fix for trigger scroll on iOS when keyboard opens

@@ -1,5 +1,5 @@
-import { ComposableItem } from './composableItem';
 import { ReturnKeyTypeOptions } from 'react-native';
+import { ComposableItem } from './composableItem';
 
 export type FormField = {
   id: string;
@@ -28,6 +28,7 @@ export type FormField = {
   disabled?: boolean;
   multiline?: boolean;
   isPassword?: boolean;
+  textContentType?: 'none' | 'URL' | 'addressCity' | 'addressCityAndState' | 'addressState' | 'countryName' | 'creditCardNumber' | 'emailAddress' | 'familyName' | 'fullStreetAddress' | 'givenName' | 'jobTitle' | 'location' | 'middleName' | 'name' | 'namePrefix' | 'nameSuffix' | 'nickname' | 'organizationName' | 'postalCode' | 'streetAddressLine1' | 'streetAddressLine2' | 'sublocality' | 'telephoneNumber' | 'username' | 'password' | 'newPassword' | 'oneTimeCode';
   maxLength?: number;
   keyboard?: 'email-address' | 'default';
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
