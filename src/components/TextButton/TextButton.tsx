@@ -30,7 +30,7 @@ export default class TextButton extends Component<ITextButtonProps> {
             </View>
           ) : (
               <TouchableNativeFeedback
-                onPress={onPress}
+                onPress={!disabled ? onPress : undefined}
                 disabled={disabled}
                 style={[styles.touchableContainer, this.props.style]}
               >
@@ -51,7 +51,7 @@ export default class TextButton extends Component<ITextButtonProps> {
           </View>
         ) : (
             <TouchableOpacity
-              onPress={onPress}
+              onPress={!disabled ? onPress : undefined}
               disabled={disabled}
               style={[styles.touchableContainer, this.props.style]}
             >
