@@ -19,154 +19,39 @@ const Stack = createStackNavigator();
 
 export const ComposableFormModals = [
   <Stack.Screen
+    key={SELECT_PICKER_OVERLAY_KEY}
     name={SELECT_PICKER_OVERLAY_KEY}
     component={SelectPickerOverlay}
     options={bottomSheetOptions}
   />,
   <Stack.Screen
+    key={SELECT_PICKER_SECTION_OVERLAY_KEY}
     name={SELECT_PICKER_SECTION_OVERLAY_KEY}
     component={SelectPickerSectionOverlay}
     options={bottomSheetOptions}
   />,
   <Stack.Screen
+    key={AUTOCOMPLETE_PICKER_OVERLAY_KEY}
     name={AUTOCOMPLETE_PICKER_OVERLAY_KEY}
     component={AutocompletePickerOverlay}
     options={bottomSheetOptions}
   />,
   <Stack.Screen
+    key={CALENDAR_PICKER_OVERLAY_KEY}
     name={CALENDAR_PICKER_OVERLAY_KEY}
     component={CalendarPickerOverlay}
     options={bottomSheetOptions}
   />,
   <Stack.Screen
+    key={DURATION_PICKER_OVERLAY_KEY}
     name={DURATION_PICKER_OVERLAY_KEY}
     component={DurationPickerOverlay}
     options={bottomSheetOptions}
   />,
   <Stack.Screen
+    key={MAP_PICKER_OVERLAY_KEY}
     name={MAP_PICKER_OVERLAY_KEY}
     component={MapPickerOverlay}
     options={bottomSheetOptions}
   />,
 ];
-
-// export function showSelectOverlay(passProps: ISelectPickerOverlayProps) {
-//   try {
-//     Navigation.showOverlay({
-//       component: {
-//         name: SELECT_PICKER_OVERLAY_KEY,
-//         passProps: {
-//           ...passProps,
-//           isBackDropMode: true
-//         },
-//         options: {
-//           overlay: {
-//             interceptTouchOutside: false
-//           },
-//           layout: {
-//             backgroundColor: 'transparent'
-//           }
-//         }
-//       }
-//     });
-//   } catch (err) {
-//     console.log('Cannot use RNN showPickerOverlay before installing dependency');
-//   }
-// }
-
-// export function showAutocompleteOverlay(passProps: IAutocompletePickerOverlayProps) {
-//   try {
-//     Navigation.showOverlay({
-//       component: {
-//         name: AUTOCOMPLETE_PICKER_OVERLAY_KEY,
-//         passProps: {
-//           ...passProps,
-//           canExtendFullScreen: true,
-//           hasTextInput: true,
-//           minHeight: 350
-//         },
-//         options: {
-//           overlay: {
-//             interceptTouchOutside: false
-//           },
-//           layout: {
-//             backgroundColor: 'transparent'
-//           }
-//         }
-//       }
-//     });
-//   } catch (err) {
-//     console.log('Cannot use RNN showAutocompleteOverlay before installing dependency');
-//   }
-// }
-
-// export function showCalendarOverlay(passProps: ICalendarPickerOverlayProps) {
-//   try {
-//     Navigation.showOverlay({
-//       component: {
-//         name: CALENDAR_PICKER_OVERLAY_KEY,
-//         passProps,
-//         options: {
-//           overlay: {
-//             interceptTouchOutside: false
-//           },
-//           layout: {
-//             backgroundColor: 'transparent'
-//           }
-//         }
-//       }
-//     });
-//   } catch (err) {
-//     console.log('Cannot use RNN showCalendarOverlay before installing dependency');
-//   }
-// }
-
-// export function showDurationOverlay(passProps: IDurationPickerOverlayProps) {
-//   try {
-//     Navigation.showOverlay({
-//       component: {
-//         name: DURATION_PICKER_OVERLAY_KEY,
-//         passProps: {
-//           ...passProps,
-//           disabledInteraction: Platform.OS === 'android'
-//         },
-//         options: {
-//           overlay: {
-//             interceptTouchOutside: false
-//           },
-//           layout: {
-//             backgroundColor: 'transparent'
-//           }
-//         }
-//       }
-//     });
-//   } catch (err) {
-//     console.log('Cannot use RNN showCalendarOverlay before installing dependency');
-//   }
-// }
-
-// export function showMapOverlay(passProps: IMapPickerOverlayProps) {
-//   try {
-//     Navigation.showOverlay({
-//       component: {
-//         name: MAP_PICKER_OVERLAY_KEY,
-//         passProps: {
-//           ...passProps,
-//           canExtendFullScreen: true,
-//           hasTextInput: true,
-//           minHeight: 350
-//         },
-//         options: {
-//           overlay: {
-//             interceptTouchOutside: true
-//           },
-//           layout: {
-//             backgroundColor: 'transparent'
-//           }
-//         }
-//       }
-//     });
-//   } catch (err) {
-//     console.log('Cannot use RNN showMapOverlay before installing dependency');
-//   }
-// }
