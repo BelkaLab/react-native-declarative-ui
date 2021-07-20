@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "react": "16.8.6",
-    "react-native": "0.59.10",
+    "react-native": "0.62.3",
     "react-native-declarative-ui": "^0.2.0"
   },
   "devDependencies": {
